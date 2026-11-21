@@ -8,7 +8,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { verdict } from '../src/advise.mjs'
-import { ARMS, BASELINE, addArms } from './arms.mjs'
+import { ARMS, BASELINE, EFFORTS, addArms, armOf, effortOf } from './arms.mjs'
 import { collect } from './collect.mjs'
 import { ROOT, flags, outDir, paths, readJson, runsOf, writeJson } from './lib.mjs'
 import { TASKS, taskOf } from './tasks.mjs'
@@ -173,47 +173,72 @@ function signTest(pairs, value) {
   return { less, n, chance: Math.min(1, (2 * tail) / 2 ** n) }
 }
 const chanceText = (t) => (t.chance === null ? 'n/a' : t.chance < 0.001 ? 'under 0.1%' : `${(100 * t.chance).toFixed(t.chance < 0.1 ? 1 : 0)}%`)
-/** The tasks that an arm and the baseline both ran in a round, as pairs of runs. */
-const pairsOf = (a, rep) => (base ? a.runs.filter((r) => r.rep === rep).map((r) => ({ task: r.task, a: r, b: base.runs.find((x) => x.task === r.task && x.rep === rep) })).filter((p) => p.b) : [])
-const pairedRounds = base ? [...new Set(base.runs.filter((r) => r.setup?.paired).map((r) => r.rep))].sort() : []
+/** An arm that differs from the other arms of its model in the effort level only. */
+const plainEffort = (a) => !a.arm.from && !a.arm.only && !a.arm.other && Object.keys(a.arm.settings).every((key) => key === 'model' || key === 'effortLevel')
+/** The runs of an arm in a paired round. */
+const pairedRuns = (a, rep) => a.runs.filter((r) => r.rep === rep && r.setup?.paired)
+/**
+ * The arm that the others of a paired round are set against: the baseline when it ran in the
+ * round, and else the arm at effort xhigh with no other change. So a round of one model's arms
+ * is read against that model at effort xhigh.
+ */
+const referenceOf = (rep) => {
+  const group = whole.filter((a) => pairedRuns(a, rep).length)
+  return group.find((a) => a === base) ?? group.find((a) => plainEffort(a) && effortOf(a.arm) === 'xhigh')
+}
+/** The tasks that two arms both ran in a round, as pairs of runs. The second arm is the baseline, or the one given. */
+const pairsOf = (a, rep, ref = base) => (ref ? a.runs.filter((r) => r.rep === rep).map((r) => ({ task: r.task, a: r, b: ref.runs.find((x) => x.task === r.task && x.rep === rep) })).filter((p) => p.b) : [])
+/** The pairs of a paired round: both runs started at the same moment. */
+const sideBySide = (a, rep, ref) => pairsOf(a, rep, ref).filter((p) => p.a.setup?.paired && p.b.setup?.paired)
+const pairedRounds = [...new Set(whole.flatMap((a) => a.runs.filter((r) => r.setup?.paired).map((r) => r.rep)))].sort()
 const paired = []
 for (const rep of pairedRounds) {
-  const rows = whole.filter((a) => a !== base).map((a) => ({ a, pairs: pairsOf(a, rep).filter((p) => p.a.setup?.paired) })).filter((x) => x.pairs.length)
+  const ref = referenceOf(rep)
+  if (!ref) continue
+  const rows = whole.filter((a) => a !== ref).map((a) => ({ a, pairs: sideBySide(a, rep, ref) })).filter((x) => x.pairs.length)
   if (!rows.length) continue
   const figures = rows.map(({ a, pairs }) => {
     const mine = pairs.map((p) => p.a)
     const theirs = pairs.map((p) => p.b)
     return { arm: a.arm.id, name: a.arm.name, tasks: pairs.length, closed: mine.filter((r) => r.score.closed).length, baselineClosed: theirs.filter((r) => r.score.closed).length, cost: sum(mine, costOf), baselineCost: sum(theirs, costOf), costSign: signTest(pairs, costOf), seconds: sum(mine, seconds), baselineSeconds: sum(theirs, seconds), medianSeconds: median(mine.map(seconds)), baselineMedianSeconds: median(theirs.map(seconds)), timeSign: signTest(pairs, seconds) }
   })
-  paired.push({ round: rep, arms: figures })
+  paired.push({ round: rep, reference: ref.arm.id, arms: figures })
+  // The words for the arm that the others are set against.
+  const it = ref === base ? 'in the baseline' : 'at effort xhigh'
+  const short = ref === base ? 'baseline' : 'effort xhigh'
   say(`## Round ${rep}: every arm started each task at the same moment`)
-  say(`The arms of this round ran side by side on each task, so they ran under the same load. Each arm is set against the baseline (${base.arm.name}) of the same round, on the tasks that both ran.`)
-  say(table(['arm', 'tasks closed (baseline)', 'cost', 'cost in the baseline', 'difference', 'tasks that cost less than in the baseline', 'chance of such a split without a real difference'], figures.map((x) => [x.name, `${x.closed} of ${x.tasks} (${x.baselineClosed})`, money(x.cost), money(x.baselineCost), change(x.baselineCost, x.cost), `${x.costSign.less} of ${x.costSign.n}`, chanceText(x.costSign)])))
-  say(table(['arm', 'time for the tasks', 'time in the baseline', 'difference', 'median time (baseline)', 'tasks that took less time than in the baseline', 'chance of such a split without a real difference'], figures.map((x) => [x.name, `${Math.round(x.seconds)}s`, `${Math.round(x.baselineSeconds)}s`, change(x.baselineSeconds, x.seconds), `${Math.round(x.medianSeconds)}s (${Math.round(x.baselineMedianSeconds)}s)`, `${x.timeSign.less} of ${x.timeSign.n}`, chanceText(x.timeSign)])))
+  say(`The arms of this round ran side by side on each task, so they ran under the same load. Each arm is set against ${ref === base ? `the baseline (${ref.arm.name})` : `the arm "${ref.arm.name}"`} of the same round, on the tasks that both ran.`)
+  say(table(['arm', `tasks closed (${short})`, 'cost', `cost ${it}`, 'difference', `tasks that cost less than ${it}`, 'chance of such a split without a real difference'], figures.map((x) => [x.name, `${x.closed} of ${x.tasks} (${x.baselineClosed})`, money(x.cost), money(x.baselineCost), change(x.baselineCost, x.cost), `${x.costSign.less} of ${x.costSign.n}`, chanceText(x.costSign)])))
+  say(table(['arm', 'time for the tasks', `time ${it}`, 'difference', `median time (${short})`, `tasks that took less time than ${it}`, 'chance of such a split without a real difference'], figures.map((x) => [x.name, `${Math.round(x.seconds)}s`, `${Math.round(x.baselineSeconds)}s`, change(x.baselineSeconds, x.seconds), `${Math.round(x.medianSeconds)}s (${Math.round(x.baselineMedianSeconds)}s)`, `${x.timeSign.less} of ${x.timeSign.n}`, chanceText(x.timeSign)])))
   say('The last column is a sign test: how likely it is to see the tasks split at least this one-sidedly when the arm makes no difference. Under 5% is the usual line for a real difference. It says nothing about how large the difference is.')
 }
 
-// 3c. The effort levels of the baseline's model, each next to the baseline of the same round.
-const EFFORTS = ['xhigh', 'high', 'medium', 'low']
-const baseModel = base?.arm.settings?.model
-const onlyEffort = (a) => !a.arm.from && !a.arm.only && a.arm.settings?.model === baseModel && Object.keys(a.arm.settings).every((key) => key === 'model' || key === 'effortLevel') && EFFORTS.includes(a.arm.settings.effortLevel)
+// 3c. The effort levels of each model, each next to the same model at effort xhigh.
+const NOT_SET = 'not set'
+/** The effort level of an arm, or "not set" for an arm that leaves the level to Claude Code. */
+const levelOf = (a) => effortOf(a.arm) ?? NOT_SET
+const levelOrder = (a) => (EFFORTS.includes(levelOf(a)) ? EFFORTS.indexOf(levelOf(a)) : EFFORTS.length)
+const outputOf = (r) => sum(Object.values(r.claude?.modelUsage ?? {}), (u) => u.outputTokens ?? 0)
 const efforts = []
-if (base) {
-  const figures = (effort, runs, pairs, mine = pairs.map((p) => p.a), theirs = pairs.map((p) => p.b)) => ({ effort, runs, tasks: pairs.length, closed: mine.filter((r) => r.score.closed).length, quality: sum(mine, (r) => r.score.quality) / mine.length, cost: sum(mine, costOf), baselineCost: sum(theirs, costOf), medianSeconds: median(mine.map(seconds)), turns: sum(mine, (r) => r.claude?.turns ?? 0) })
-  for (const a of whole.filter(onlyEffort).sort((x, y) => EFFORTS.indexOf(x.arm.settings.effortLevel) - EFFORTS.indexOf(y.arm.settings.effortLevel))) {
-    const effort = a.arm.settings.effortLevel
-    // The runs outside a paired round: the first run of each task, against the baseline's first run.
-    const loose = first(a).filter((r) => !r.setup?.paired).map((r) => ({ a: r, b: first(base).find((x) => x.task === r.task) })).filter((p) => p.b)
-    if (loose.length) efforts.push({ ...figures(effort, 'the first run of each task', loose), sameLoad: a === base })
+for (const model of [...new Set(whole.filter(plainEffort).map((a) => a.arm.settings.model))]) {
+  const group = whole.filter((a) => plainEffort(a) && a.arm.settings.model === model).sort((x, y) => levelOrder(x) - levelOrder(y))
+  const ref = group.find((a) => levelOf(a) === 'xhigh')
+  if (!ref || group.length < 2) continue
+  const figures = (a, runs, pairs, sameLoad, mine = pairs.map((p) => p.a), theirs = pairs.map((p) => p.b)) => ({ model, arm: a.arm.id, effort: levelOf(a), runs, tasks: pairs.length, closed: mine.filter((r) => r.score.closed).length, quality: sum(mine, (r) => r.score.quality) / mine.length, cost: sum(mine, costOf), baselineCost: sum(theirs, costOf), medianSeconds: median(mine.map(seconds)), seconds: sum(mine, seconds), turns: sum(mine, (r) => r.claude?.turns ?? 0), outputTokens: sum(mine, outputOf), sameLoad })
+  const rows = []
+  for (const a of group) {
+    // The runs outside a paired round: the first run of each task, against the first run of each task at xhigh.
+    const loose = first(a).filter((r) => !r.setup?.paired).map((r) => ({ a: r, b: first(ref).find((x) => x.task === r.task) })).filter((p) => p.b)
+    if (loose.length) rows.push(figures(a, 'the first run of each task', loose, a === ref))
     for (const rep of pairedRounds) {
-      const pairs = pairsOf(a, rep).filter((p) => p.a.setup?.paired)
-      if (pairs.length) efforts.push({ ...figures(effort, `round ${rep}`, pairs), sameLoad: true })
+      const pairs = sideBySide(a, rep, ref)
+      if (pairs.length) rows.push(figures(a, `round ${rep}`, pairs, true))
     }
   }
-}
-if (efforts.some((e) => e.effort !== base.arm.settings.effortLevel)) {
-  say(`## The effort levels of ${baseModel}`)
-  say(table(['effort', 'runs', 'tasks closed', 'quality', 'cost', 'share of the cost at the baseline effort, same runs', 'median time', 'turns'], efforts.map((e) => [e.effort, e.runs, `${e.closed} of ${e.tasks}`, pct(e.quality), money(e.cost), e.baselineCost ? pct(e.cost / e.baselineCost) : 'n/a', `${Math.round(e.medianSeconds)}s${e.sameLoad ? '' : ' (not under the same load as the baseline)'}`, String(e.turns)])))
+  efforts.push(...rows)
+  say(`## The effort levels of ${model}`)
+  say(table(['effort', 'runs', 'tasks closed', 'quality', 'cost', 'cost as a share of effort xhigh, on the same tasks', 'median time', 'time for the tasks', 'turns', 'output tokens'], rows.map((e) => [e.effort, `${e.runs}${e.sameLoad ? '' : ' (its time was not under the same load as xhigh)'}`, `${e.closed} of ${e.tasks}`, pct(e.quality), money(e.cost), e.baselineCost ? pct(e.cost / e.baselineCost) : 'n/a', `${Math.round(e.medianSeconds)}s`, `${Math.round(e.seconds)}s`, String(e.turns), e.outputTokens.toLocaleString('en-US')])))
+  say(`A row for a round sets the level against effort xhigh in the same round, where both started each task at the same moment. A row for "the first run of each task" sets it against the first run of each task at effort xhigh, which can be from another day: its cost can be compared, and its time cannot.${group.some((a) => levelOf(a) === NOT_SET) ? ' "not set" is the arm that names no effort level, so Claude Code picks one.' : ''}`)
 }
 
 // 3d. One change alone on the baseline, on the tasks that the change acts on.
@@ -344,15 +369,26 @@ if (advised.length) {
   say('The best case is the cost of the arm\'s first runs minus the cost of the cheapest arm that closed each task. It is known only after the fact. It shows how much of the possible saving the proposals name.')
 }
 
-// 7. The directions: what "widal advise" proposed from the baseline, and what happened when it was applied.
-const stateFile = join(paths(out).view('widal-on').root, 'widal-on.json')
-const state = readJson(stateFile)
-let directions
-if (state) {
-  say('## The directions: what Widal.Code proposed, and what it did')
+// 7. The directions: what "widal advise" proposed from an arm's runs, and what happened when it was applied.
+/**
+ * The part of the report on one arm with Widal.Code on. "Before" is the arm that it starts from
+ * (`from` in arms.mjs): the tool advised from that arm's runs. Returns what goes into results.json.
+ */
+function directionsOf(arm) {
+  const root = paths(out).view(arm.id).root
+  const state = readJson(join(root, 'widal-on.json'))
+  if (!state) return undefined
+  const on = arms.find((a) => a.arm.id === arm.id)
+  const from = arms.find((a) => a.arm.id === arm.from)
+  // The words for the arm before the changes.
+  const main = arm.from === BASELINE
+  const before = main ? 'baseline' : armOf(arm.from).name
+  const theBefore = main ? 'the baseline' : armOf(arm.from).name
+  let directions
+  say(main ? '## The directions: what Widal.Code proposed, and what it did' : `## The directions for ${before}: what Widal.Code proposed, and what it did`)
   say(
     table(
-      ['proposal', 'saving the tool expects', 'share of the baseline', 'can the tool apply it', 'applied'],
+      ['proposal', 'saving the tool expects', main ? 'share of the baseline' : 'share of the spend the tool saw', 'can the tool apply it', 'applied'],
       state.proposals.map((p) => {
         const a = state.applied.find((x) => x.proposal === p.id)
         return [p.title, p.saving === null ? 'no amount yet' : money(p.saving), p.share === null ? 'n/a' : pct(p.share), p.action ? `yes: widal apply ${[p.action, ...p.args].join(' ')}` : 'no, by hand', a ? (a.status === 0 ? 'yes' : 'failed') : 'no']
@@ -360,48 +396,53 @@ if (state) {
     ),
   )
   say(`Settings before: \`${JSON.stringify(state.settingsBefore)}\``, `Settings after "widal apply": \`${JSON.stringify(state.settingsAfter)}\``)
-  if (on && base) {
-    const pairs = TASKS.map((task) => ({ task, b: first(base).find((r) => r.task === task.id), w: first(on).find((r) => r.task === task.id) })).filter((p) => p.b && p.w)
+  if (on && from) {
+    // Each task in the arm's first run, next to the run before the changes in the same round, or else the first run before the changes.
+    const pairs = TASKS.map((task) => {
+      const w = first(on).find((r) => r.task === task.id)
+      return { task, w, b: w && (from.runs.find((r) => r.task === task.id && r.rep === w.rep) ?? first(from).find((r) => r.task === task.id)) }
+    }).filter((p) => p.b && p.w)
     const b = stats(pairs.map((p) => p.b))
     const w = stats(pairs.map((p) => p.w))
     directions = { tasks: pairs.length, baseline: b, widalOn: w, saved: b.cost - w.cost, expected: sum(state.applied, (a) => a.saving ?? 0) }
     say('### The same tasks before and after')
     say(
       table(
-        ['task', 'baseline', 'Widal.Code on', 'change in cost'],
+        ['task', before, 'Widal.Code on', 'change in cost'],
         [
           ...pairs.map((p) => [p.task.id, `${p.b.score.closed ? 'closed' : `open (${p.b.score.passed}/${p.b.score.total})`} ${money(costOf(p.b))} ${Math.round(p.b.wallMs / 1000)}s`, `${p.w.score.closed ? 'closed' : `open (${p.w.score.passed}/${p.w.score.total})`} ${money(costOf(p.w))} ${Math.round(p.w.wallMs / 1000)}s`, costOf(p.b) ? `${costOf(p.w) < costOf(p.b) ? '-' : '+'}${pct(Math.abs(costOf(p.w) - costOf(p.b)) / costOf(p.b))}` : 'n/a']),
           ['all', `${b.closed} of ${b.runs} closed, ${money(b.cost)}, ${Math.round(b.seconds)}s`, `${w.closed} of ${w.runs} closed, ${money(w.cost)}, ${Math.round(w.seconds)}s`, b.cost ? `${w.cost < b.cost ? '-' : '+'}${pct(Math.abs(w.cost - b.cost) / b.cost)}` : 'n/a'],
         ],
       ),
     )
-    say(`Measured saving: ${money(b.cost - w.cost)} (${b.cost ? pct((b.cost - w.cost) / b.cost) : 'n/a'} of the baseline). The tool expected: ${state.applied.some((a) => a.saving === null) ? 'no amount for at least one change, and ' : ''}${money(directions.expected)} for the changes with an amount.`)
+    say(`Measured saving: ${money(b.cost - w.cost)} (${b.cost ? pct((b.cost - w.cost) / b.cost) : 'n/a'} of ${theBefore}). The tool expected: ${state.applied.some((a) => a.saving === null) ? 'no amount for at least one change, and ' : ''}${money(directions.expected)} for the changes with an amount.`)
 
     // What each change did. The changes were applied together, so each one is read from the tasks it can act on.
     const session = (a, r) => a.view?.sessions.find((x) => x.id === r?.claude?.session)
     const pair = (id) => pairs.find((p) => p.task.id === id)
+    const applied = (action) => state.applied.find((a) => a.action === action)
     const rows = []
     const plainPairs = pairs.filter((p) => !p.task.id.startsWith('s'))
-    if (plainPairs.length) {
-      const before = sum(plainPairs, (p) => costOf(p.b))
+    if (plainPairs.length && applied('effort-default')) {
+      const cost = sum(plainPairs, (p) => costOf(p.b))
       const after = sum(plainPairs, (p) => costOf(p.w))
-      rows.push(['A lower effort (the only change that acts on the tasks without built-in waste)', `${plainPairs.length} tasks: ${money(before)}`, money(after), change(before, after), state.applied.find((a) => a.action === 'effort-default')?.saving === null ? 'no amount' : money(state.applied.find((a) => a.action === 'effort-default')?.saving)])
+      rows.push(['A lower effort (the only change that acts on the tasks without built-in waste)', `${plainPairs.length} tasks: ${money(cost)}`, money(after), change(cost, after), applied('effort-default').saving === null ? 'no amount' : money(applied('effort-default').saving)])
     }
     const s1 = pair('s1')
-    if (s1 && session(base, s1.b) && session(on, s1.w)) {
-      const x = session(base, s1.b)
+    if (applied('subagent-model') && s1 && session(from, s1.b) && session(on, s1.w)) {
+      const x = session(from, s1.b)
       const y = session(on, s1.w)
-      rows.push([`A cheaper model for subagents (task s1, the cost of the subagents alone; before on ${x.subagentModels.join(', ') || 'none'}, after on ${y.subagentModels.join(', ') || 'none'})`, `${money(x.subagentCost)} in ${x.subagentCalls} calls`, `${money(y.subagentCost)} in ${y.subagentCalls} calls`, change(x.subagentCost, y.subagentCost), money(state.applied.find((a) => a.action === 'subagent-model')?.saving)])
+      rows.push([`A cheaper model for subagents (task s1, the cost of the subagents alone; before on ${x.subagentModels.join(', ') || 'none'}, after on ${y.subagentModels.join(', ') || 'none'})`, `${money(x.subagentCost)} in ${x.subagentCalls} calls`, `${money(y.subagentCost)} in ${y.subagentCalls} calls`, change(x.subagentCost, y.subagentCost), money(applied('subagent-model').saving)])
     }
     const s2 = pair('s2')
     const t2 = pair('t2')
-    if (s2 && t2) rows.push(['A cap on long command output (task s2; task t2 is the same work without the long output, and changed by ' + change(costOf(t2.b), costOf(t2.w)) + ')', money(costOf(s2.b)), money(costOf(s2.w)), change(costOf(s2.b), costOf(s2.w)), money(state.applied.find((a) => a.action === 'bash-output-cap')?.saving)])
+    if (applied('bash-output-cap') && s2 && t2) rows.push(['A cap on long command output (task s2; task t2 is the same work without the long output, and changed by ' + change(costOf(t2.b), costOf(t2.w)) + ')', money(costOf(s2.b)), money(costOf(s2.w)), change(costOf(s2.b), costOf(s2.w)), money(applied('bash-output-cap').saving)])
     if (rows.length) {
       say('### What each change did')
       say(table(['change', 'before', 'after', 'measured', 'the tool expected'], rows))
     }
   }
-  const hookLog = join(paths(out).view('widal-on').root, 'hooks.jsonl')
+  const hookLog = join(root, 'hooks.jsonl')
   if (existsSync(hookLog)) {
     const calls = readFileSync(hookLog, 'utf8').trim().split('\n').filter(Boolean).map((l) => JSON.parse(l))
     const byHook = new Map()
@@ -438,7 +479,11 @@ if (state) {
     directions = { ...(directions ?? {}), measure: measured }
     say(`"widal undo" put the settings back as they were: ${state.undoPutSettingsBack ? 'yes' : 'no'}.`)
   }
+  return { arm: arm.id, from: arm.from, directions, proposals: state.proposals, applied: state.applied }
 }
+// The arm on the baseline first, then the arms on another model.
+const widalOn = ARMS.filter((arm) => arm.from && arm.plugin).map(directionsOf).filter(Boolean)
+const onBaseline = widalOn.find((x) => x.from === BASELINE)
 
 console.log(lines.join('\n'))
 writeJson(join(out, 'results.json'), {
@@ -451,7 +496,9 @@ writeJson(join(out, 'results.json'), {
   alone: single.map((x) => ({ arm: x.arm, task: x.task, round: x.round, closed: x.run.score.closed, cost: costOf(x.run), seconds: seconds(x.run), baselineCost: x.baseline ? costOf(x.baseline) : null, baselineSeconds: x.baseline ? seconds(x.baseline) : null, allCost: x.all ? costOf(x.all) : null })),
   trust: checked,
   alike,
-  directions,
-  proposals: state?.proposals,
-  applied: state?.applied,
+  // The arm with Widal.Code on that starts from the baseline, and then every such arm.
+  directions: onBaseline?.directions,
+  proposals: onBaseline?.proposals,
+  applied: onBaseline?.applied,
+  widalOn,
 })

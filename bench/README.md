@@ -147,6 +147,20 @@ The report sets each arm of a paired round against the baseline of the same roun
 for time, and adds a sign test: how likely such a split of the tasks is when the arm makes no
 difference. Cost can be compared in any round, because it comes from the token counts.
 
+A paired round does not need the baseline. In a round without it, the report sets each arm against
+the arm at effort xhigh with no other change, so a round of one model's arms is read against that
+model at effort xhigh. Give each group of arms that runs side by side a round number of its own:
+the report takes all arms with paired runs in round 4 as one group.
+
+```
+node bench/run.mjs --out <folder> --arms sonnet-xhigh,sonnet-low,sonnet-medium,sonnet-high,sonnet-max,sonnet-widal-on --round 4 --paired
+```
+
+For each model with arms at more than one effort level, the report has a table of the levels: the
+tasks closed, the cost, the cost as a share of effort xhigh on the same tasks, the time, the turns
+and the output tokens. For each arm with Widal.Code on, it shows what the tool proposed from the
+runs of the arm it starts from, what it applied, and the same tasks before and after.
+
 ## Run another tool on the same tasks
 
 `--arms-file <file>` adds arms from a JSON file. An arm there is the way to run another tool on the
