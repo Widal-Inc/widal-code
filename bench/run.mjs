@@ -67,7 +67,7 @@ function sessionEnv(arm) {
 function settingsFile(arm) {
   const file = P.settings(arm.id)
   if (arm.from) {
-    if (!existsSync(file)) throw new Error(`The arm "${arm.id}" has no settings yet. Run first: node bench/widal-on.mjs --out ${out}`)
+    if (!existsSync(file)) throw new Error(`The arm "${arm.id}" has no settings yet. Run first: node bench/widal-on.mjs --out ${out} --arm ${arm.id}`)
     return file
   }
   writeJson(file, settingsOf(arm))
@@ -129,6 +129,8 @@ async function runOne(arm, task, rep) {
   if (arm.plugin) linkLogs(out, arm.id, arm.id, { early: true })
 
   const args = ['-p', task.prompt, '--output-format', 'json', '--setting-sources', 'project', '--settings', settingsFile(arm), '--strict-mcp-config', '--mcp-config', '{"mcpServers":{}}', '--max-budget-usd', String(budget)]
+  // An effort level that the settings file cannot name (max) goes on the command line.
+  if (arm.effort) args.push('--effort', arm.effort)
   if (arm.plugin) args.push('--plugin-dir', P.plugin(arm.id))
   if (arm.pluginDir) args.push('--plugin-dir', arm.pluginDir)
   if (arm.systemPrompt) args.push('--append-system-prompt', arm.systemPrompt)
@@ -150,6 +152,8 @@ async function runOne(arm, task, rep) {
   cpSync(work, kept, { recursive: true, filter: (path) => !path.endsWith('/.git') })
   const record = {
     arm: arm.id, task: task.id, taskNumber: task.number, taskHash: taskHash(task), rep, ticket, branch, cwd: work, setup, settings: readJson(settingsFile(arm)),
+    // The effort level that the session got on the command line, when the arm names one.
+    ...(arm.effort ? { effort: arm.effort } : {}),
     // An arm of an arms file: what it added to the session, next to the settings.
     ...(arm.other ? { other: { name: arm.name, pluginDir: arm.pluginDir, tools: arm.tools, path: arm.path, env: arm.env && Object.keys(arm.env), systemPrompt: arm.systemPrompt } } : {}),
     started: new Date(started).toISOString(), wallMs: ended - started, exit: r.status, timedOut: r.timedOut,

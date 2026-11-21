@@ -2,6 +2,8 @@
 // whether Widal.Code is on. Each arm is a settings file that Claude Code gets with --settings.
 //
 // `number` goes into the ticket key of each run, so that the spend per ticket can be checked.
+// `effort` is an effort level that the sessions get with "--effort": Claude Code's "effortLevel"
+// setting takes low, medium, high and xhigh, and not max.
 import { readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 
@@ -24,7 +26,32 @@ export const ARMS = [
   // One change of Widal.Code alone on the baseline, on the tasks that the change acts on (`only`).
   { id: 'fable-sub-sonnet', number: 9, name: 'Fable 5.2 xhigh, subagents on Sonnet 5.5', extra: true, only: ['s1'], settings: { model: 'claude-fable-5-2', effortLevel: 'xhigh', env: { CLAUDE_CODE_SUBAGENT_MODEL: 'claude-sonnet-5-5' } } },
   { id: 'fable-cap', number: 10, name: 'Fable 5.2 xhigh, command output capped', extra: true, only: ['t2', 's2'], settings: { model: 'claude-fable-5-2', effortLevel: 'xhigh', bashOutputMaxChars: 10000 } },
+  // The other effort levels of the four models, so that every level of every model can be read.
+  { id: 'fable-max', number: 11, name: 'Fable 5.2, effort max', extra: true, effort: 'max', settings: { model: 'claude-fable-5-2' } },
+  { id: 'opus-low', number: 12, name: 'Opus 5.5, effort low', extra: true, settings: { model: 'claude-opus-5-5', effortLevel: 'low' } },
+  { id: 'opus-medium', number: 13, name: 'Opus 5.5, effort medium', extra: true, settings: { model: 'claude-opus-5-5', effortLevel: 'medium' } },
+  { id: 'opus-high', number: 14, name: 'Opus 5.5, effort high', extra: true, settings: { model: 'claude-opus-5-5', effortLevel: 'high' } },
+  { id: 'opus-max', number: 15, name: 'Opus 5.5, effort max', extra: true, effort: 'max', settings: { model: 'claude-opus-5-5' } },
+  { id: 'sonnet-low', number: 16, name: 'Sonnet 5.5, effort low', extra: true, settings: { model: 'claude-sonnet-5-5', effortLevel: 'low' } },
+  { id: 'sonnet-medium', number: 17, name: 'Sonnet 5.5, effort medium', extra: true, settings: { model: 'claude-sonnet-5-5', effortLevel: 'medium' } },
+  { id: 'sonnet-high', number: 18, name: 'Sonnet 5.5, effort high', extra: true, settings: { model: 'claude-sonnet-5-5', effortLevel: 'high' } },
+  { id: 'sonnet-max', number: 19, name: 'Sonnet 5.5, effort max', extra: true, effort: 'max', settings: { model: 'claude-sonnet-5-5' } },
+  // The numbers 20 to 99 are for the arms of an arms file.
+  { id: 'haiku-low', number: 100, name: 'Haiku 5.5, effort low', extra: true, settings: { model: 'claude-haiku-5-5', effortLevel: 'low' } },
+  { id: 'haiku-medium', number: 101, name: 'Haiku 5.5, effort medium', extra: true, settings: { model: 'claude-haiku-5-5', effortLevel: 'medium' } },
+  { id: 'haiku-high', number: 102, name: 'Haiku 5.5, effort high', extra: true, settings: { model: 'claude-haiku-5-5', effortLevel: 'high' } },
+  { id: 'haiku-xhigh', number: 103, name: 'Haiku 5.5, effort xhigh', extra: true, settings: { model: 'claude-haiku-5-5', effortLevel: 'xhigh' } },
+  { id: 'haiku-max', number: 104, name: 'Haiku 5.5, effort max', extra: true, effort: 'max', settings: { model: 'claude-haiku-5-5' } },
+  // Widal.Code on for another model: the tool advises from that arm's runs (bench/widal-on.mjs --arm <id>).
+  { id: 'opus-widal-on', number: 105, name: 'Opus 5.5 xhigh, Widal.Code on', extra: true, from: 'opus-xhigh', plugin: true },
+  { id: 'sonnet-widal-on', number: 106, name: 'Sonnet 5.5 xhigh, Widal.Code on', extra: true, from: 'sonnet-xhigh', plugin: true },
 ]
+
+/** The effort levels of Claude Code, lowest first. */
+export const EFFORTS = ['low', 'medium', 'high', 'xhigh', 'max']
+
+/** The effort level an arm sets, or undefined when it leaves the level to Claude Code. */
+export const effortOf = (arm) => arm.effort ?? arm.settings?.effortLevel
 
 /** The arm that the others are compared with. */
 export const BASELINE = 'fable-xhigh'

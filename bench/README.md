@@ -92,16 +92,24 @@ An arm is one way to run the tasks (`arms.mjs`): Fable 5.2 at effort xhigh (the 
 "Widal.Code on" means: `widal advise` reads the baseline's sessions, `widal apply` runs for every
 proposal that the tool can apply itself, and Widal.Code's hooks run in the sessions.
 
-Four more arms run only when `--arms` names them:
+More arms run only when `--arms` names them:
 
 | arm | what it is | tasks |
 |---|---|---|
-| `fable-high`, `fable-medium` | The baseline at effort high and at effort medium, so that the cost of each effort level can be read. | all |
+| `fable-high`, `fable-medium`, `fable-max` | The baseline at the other effort levels, so that the cost of each effort level can be read. | all |
+| `opus-low`, `opus-medium`, `opus-high`, `opus-max` | Opus 5.5 at the other effort levels. | all |
+| `sonnet-low`, `sonnet-medium`, `sonnet-high`, `sonnet-max` | Sonnet 5.5 at the other effort levels. | all |
+| `haiku-low`, `haiku-medium`, `haiku-high`, `haiku-xhigh`, `haiku-max` | Haiku 5.5 at each effort level. The arm `haiku` sets no level. | all |
+| `opus-widal-on`, `sonnet-widal-on` | Opus 5.5 and Sonnet 5.5 at effort xhigh with Widal.Code on. The tool advises from the runs of `opus-xhigh` or `sonnet-xhigh`. | all |
 | `fable-sub-sonnet` | The baseline with one change alone: subagents run on Sonnet 5.5. | s1 |
 | `fable-cap` | The baseline with one change alone: command output is cut at 10,000 characters. | t2, s2 |
 
 The last two run only the tasks that their change acts on (`only` in `arms.mjs`). They show what
 one of Widal.Code's changes does without the others.
+
+Each of the four models has an arm at every effort level: low, medium, high, xhigh and max. Claude
+Code's `effortLevel` setting does not take `max`, so an arm at max starts its sessions with
+`--effort max` (`effort` in `arms.mjs`).
 
 ## Run it
 
@@ -115,6 +123,10 @@ node bench/run.mjs --out <folder> --arms widal-on      # the same tasks with Wid
 node bench/widal-on.mjs --out <folder> --undo          # measure, take the changes back, check the settings
 node bench/report.mjs --out <folder>                   # the results
 ```
+
+For Widal.Code on another model, name the arm: `node bench/widal-on.mjs --out <folder> --arm
+opus-widal-on`, after `opus-xhigh` has run, and then `node bench/run.mjs --out <folder> --arms
+opus-xhigh,opus-widal-on --round 2 --paired`.
 
 Useful flags of `run.mjs`: `--arms a,b`, `--tasks t1,t2`, `--reps 3` (each task several times),
 `--budget 6` (dollars per session), `--minutes 30` (time limit per session), and `--lane b` (a

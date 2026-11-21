@@ -1,7 +1,11 @@
-// Turns Widal.Code on for the arm "widal-on", the way a person would after a period of work.
+// Turns Widal.Code on for an arm, the way a person would after a period of work.
 //
 //   node bench/widal-on.mjs --out <folder>          advise from the baseline's runs, apply, and set up the hooks
 //   node bench/widal-on.mjs --out <folder> --undo   ask the tool to measure, take the changes back, and check the settings
+//   node bench/widal-on.mjs --out <folder> --arm opus-widal-on   the same for another arm with Widal.Code on
+//
+// The arm is "widal-on", or the one that --arm names. Its `from` in bench/arms.mjs is the arm
+// whose runs the tool advises from. This text calls that arm the baseline.
 //
 // The first form, after the baseline arm has run:
 // 1. "widal advise --json" on the baseline's sessions gives the proposals.
@@ -14,12 +18,15 @@
 // folder and a Claude Code folder inside the folder of the benchmark run.
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { BASELINE, armOf, settingsOf } from './arms.mjs'
+import { armOf, settingsOf } from './arms.mjs'
 import { collect, linkLogs, widal } from './collect.mjs'
 import { ROOT, flags, outDir, paths, readJson, viewEnv, writeJson } from './lib.mjs'
 
-const ARM = 'widal-on'
 const f = flags()
+const ARM = typeof f.arm === 'string' ? f.arm : 'widal-on'
+if (!armOf(ARM).from || !armOf(ARM).plugin) throw new Error(`The arm "${ARM}" is not an arm with Widal.Code on.`)
+/** The arm whose runs the tool advises from, and whose settings the changes start from. */
+const BASELINE = armOf(ARM).from
 const out = outDir(f)
 const P = paths(out)
 const env = viewEnv(out, ARM)

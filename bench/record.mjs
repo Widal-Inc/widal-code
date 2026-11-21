@@ -106,7 +106,7 @@ export function publicRecord(run, settings = run.settings) {
     day: text(String(run.started ?? '').slice(0, 10), 'day', 'day'),
     settings: {
       model: text(own?.model, 'model', 'settings.model', { optional: true }),
-      effort: text(own?.effortLevel, 'id', 'settings.effort', { optional: true }),
+      effort: text(run.effort ?? arm.effort ?? own?.effortLevel, 'id', 'settings.effort', { optional: true }),
       subagentModel: text(own?.env?.CLAUDE_CODE_SUBAGENT_MODEL, 'model', 'settings.subagentModel', { optional: true }),
       bashOutputMaxChars: number(own?.bashOutputMaxChars),
       widalCodeHooks: arm.plugin === true,
