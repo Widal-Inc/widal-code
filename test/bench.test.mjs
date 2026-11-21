@@ -8,7 +8,7 @@ import { join } from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 import { gunzipSync } from 'node:zlib'
-import { ARMS, addArms } from '../bench/arms.mjs'
+import { ARMS, EFFORTS, addArms, effortOf, settingsOf } from '../bench/arms.mjs'
 import { publicRecord, taskHash } from '../bench/record.mjs'
 import { sendRecords } from '../bench/send.mjs'
 import { score, startState } from '../bench/score.mjs'
@@ -61,6 +61,29 @@ test('the arms have different ids and numbers, and an arm names only tasks that 
   for (const arm of ARMS) if (arm.only) assert.equal(arm.extra, true)
 })
 
+test('each of the four models has an arm at every effort level, and "max" goes on the command line', () => {
+  const plain = ARMS.filter((arm) => !arm.from && !arm.only && effortOf(arm) && Object.keys(arm.settings).every((key) => key === 'model' || key === 'effortLevel'))
+  for (const model of ['claude-fable-5-2', 'claude-opus-5-5', 'claude-sonnet-5-5', 'claude-haiku-5-5']) {
+    assert.deepEqual(plain.filter((arm) => arm.settings.model === model).map(effortOf).sort(), [...EFFORTS].sort(), `the effort levels of ${model}`)
+  }
+  for (const arm of ARMS) {
+    // Claude Code's "effortLevel" setting does not take "max": such an arm names the level as `effort`.
+    if (arm.settings?.effortLevel) assert.ok(['low', 'medium', 'high', 'xhigh'].includes(arm.settings.effortLevel), arm.id)
+    if (arm.effort) assert.deepEqual([arm.effort, arm.settings.effortLevel], ['max', undefined], arm.id)
+  }
+})
+
+test('an arm with Widal.Code on starts from an arm that is there, and is never part of a run that names no arms', () => {
+  const on = ARMS.filter((arm) => arm.from)
+  assert.deepEqual(on.map((arm) => arm.id), ['widal-on', 'opus-widal-on', 'sonnet-widal-on'])
+  for (const arm of on) {
+    const from = ARMS.find((a) => a.id === arm.from)
+    assert.ok(from && !from.from && !from.only, arm.id)
+    assert.equal(arm.plugin, true)
+    assert.equal(settingsOf(arm).model, from.settings.model)
+  }
+})
+
 // A run record as bench/run.mjs writes it, with text in every place that must not be shared.
 const SECRET = 'do-not-share'
 const runRecord = () => ({
@@ -93,6 +116,13 @@ test('the record of a run that may be shared holds numbers, ids and versions, an
   const walk = (value) => (typeof value === 'string' ? texts.push(value) : value && typeof value === 'object' ? Object.values(value).forEach(walk) : undefined)
   walk(record)
   for (const value of texts) assert.match(value, /^[A-Za-z0-9][A-Za-z0-9.:+ _-]{0,79}$/)
+})
+
+test('the record of a run at effort max names that level', () => {
+  const run = { ...runRecord(), arm: 'opus-max', effort: 'max', settings: { model: 'claude-opus-5-5' } }
+  assert.deepEqual(publicRecord(run).settings, { model: 'claude-opus-5-5', effort: 'max', subagentModel: null, bashOutputMaxChars: null, widalCodeHooks: false })
+  // A record made from the arm alone, without the settings of the run.
+  assert.equal(publicRecord({ ...run, effort: undefined, settings: undefined }).settings.effort, 'max')
 })
 
 test('a run with a text in the wrong form gives no record', () => {
