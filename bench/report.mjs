@@ -1,6 +1,6 @@
 // The results of a benchmark run, as Markdown on the screen and as <folder>/results.json.
 //
-//   node bench/report.mjs --out <folder> [--rate 100] [--review 5]
+//   node bench/report.mjs --out <folder> [--rate 100] [--review 5] [--arms-file <file>]
 //
 // --rate is what an hour of an engineer costs, in dollars. --review is the minutes a person needs
 // to look at what an agent left, for every run, closed or not. Both are assumptions: they only
@@ -8,13 +8,15 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { verdict } from '../src/advise.mjs'
-import { ARMS, BASELINE } from './arms.mjs'
+import { ARMS, BASELINE, addArms } from './arms.mjs'
 import { collect } from './collect.mjs'
 import { ROOT, flags, outDir, paths, readJson, runsOf, writeJson } from './lib.mjs'
 import { TASKS, taskOf } from './tasks.mjs'
 
 const f = flags()
 const out = outDir(f)
+// The arms of an arms file are in the report when the same file is given here.
+if (typeof f['arms-file'] === 'string') addArms(f['arms-file'], out)
 const RATE = Number(f.rate ?? 100)
 const REVIEW = Number(f.review ?? 5)
 

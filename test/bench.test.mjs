@@ -1,14 +1,14 @@
 // The benchmark's tasks (bench/): each task is open at the start, and its reference solution
 // closes it. So a task that an agent does not close is the agent's miss, not a broken check.
 import assert from 'node:assert/strict'
-import { cpSync, existsSync, mkdtempSync } from 'node:fs'
+import { cpSync, existsSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 import { gunzipSync } from 'node:zlib'
-import { ARMS } from '../bench/arms.mjs'
+import { ARMS, addArms } from '../bench/arms.mjs'
 import { publicRecord, taskHash } from '../bench/record.mjs'
 import { sendRecords } from '../bench/send.mjs'
 import { score, startState } from '../bench/score.mjs'
@@ -189,4 +189,36 @@ test('a board that refuses the records, or that is older, is named in plain word
   const gone = await sendRecords([publicRecord(runRecord())], { url: 'http://127.0.0.1:9', token: TOKEN })
   assert.equal(gone.ok, false)
   assert.match(gone.text, /Could not reach the board/)
+})
+
+test('an arms file adds arms that run only when named, with the folders filled in, and a wrong arm is refused', () => {
+  const folder = mkdtempSync(join(tmpdir(), 'widal-code-bench-arms-'))
+  const file = join(folder, 'arms.json')
+  const own = ARMS.length
+  const arm = { id: 'other-tool', number: 21, name: 'Baseline with another tool', settings: { model: 'claude-fable-5-2', effortLevel: 'xhigh', env: { TOOL_DATA: '${out}/tool-data' } }, pluginDir: '${dir}/plugin', tools: ['Bash(tool:*)'], path: ['${dir}/bin'], systemPrompt: 'Command output is condensed.' }
+  writeFileSync(file, JSON.stringify([arm]))
+  try {
+    const [added] = addArms(file, '/bench/out')
+    assert.equal(ARMS.length, own + 1)
+    assert.deepEqual({ extra: added.extra, other: added.other, pluginDir: added.pluginDir, path: added.path, data: added.settings.env.TOOL_DATA }, { extra: true, other: true, pluginDir: join(folder, 'plugin'), path: [join(folder, 'bin')], data: '/bench/out/tool-data' })
+    // The same file a second time has the ids of arms that are there.
+    assert.throws(() => addArms(file, '/bench/out'), /has the id of another arm/)
+    const refused = [
+      [{ ...arm, id: 'Other Tool' }, /needs an "id"/],
+      [{ ...arm, id: 'b', number: 6 }, /needs a "number" from 20 to 99/],
+      [{ ...arm, id: 'c', number: 22, settings: {} }, /needs "settings" with a "model"/],
+      [{ ...arm, id: 'd', number: 22, from: 'fable-xhigh' }, /has the field "from"/],
+      [{ ...arm, id: 'e', number: 22, tools: 'Bash' }, /needs a list of texts as "tools"/],
+    ]
+    for (const [wrong, message] of refused) {
+      writeFileSync(file, JSON.stringify([wrong]))
+      assert.throws(() => addArms(file, '/bench/out'), message)
+    }
+    writeFileSync(file, '{}')
+    assert.throws(() => addArms(file, '/bench/out'), /must hold a list of arms/)
+    assert.equal(ARMS.length, own + 1, 'a refused arm is not added')
+  } finally {
+    // The other tests see the benchmark's own arms only.
+    ARMS.splice(own)
+  }
 })

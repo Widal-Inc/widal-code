@@ -1,6 +1,6 @@
 // Runs tasks through Claude Code, one real session per task, and scores what each session left.
 //
-//   node bench/run.mjs --out <folder> [--arms a,b] [--tasks t1,t2] [--reps 1] [--round 2] [--paired] [--budget 6] [--minutes 30] [--lane b]
+//   node bench/run.mjs --out <folder> [--arms a,b] [--arms-file <file>] [--tasks t1,t2] [--reps 1] [--round 2] [--paired] [--budget 6] [--minutes 30] [--lane b]
 //
 // Each run:
 // - starts from the sample project in a new git repository, on a branch that names a ticket;
@@ -18,10 +18,12 @@
 // them have ended. Every arm then works next to the same number of other sessions, so that the
 // times of the arms can be compared. Without it an arm that ends early leaves the others alone.
 // --round runs one round only (the number in the name of the record), in place of --reps.
+// --arms-file adds arms from a file, for example the baseline with another tool on (addArms in
+// bench/arms.mjs says what such an arm can hold).
 import { spawn, spawnSync } from 'node:child_process'
 import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
-import { join } from 'node:path'
-import { ARMS, TOOLS, armOf, settingsOf } from './arms.mjs'
+import { delimiter, join } from 'node:path'
+import { ARMS, TOOLS, addArms, armOf, settingsOf } from './arms.mjs'
 import { linkLogs } from './collect.mjs'
 import { ROOT, flags, outDir, paths, readJson, writeJson } from './lib.mjs'
 import { taskHash } from './record.mjs'
@@ -31,6 +33,7 @@ import { TASKS, taskOf } from './tasks.mjs'
 const f = flags()
 const out = outDir(f)
 const P = paths(out)
+if (typeof f['arms-file'] === 'string') addArms(f['arms-file'], out)
 const arms = (typeof f.arms === 'string' ? f.arms.split(',') : ARMS.filter((a) => !a.from && !a.extra).map((a) => a.id)).map(armOf)
 const tasks = (typeof f.tasks === 'string' ? f.tasks.split(',') : TASKS.map((t) => t.id)).map(taskOf)
 const reps = Number(f.reps ?? 1)
@@ -55,7 +58,9 @@ function git(cwd, ...args) {
 function sessionEnv(arm) {
   const env = { ...process.env, WIDAL_HOME: P.view(arm.id).home }
   for (const name of Object.keys(env)) if (/^CLAUDE(CODE|_CODE_|_PID|_EFFORT)/.test(name)) delete env[name]
-  return env
+  // What an arm of an arms file adds: folders in front of PATH, and variables of its own.
+  if (arm.path?.length) env.PATH = [...arm.path, env.PATH].join(delimiter)
+  return { ...env, ...(arm.env ?? {}) }
 }
 
 /** The settings file of an arm. An arm with Widal.Code on has one already, written by bench/widal-on.mjs. */
@@ -125,7 +130,9 @@ async function runOne(arm, task, rep) {
 
   const args = ['-p', task.prompt, '--output-format', 'json', '--setting-sources', 'project', '--settings', settingsFile(arm), '--strict-mcp-config', '--mcp-config', '{"mcpServers":{}}', '--max-budget-usd', String(budget)]
   if (arm.plugin) args.push('--plugin-dir', P.plugin(arm.id))
-  args.push('--allowedTools', TOOLS.join(','))
+  if (arm.pluginDir) args.push('--plugin-dir', arm.pluginDir)
+  if (arm.systemPrompt) args.push('--append-system-prompt', arm.systemPrompt)
+  args.push('--allowedTools', [...TOOLS, ...(arm.tools ?? [])].join(','))
   const started = Date.now()
   const r = await claude(args, { cwd: work, env: sessionEnv(arm), timeoutMs: minutes * 60_000 })
   const ended = Date.now()
@@ -143,6 +150,8 @@ async function runOne(arm, task, rep) {
   cpSync(work, kept, { recursive: true, filter: (path) => !path.endsWith('/.git') })
   const record = {
     arm: arm.id, task: task.id, taskNumber: task.number, taskHash: taskHash(task), rep, ticket, branch, cwd: work, setup, settings: readJson(settingsFile(arm)),
+    // An arm of an arms file: what it added to the session, next to the settings.
+    ...(arm.other ? { other: { name: arm.name, pluginDir: arm.pluginDir, tools: arm.tools, path: arm.path, env: arm.env && Object.keys(arm.env), systemPrompt: arm.systemPrompt } } : {}),
     started: new Date(started).toISOString(), wallMs: ended - started, exit: r.status, timedOut: r.timedOut,
     claude: reported && {
       cost: reported.total_cost_usd, durationMs: reported.duration_ms, apiMs: reported.duration_api_ms, turns: reported.num_turns,
