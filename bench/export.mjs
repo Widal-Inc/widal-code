@@ -21,6 +21,7 @@ const P = paths(out)
 const to = typeof f.to === 'string' ? f.to : join(out, 'records.jsonl')
 
 const records = []
+// Only the benchmark's own arms: the runs of an arm from an arms file are never exported.
 for (const arm of ARMS) {
   // A run from before the settings were kept in its record gets them from the arm's settings file.
   const kept = readJson(P.settings(arm.id))

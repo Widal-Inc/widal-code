@@ -135,6 +135,29 @@ The report sets each arm of a paired round against the baseline of the same roun
 for time, and adds a sign test: how likely such a split of the tasks is when the arm makes no
 difference. Cost can be compared in any round, because it comes from the token counts.
 
+## Run another tool on the same tasks
+
+`--arms-file <file>` adds arms from a JSON file. An arm there is the way to run another tool on the
+same tasks, next to the baseline and in the same paired round:
+
+```
+node bench/run.mjs --out <folder> --arms-file <file> --arms fable-xhigh,widal-on,<id> --round 3 --paired
+node bench/report.mjs --out <folder> --arms-file <file>
+```
+
+```json
+[{ "id": "other-tool", "number": 21, "name": "Fable 5.2 xhigh, with the other tool",
+   "settings": { "model": "claude-fable-5-2", "effortLevel": "xhigh", "env": { "TOOL_DATA": "${out}/tool-data" } },
+   "pluginDir": "${dir}/plugin", "tools": ["Bash(tool:*)"], "path": ["${dir}/bin"],
+   "systemPrompt": "What the tool's install would add to a person's own instructions." }]
+```
+
+`${out}` is the folder of the benchmark run and `${dir}` the folder of the file. Set the tool up
+as its own install would, and give it a data folder inside `${out}`, so that it writes nothing
+into your own home. Run one task first and check that the tool acted (its own counters, or the
+session's record), because an arm in which the tool did nothing reads like "no effect". The runs
+of such an arm are in the report, and never in the records that may be shared.
+
 ## Keep and share the records
 
 ```
