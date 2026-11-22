@@ -230,6 +230,63 @@ new sign-in lands in the benchmark's folder and yours keeps the old one. The run
 Codex arm and says how to put the new file in place, or sign in again. To avoid that in a long
 run, use Codex yourself shortly before you start, so that its sign-in is fresh.
 
+## Run public task sets through Harbor
+
+The 13 tasks of the sample project show large differences and miss small ones (the report's last
+section says how many tasks a difference needs). Public task sets with hidden tests give hundreds
+of tasks in many languages: SWE-rebench, SWE-bench Pro and Terminal-Bench, among others. They run
+through [Harbor](https://github.com/harbor-framework/harbor), the harness of Terminal-Bench, which
+starts each task in a container of its own, runs one agent session in it, and then runs the task's
+tests.
+
+`bench/harbor/setup_agent.py` is an agent for Harbor: Harbor's own Claude Code agent with one setup
+of the benchmark on top. A setup is an entry of a file of setups (`bench/harbor/setups.example.json`
+has the baseline and Widal.Code's changes), with the model's settings, the effort level, folders to
+load as plugins, commands to run in the container first, variables, a budget and the tools the
+session may use. Harbor's agent bypasses all permission checks by default. A setup runs with the
+mode "dontAsk" and a list of allowed tools instead.
+
+Install Harbor in a folder of its own, with its telemetry off (Harbor sends usage events unless
+`HARBOR_TELEMETRY=off`):
+
+```
+uv venv <folder>/harbor-venv && VIRTUAL_ENV=<folder>/harbor-venv uv pip install harbor
+export HARBOR_TELEMETRY=off
+```
+
+First check the tasks with Harbor's "oracle" agent, which applies each task's reference solution
+and starts no model:
+
+```
+<folder>/harbor-venv/bin/harbor run -d terminal-bench/terminal-bench-2-1 -a oracle -o <folder>/jobs-oracle
+```
+
+Then run each setup on the same tasks, from the root of this repository, and read the results into
+records of the benchmark:
+
+```
+PYTHONPATH=. <folder>/harbor-venv/bin/harbor run -d <set> -m anthropic/claude-fable-5-2 \
+  -a bench.harbor.setup_agent:SetupAgent --ak setups=bench/harbor/setups.example.json --ak setup=baseline \
+  -o <folder>/jobs
+node bench/harbor.mjs import --jobs <folder>/jobs --out <folder>
+node bench/harbor.mjs report --out <folder>
+```
+
+The report sets each setup against the baseline on the tasks that both ran: the share of tasks
+solved, the cost per task and per solved task, and the time, each with a 95% interval, and a sign
+test on the cost. A trial that ended on an error of the harness before the agent spent anything
+counts in no number and is listed apart.
+
+Claude Code signs in inside the container with `ANTHROPIC_API_KEY`, or with a token of a
+subscription from `claude setup-token` in `CLAUDE_CODE_OAUTH_TOKEN`. A run starts real sessions and
+costs what they cost. Most task images are built for Intel processors, so on a Mac with Apple
+silicon they run under emulation and slowly, and a few hundred images need much disk. A cloud
+machine, or one of Harbor's cloud sandboxes (`--env`), suits a full run better.
+
+In version 0.1 Widal.Code proposed its changes from the baseline's own sessions. For a new task
+set, run the baseline first, point `widal advise` at the sessions Harbor kept for it (in each
+trial's `agent/sessions` folder), and put what it proposes into the setup.
+
 ## Run issues of another project
 
 `--tasks-file <file>` runs the tasks of a JSON file in place of the benchmark's own. Such a task is
