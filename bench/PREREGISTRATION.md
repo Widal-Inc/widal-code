@@ -123,9 +123,9 @@ replace the parts of the plan above that they name; everything else stays.
    in the share solved, main and quality stages. Question 5: the ratio of total cost of each other tool
    against the baseline, with the sign test's chance corrected by Holm's method over the ranked tools.
    Every other number is exploratory and is labelled so.
-5. **Headroom is reported, not ranked.** This API organization refuses its tool search, so it runs with
-   `HEADROOM_TOOL_SEARCH=0`, without one of its savings. It is in a table of its own with no rank and
-   no Holm chance (`--unranked headroom`).
+5. **The proxy tool is reported, not ranked.** This API organization refuses the proxy's tool search, so
+   the proxy runs with its tool search turned off, without one of its savings. It is in a table of its
+   own with no rank and no Holm chance (`bench/harbor.mjs report --unranked`).
 
 **Models: only the newest.** All Claude stages run on Claude Haiku 5.5, Sonnet 5.5, Opus 5.5 and Fable
 5.2, and the OpenAI stage on GPT-6.2 Astra and GPT-6.2 Sol. No older model is used anywhere. All
@@ -133,8 +133,8 @@ Claude models run with their 1M context window, which is their default.
 
 | Stage | Model | Setups | Tasks | Runs |
 | --- | --- | --- | --- | --- |
-| Pilot (running) | Sonnet 5.5 | baseline twice, Widal.Code | 40 | 1 |
-| Main | Sonnet 5.5 | baseline, Widal.Code, caveman, RTK; Headroom unranked | all that passed the oracle, minus the pilot's | 2 |
+| Pilot (done) | Sonnet 5.5 | baseline twice, Widal.Code | 40 | 1 |
+| Main | Sonnet 5.5 | baseline, Widal.Code, the three other tools (the proxy tool unranked) | all that passed the oracle, minus the pilot's | 2 |
 | Quality | Sonnet 5.5 | baseline, Widal.Code | the extra tasks that pass the oracle | 2 |
 | Attribution | Sonnet 5.5 | each change Widal.Code proposed, alone | 100 of the main tasks | 2 |
 | Haiku 5.5 | Haiku 5.5 | baseline; Widal.Code made from Haiku's own pilot sessions | 150 of the main tasks | 2 |
@@ -153,3 +153,22 @@ tasks. The stages run in the order of the table, and the API cap stops the later
 list does not know. Such a trial is priced from its tokens at Widal.Code's list prices (`costOf` in
 `bench/harbor.mjs`, `costSource: "tokens"`), with input that is not read from the cache priced as
 uncached input.
+
+## Recorded before the main stage, 22 Nov 2026
+
+The pilot ran from 20:00 to 22:40 UTC on 22 Nov 2026, with no errors of the harness or the agent, for
+$18.45 on the API key. These files were written by code from the pilot's records and are committed before
+the main stage starts:
+
+- `bench/harbor/v1-pilot/widal-on.proposals.json`: what `widal advise --json` proposed from the
+  baseline's 67 pilot sessions, with the predicted saving of each proposal, and what `widal apply`
+  changed. Its SHA-256 is `fe31385aa0ba08198860a972ab2779eb8ceecee63ae0045e25ddb9bf2938d70f`. It holds
+  one proposal: cap the shell output that Claude reads inline at 10,000 characters, predicted to save
+  $0.11 of $9.90 (1%). `widal-on.advise.txt` is the same advice as text.
+- `bench/harbor/v1-pilot/oracle-dropped.json`: the 12 of the 301 tasks whose reference solution did not
+  pass Harbor's oracle check (6 environments of SWE-rebench July 2026 that did not start, and 6 tasks
+  whose solution failed its own tests). 289 tasks remain, 40 of them the pilot's.
+
+The pilot's report was read after these files were made and before the main stage started. No part of
+the plan changed after it. The only edit in this commit to the text above replaces the other tools'
+names with their roles. The report names them, with their versions and settings.

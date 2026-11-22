@@ -1,0 +1,92 @@
+{
+  "checked": "2026-11-22",
+  "what": "Tasks of bench/harbor/v1-tasks.json whose reference solution did not reach reward 1 in Harbor's oracle check. They are left out of every stage.",
+  "tasks": 301,
+  "passed": 289,
+  "dropped": [
+    {
+      "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+      "task": "ibragim-badertdinov/astral-sh__ruff-25567",
+      "reward": null,
+      "error": "RuntimeError",
+      "why": "the environment failed before the tests ran"
+    },
+    {
+      "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+      "task": "ibragim-badertdinov/facebook__lexical-8676",
+      "reward": null,
+      "error": "RuntimeError",
+      "why": "the environment failed before the tests ran"
+    },
+    {
+      "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+      "task": "ibragim-badertdinov/microsoft__waza-247",
+      "reward": null,
+      "error": "RuntimeError",
+      "why": "the environment failed before the tests ran"
+    },
+    {
+      "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+      "task": "ibragim-badertdinov/mvanhorn__cli-printing-press-2002",
+      "reward": null,
+      "error": "RuntimeError",
+      "why": "the environment failed before the tests ran"
+    },
+    {
+      "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+      "task": "ibragim-badertdinov/vuejs__core-14877",
+      "reward": null,
+      "error": "RuntimeError",
+      "why": "the environment failed before the tests ran"
+    },
+    {
+      "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+      "task": "ibragim-badertdinov/withcoral__coral-1179",
+      "reward": null,
+      "error": "RuntimeError",
+      "why": "the environment failed before the tests ran"
+    },
+    {
+      "dataset": "swe-rebench/swe-rebench-leaderboard",
+      "task": "swe-rebench/agronholm__anyio-1121",
+      "reward": 0,
+      "error": null,
+      "why": "the reference solution did not pass the tests"
+    },
+    {
+      "dataset": "swe-rebench/swe-rebench-leaderboard",
+      "task": "swe-rebench/sigma67__ytmusicapi-909_interface",
+      "reward": 0,
+      "error": null,
+      "why": "the reference solution did not pass the tests"
+    },
+    {
+      "dataset": "cais/swebenchpro",
+      "task": "cais/instance_nodebb__nodebb-00c70ce7b0541cfc94afe567921d7668cdc8f4ac-vnan",
+      "reward": 0,
+      "error": null,
+      "why": "the reference solution did not pass the tests"
+    },
+    {
+      "dataset": "cais/swebenchpro",
+      "task": "cais/instance_element-hq__element-web-aec454dd6feeb93000380523cbb0b3681c0275fd-vnan",
+      "reward": 0,
+      "error": null,
+      "why": "the reference solution did not pass the tests"
+    },
+    {
+      "dataset": "terminal-bench/terminal-bench-2-1",
+      "task": "terminal-bench/build-cython-ext",
+      "reward": 0,
+      "error": null,
+      "why": "the reference solution did not pass the tests"
+    },
+    {
+      "dataset": "terminal-bench/terminal-bench-2-1",
+      "task": "terminal-bench/mcmc-sampling-stan",
+      "reward": 0,
+      "error": "NonZeroAgentExitCodeError",
+      "why": "the reference solution did not pass the tests"
+    }
+  ]
+}

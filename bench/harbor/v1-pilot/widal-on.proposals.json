@@ -1,0 +1,54 @@
+{
+  "at": "2026-11-22T21:30:19.606Z",
+  "from": "baseline",
+  "into": "widal-on",
+  "sessions": 67,
+  "total": 9.899710300000002,
+  "proposals": [
+    {
+      "id": "bash-output-cap",
+      "title": "Cap the shell output that Claude reads inline at 10,000 characters",
+      "saving": 0.1138716616229496,
+      "share": 0.011502524636801702,
+      "action": "bash-output-cap",
+      "args": [
+        "--chars",
+        "10000"
+      ],
+      "applied": false,
+      "appliedAt": null,
+      "note": null
+    }
+  ],
+  "applied": [
+    {
+      "proposal": "bash-output-cap",
+      "action": "bash-output-cap",
+      "args": [
+        "--chars",
+        "10000"
+      ],
+      "saving": 0.1138716616229496,
+      "share": 0.011502524636801702,
+      "status": 0,
+      "said": "Set \"bashOutputMaxChars\" to 10000 in Claude Code's settings. Claude gets at most that many characters of a successful command's output inline."
+    }
+  ],
+  "settingsBefore": {
+    "autoMemoryEnabled": false,
+    "env": {
+      "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+      "DISABLE_AUTOUPDATER": "1",
+      "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS": "1"
+    }
+  },
+  "settingsAfter": {
+    "autoMemoryEnabled": false,
+    "env": {
+      "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+      "DISABLE_AUTOUPDATER": "1",
+      "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS": "1"
+    },
+    "bashOutputMaxChars": 10000
+  }
+}
