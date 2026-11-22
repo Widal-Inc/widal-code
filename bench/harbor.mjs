@@ -15,7 +15,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { closedShare, ratioOfTotals, signTest } from './stats.mjs'
+import { closedShare, ratioOfTotals, signTest, solvedDifference } from './stats.mjs'
 
 /** Every folder under `root` that holds a result.json of a trial, at any depth. */
 function trialFolders(root) {
@@ -107,6 +107,7 @@ export function readRecords(out) {
 }
 
 const pct = (x) => `${Math.round(100 * x)}%`
+const points = (x) => `${x > 0 ? '+' : ''}${(100 * x).toFixed(1)}`
 const asChange = (ratio) => `${ratio < 1 ? '-' : '+'}${pct(Math.abs(ratio - 1))}`
 const interval = (x) => (x ? `${asChange(x.ratio)} (${asChange(x.low)} to ${asChange(x.high)})` : 'n/a')
 const chance = (t) => (t.chance === null ? 'n/a' : t.chance < 0.001 ? 'under 0.1%' : `${(100 * t.chance).toFixed(1)}%`)
@@ -137,6 +138,7 @@ export function report(records, { baseline = 'baseline', stage } = {}) {
       costRatio: arm === baseline ? null : ratioOfTotals(priced.map((p) => ({ a: p.r.cost, b: p.b.cost }))),
       costSign: arm === baseline ? null : signTest(priced.map((p) => ({ a: p.r.cost, b: p.b.cost }))),
       timeRatio: arm === baseline ? null : ratioOfTotals(timed.map((p) => ({ a: p.r.seconds, b: p.b.seconds }))),
+      solvedDiff: arm === baseline ? null : solvedDifference(pairs.map((p) => ({ a: p.r.closed, b: p.b.closed }))),
       solvedBoth: pairs.filter((p) => p.r.closed && p.b.closed).length,
       solvedOnlyArm: pairs.filter((p) => p.r.closed && !p.b.closed).length,
       solvedOnlyBaseline: pairs.filter((p) => !p.r.closed && p.b.closed).length,
@@ -151,12 +153,13 @@ export function report(records, { baseline = 'baseline', stage } = {}) {
 /** The report as Markdown. */
 export function markdown(result) {
   const lines = ['# Benchmark on public task sets', '']
-  const head = ['arm', 'tasks', 'solved (95% interval)', 'cost', 'cost per solved task', 'cost against the baseline (95% interval)', 'tasks cheaper', 'chance', 'time against the baseline (95% interval)', 'solved only here / only by the baseline']
+  const head = ['arm', 'tasks', 'solved (95% interval)', 'solved against the baseline, points (95% interval)', 'cost', 'cost per solved task', 'cost against the baseline (95% interval)', 'tasks cheaper', 'chance', 'time against the baseline (95% interval)', 'solved only here / only by the baseline']
   const rows = (list) =>
     list.map((x) => [
       x.arm,
       String(x.tasks),
       `${x.solved} = ${pct(x.solvedShare.share)} (${pct(x.solvedShare.low)} to ${pct(x.solvedShare.high)})`,
+      x.solvedDiff ? `${points(x.solvedDiff.difference)} (${points(x.solvedDiff.low)} to ${points(x.solvedDiff.high)})` : '',
       money(x.cost),
       x.costPerSolved === null ? 'n/a' : money(x.costPerSolved),
       x.costRatio ? interval(x.costRatio) : '',

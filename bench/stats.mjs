@@ -145,3 +145,26 @@ export function signTest(pairs) {
   for (let k = Math.max(less, more); k <= n; k++) tail += ways[k]
   return { less, n, chance: Math.min(1, (2 * tail) / 2 ** n) }
 }
+
+/**
+ * The difference in the share of tasks solved between two arms on the same tasks (the arm minus the
+ * other), with a 95% interval from resampling the tasks. Used for the quality margin: the arm keeps
+ * quality when the lower end stays above the margin.
+ * @param {{a: boolean, b: boolean}[]} pairs One pair per task: solved by the arm, solved by the other.
+ * @returns {{difference: number, low: number, high: number, tasks: number} | null}
+ */
+export function solvedDifference(pairs, { draws = 10_000, seed = 1 } = {}) {
+  if (!pairs.length) return null
+  const n = pairs.length
+  const value = (p) => (p.a ? 1 : 0) - (p.b ? 1 : 0)
+  const difference = pairs.reduce((s, p) => s + value(p), 0) / n
+  const random = seeded(seed)
+  const found = []
+  for (let d = 0; d < draws; d++) {
+    let total = 0
+    for (let i = 0; i < n; i++) total += value(pairs[Math.floor(random() * n)])
+    found.push(total / n)
+  }
+  found.sort((x, y) => x - y)
+  return { difference, low: quantile(found, 0.025), high: quantile(found, 0.975), tasks: n }
+}
