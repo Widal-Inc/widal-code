@@ -1,0 +1,25 @@
+{
+  "setups": [
+    {
+      "id": "baseline",
+      "name": "Fable 5.2, effort xhigh, no tool",
+      "effort": "xhigh",
+      "settings": { "model": "claude-fable-5-2", "autoMemoryEnabled": false, "env": { "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1", "DISABLE_AUTOUPDATER": "1" } },
+      "budget": 10
+    },
+    {
+      "id": "widal-on",
+      "name": "Fable 5.2 with Widal.Code's changes and hooks",
+      "effort": "high",
+      "settings": {
+        "model": "claude-fable-5-2",
+        "autoMemoryEnabled": false,
+        "bashOutputMaxChars": 10000,
+        "env": { "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1", "DISABLE_AUTOUPDATER": "1", "CLAUDE_CODE_SUBAGENT_MODEL": "claude-sonnet-5-5" }
+      },
+      "uploads": [{ "from": "${setups}/../..", "to": "/opt/widal-code" }],
+      "pluginDirs": ["/opt/widal-code"],
+      "budget": 10
+    }
+  ]
+}

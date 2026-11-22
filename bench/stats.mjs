@@ -122,3 +122,26 @@ export function tasksNeeded(spread, difference) {
   const effect = Math.abs(Math.log(1 - difference))
   return Math.ceil((((1.959964 + 0.841621) * spread) / effect) ** 2)
 }
+
+/**
+ * The sign test, for both directions: of the pairs that differ, how many have the lower value on
+ * the arm's side, and the chance of a split at least this one-sided when the arm makes no
+ * difference. Pairs with the same value on both sides do not count.
+ * @param {{a: number, b: number}[]} pairs
+ * @returns {{less: number, n: number, chance: number | null}}
+ */
+export function signTest(pairs) {
+  const less = pairs.filter((p) => p.a < p.b).length
+  const more = pairs.filter((p) => p.a > p.b).length
+  const n = less + more
+  if (!n) return { less, n, chance: null }
+  let choose = 1
+  const ways = [1]
+  for (let k = 1; k <= n; k++) {
+    choose = (choose * (n - k + 1)) / k
+    ways.push(choose)
+  }
+  let tail = 0
+  for (let k = Math.max(less, more); k <= n; k++) tail += ways[k]
+  return { less, n, chance: Math.min(1, (2 * tail) / 2 ** n) }
+}
