@@ -9,8 +9,9 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { verdict } from '../src/advise.mjs'
 import { ARMS, BASELINE, EFFORTS, addArms, armOf, effortOf } from './arms.mjs'
+import { tokensAgree } from './codex.mjs'
 import { collect } from './collect.mjs'
-import { ROOT, flags, oneTaskSet, outDir, paths, readJson, runsOf, writeJson } from './lib.mjs'
+import { ROOT, agentOf, flags, oneTaskSet, outDir, paths, readJson, runsOf, writeJson } from './lib.mjs'
 import { OWN_SET, TASKS, taskOf, taskSet, useTasks } from './tasks.mjs'
 
 const f = flags()
@@ -34,7 +35,7 @@ const pct = (n) => `${Math.round(100 * n)}%`
 const table = (head, rows) => [`| ${head.join(' | ')} |`, `| ${head.map(() => '---').join(' | ')} |`, ...rows.map((row) => `| ${row.join(' | ')} |`)].join('\n')
 /** What a closed task is worth: the time an engineer would need for it by hand. */
 const valueOf = (task) => (task.minutes * RATE) / 60
-const costOf = (run) => run.claude?.cost ?? 0
+const costOf = (run) => agentOf(run)?.cost ?? 0
 
 /** The figures of a list of runs. */
 function stats(runs) {
@@ -51,8 +52,8 @@ function stats(runs) {
     costPerClosed: closed.length ? cost / closed.length : null,
     medianSeconds: median(runs.map((r) => r.wallMs / 1000)),
     seconds: sum(runs, (r) => r.wallMs / 1000),
-    turns: sum(runs, (r) => r.claude?.turns ?? 0),
-    refused: sum(runs, (r) => r.claude?.denials?.length ?? 0),
+    turns: sum(runs, (r) => agentOf(r)?.turns ?? 0),
+    refused: sum(runs, (r) => agentOf(r)?.denials?.length ?? 0),
     value,
     review,
     net: value - cost - review,
@@ -65,6 +66,8 @@ function stats(runs) {
 
 const arms = ARMS.map((arm) => ({ arm, runs: runsOf(out, arm.id), view: undefined })).filter((a) => a.runs.length)
 for (const a of arms) {
+  // Widal.Code's view of an arm is read from Claude Code's logs: an arm that runs Codex has none.
+  if (a.arm.agent === 'codex') continue
   try {
     a.view = collect(out, a.arm.id)
   } catch (e) {
@@ -221,7 +224,7 @@ const NOT_SET = 'not set'
 /** The effort level of an arm, or "not set" for an arm that leaves the level to Claude Code. */
 const levelOf = (a) => effortOf(a.arm) ?? NOT_SET
 const levelOrder = (a) => (EFFORTS.includes(levelOf(a)) ? EFFORTS.indexOf(levelOf(a)) : EFFORTS.length)
-const outputOf = (r) => sum(Object.values(r.claude?.modelUsage ?? {}), (u) => u.outputTokens ?? 0)
+const outputOf = (r) => sum(Object.values(agentOf(r)?.modelUsage ?? {}), (u) => u.outputTokens ?? 0)
 const efforts = []
 for (const model of [...new Set(whole.filter(plainEffort).map((a) => a.arm.settings.model))]) {
   const group = whole.filter((a) => plainEffort(a) && a.arm.settings.model === model).sort((x, y) => levelOrder(x) - levelOrder(y))
@@ -315,6 +318,20 @@ for (const task of TASKS) {
     if (share > alike[kind].share) alike[kind] = { share, task: task.id, a: `${x.r.arm} round ${x.r.rep}`, b: `${y.r.arm} round ${y.r.rep}` }
   }
 }
+/**
+ * The checks of the sessions that ran Codex. Codex reports tokens and no cost, so the cost of such
+ * a session is Widal.Code's alone. What can be checked is that Widal.Code read the session's log,
+ * and that its count of the tokens is Codex's own.
+ */
+function codexChecks() {
+  const runs = arms.filter((a) => a.arm.agent === 'codex').flatMap((a) => runsOf(out, a.arm.id, { all: true }))
+  if (!runs.length) return []
+  const read = runs.filter((r) => r.codex?.counted)
+  return [
+    ["Codex sessions whose log Widal.Code read and priced (Codex reports no cost of its own)", `${read.filter((r) => r.codex.counted.priced).length} of ${runs.length}`],
+    ["Codex sessions where Widal.Code counted the same tokens as Codex's own count", `${read.filter((r) => tokensAgree(r.codex)).length} of ${runs.length}`],
+  ]
+}
 const alikeText = (x) => (x.task ? `${pct(x.share)} (${x.task}: ${x.a} and ${x.b})` : 'n/a')
 const seen = checked.filter((c) => c.seen)
 const diffs = seen.map((c) => Math.abs(c.widal - c.claude))
@@ -331,6 +348,7 @@ say(
       ['Tickets in "widal tickets" with the right cost (to the cent)', `${seen.filter((c) => c.ticketReport !== undefined && Math.abs(c.ticketReport - c.claude) <= 0.0051).length} of ${seen.length}`],
       ['Largest share of added lines that two runs of one task have in common, between different arms', alikeText(alike.arms)],
       ['The same between rounds of one arm (one model writes much the same code each time)', alikeText(alike.rounds)],
+      ...codexChecks(),
     ],
   ),
 )

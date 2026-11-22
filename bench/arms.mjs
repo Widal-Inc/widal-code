@@ -57,11 +57,16 @@ export const effortOf = (arm) => arm.effort ?? arm.settings?.effortLevel
 export const BASELINE = 'fable-xhigh'
 
 /** What an arm of an arms file may hold. */
-const FILE_KEYS = ['id', 'number', 'name', 'settings', 'only', 'pluginDir', 'tools', 'path', 'env', 'systemPrompt']
+const FILE_KEYS = ['id', 'number', 'name', 'agent', 'settings', 'only', 'pluginDir', 'tools', 'path', 'env', 'systemPrompt']
+/** What only Claude Code can take: an arm that runs Codex has none of these. */
+const CLAUDE_ONLY = ['pluginDir', 'tools', 'systemPrompt']
 
 /**
  * Adds the arms of a file to the benchmark's own, for `--arms-file <file>`. This is how another
  * tool is run on the same tasks: the file is a JSON list of arms, and an arm can name
+ * - `agent`: "codex" to run the tasks through Codex in place of Claude Code (bench/codex.mjs). The
+ *   `model` and the `effortLevel` of its `settings` are then Codex's, and it takes no `pluginDir`,
+ *   `tools` or `systemPrompt`;
  * - `settings`: the settings Claude Code gets, with a `model` (as for the arms above);
  * - `pluginDir`: a plugin folder that the sessions load;
  * - `tools`: more tools that an agent may use without a person to ask;
@@ -105,6 +110,12 @@ export function addArms(file, out) {
     if (typeof arm.settings?.model !== 'string') throw wrong('needs "settings" with a "model"')
     for (const key of ['tools', 'path', 'only']) if (arm[key] !== undefined && !(Array.isArray(arm[key]) && arm[key].every((x) => typeof x === 'string'))) throw wrong(`needs a list of texts as "${key}"`)
     for (const key of ['pluginDir', 'systemPrompt']) if (arm[key] !== undefined && typeof arm[key] !== 'string') throw wrong(`needs a text as "${key}"`)
+    if (arm.agent !== undefined && arm.agent !== 'claude' && arm.agent !== 'codex') throw wrong('has an "agent" that is neither "claude" nor "codex"')
+    if (arm.agent === 'codex') {
+      const key = CLAUDE_ONLY.find((k) => arm[k] !== undefined)
+      if (key) throw wrong(`runs Codex, which cannot take "${key}"`)
+      if (arm.settings.effortLevel !== undefined && typeof arm.settings.effortLevel !== 'string') throw wrong('needs a text as the "effortLevel" of its settings')
+    }
     const full = { ...arm, extra: true, other: true }
     ARMS.push(full)
     added.push(full)
@@ -120,6 +131,8 @@ export const armOf = (id) => {
 
 /** The settings of an arm as Claude Code reads them. */
 export function settingsOf(arm) {
+  // Codex reads its settings from a config.toml of its own (bench/codex.mjs): none of Claude Code's are added.
+  if (arm.agent === 'codex') return { ...arm.settings }
   const own = arm.settings ?? armOf(arm.from).settings
   return { ...COMMON, ...own, env: { ...COMMON.env, ...(own.env ?? {}) } }
 }

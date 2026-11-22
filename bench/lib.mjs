@@ -88,6 +88,9 @@ export const writeJson = (file, data) => {
   writeFileSync(file, `${JSON.stringify(data, null, 2)}\n`)
 }
 
+/** What the agent of a run reported: Claude Code's result, or the numbers of a Codex session (bench/codex.mjs). */
+export const agentOf = (run) => run.claude ?? run.codex
+
 /**
  * The records of the runs of an arm, in the order of the tasks. A record with a "void" reason is a
  * run that does not count, for example because the task was wrong when it ran. Such runs are left

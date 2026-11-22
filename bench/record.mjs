@@ -12,6 +12,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { armOf, settingsOf } from './arms.mjs'
+import { agentOf } from './lib.mjs'
 import { startState } from './score.mjs'
 import { taskOf } from './tasks.mjs'
 
@@ -96,7 +97,7 @@ export function publicRecord(run, settings = run.settings) {
   const arm = armOf(run.arm)
   const own = settings ?? (arm.from ? undefined : settingsOf(arm))
   const setup = run.setup ?? {}
-  const models = Object.entries(run.claude?.modelUsage ?? {}).map(([model, u]) => ({
+  const models = Object.entries(agentOf(run)?.modelUsage ?? {}).map(([model, u]) => ({
     model: text(model, 'model', 'models.model'),
     in: number(u.inputTokens),
     out: number(u.outputTokens),
@@ -137,11 +138,11 @@ export function publicRecord(run, settings = run.settings) {
       testsPass: flag(run.score?.testsPass),
       timedOut: run.timedOut === true,
     },
-    cost: number(run.claude?.cost),
+    cost: number(agentOf(run)?.cost),
     wallSeconds: number(run.wallMs) === null ? null : Math.round(run.wallMs / 100) / 10,
-    apiSeconds: number(run.claude?.apiMs) === null ? null : Math.round(run.claude.apiMs / 100) / 10,
-    turns: number(run.claude?.turns),
-    refused: Array.isArray(run.claude?.denials) ? run.claude.denials.length : null,
+    apiSeconds: number(agentOf(run)?.apiMs) === null ? null : Math.round(agentOf(run).apiMs / 100) / 10,
+    turns: number(agentOf(run)?.turns),
+    refused: Array.isArray(agentOf(run)?.denials) ? agentOf(run).denials.length : null,
     models,
   }
 }
