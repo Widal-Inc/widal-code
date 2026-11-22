@@ -1,6 +1,6 @@
 // Runs tasks through Claude Code, one real session per task, and scores what each session left.
 //
-//   node bench/run.mjs --out <folder> [--arms a,b] [--arms-file <file>] [--tasks t1,t2] [--reps 1] [--round 2] [--paired] [--budget 6] [--minutes 30] [--lane b]
+//   node bench/run.mjs --out <folder> [--arms a,b] [--arms-file <file>] [--tasks-file <file>] [--tasks t1,t2] [--reps 1] [--round 2] [--paired] [--budget 6] [--minutes 30] [--lane b]
 //
 // Each run:
 // - starts from the sample project in a new git repository, on a branch that names a ticket;
@@ -20,20 +20,28 @@
 // --round runs one round only (the number in the name of the record), in place of --reps.
 // --arms-file adds arms from a file, for example the baseline with another tool on (addArms in
 // bench/arms.mjs says what such an arm can hold).
+// --tasks-file runs the tasks of a file in place of the benchmark's own: issues of another
+// project, scored with that project's own tests (useTasks in bench/tasks.mjs says what such a
+// task holds). A session then starts in a copy of that project. It gets the shell commands that
+// the task names and no others, and no variable of the person's environment that names a key, a
+// token, a password or a cloud account.
 import { spawn, spawnSync } from 'node:child_process'
 import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { delimiter, join } from 'node:path'
 import { ARMS, TOOLS, addArms, armOf, settingsOf } from './arms.mjs'
 import { linkLogs } from './collect.mjs'
-import { ROOT, flags, outDir, paths, readJson, writeJson } from './lib.mjs'
+import { ROOT, flags, oneTaskSet, outDir, paths, readJson, writeJson } from './lib.mjs'
+import { markStart, scoreOther, startOther } from './other.mjs'
 import { taskHash } from './record.mjs'
 import { score, startState } from './score.mjs'
-import { TASKS, taskOf } from './tasks.mjs'
+import { OWN_SET, TASKS, taskOf, taskSet, useTasks } from './tasks.mjs'
 
 const f = flags()
 const out = outDir(f)
 const P = paths(out)
 if (typeof f['arms-file'] === 'string') addArms(f['arms-file'], out)
+if (typeof f['tasks-file'] === 'string') useTasks(f['tasks-file'])
+const taskSetFile = oneTaskSet(out, taskSet(), OWN_SET)
 const arms = (typeof f.arms === 'string' ? f.arms.split(',') : ARMS.filter((a) => !a.from && !a.extra).map((a) => a.id)).map(armOf)
 const tasks = (typeof f.tasks === 'string' ? f.tasks.split(',') : TASKS.map((t) => t.id)).map(taskOf)
 const reps = Number(f.reps ?? 1)
@@ -54,10 +62,18 @@ function git(cwd, ...args) {
   return r.stdout
 }
 
+/** Names of variables that hold a secret or point at an account. The model provider's own are kept: the sign-in can need them. */
+const SECRET = /KEY|TOKEN|SECRET|PASSWORD|PASSWD|CREDENTIAL|^AWS_|^DATABASE_URL$|^PG[A-Z]+$/i
+
 /** The environment of a session: the person's, without what marks it as a child of another Claude Code session. */
-function sessionEnv(arm) {
+function sessionEnv(arm, task) {
   const env = { ...process.env, WIDAL_HOME: P.view(arm.id).home }
   for (const name of Object.keys(env)) if (/^CLAUDE(CODE|_CODE_|_PID|_EFFORT)/.test(name)) delete env[name]
+  // A session in another project runs that project's commands: it gets no secret of the person's, and the variables of the task.
+  if (task.other) {
+    for (const name of Object.keys(env)) if (SECRET.test(name) && !name.startsWith('ANTHROPIC_')) delete env[name]
+    Object.assign(env, task.env ?? {})
+  }
   // What an arm of an arms file adds: folders in front of PATH, and variables of its own.
   if (arm.path?.length) env.PATH = [...arm.path, env.PATH].join(delimiter)
   return { ...env, ...(arm.env ?? {}) }
@@ -114,14 +130,19 @@ const setup = {
 async function runOne(arm, task, rep) {
   const file = P.result(arm.id, task.id, rep)
   if (existsSync(file)) return readJson(file)
-  const work = P.work(arm.id, lane)
+  const work = P.work(arm.id, lane, task.folder)
   if (!work.startsWith(out)) throw new Error('the work folder is outside the folder of the benchmark run')
   rmSync(work, { recursive: true, force: true })
   mkdirSync(join(work, '..'), { recursive: true })
-  startState(task, work)
-  git(work, 'init', '-q', '-b', 'main')
-  git(work, 'add', '-A')
-  git(work, 'commit', '-q', '-m', 'start')
+  if (task.other) {
+    startOther(task, work)
+    markStart(work)
+  } else {
+    startState(task, work)
+    git(work, 'init', '-q', '-b', 'main')
+    git(work, 'add', '-A')
+    git(work, 'commit', '-q', '-m', 'start')
+  }
   const ticket = `ABC-${arm.number}${String(task.number).padStart(2, '0')}${rep}`
   const branch = `user/${ticket.toLowerCase()}-${task.slug}`
   git(work, 'checkout', '-q', '-b', branch)
@@ -134,9 +155,11 @@ async function runOne(arm, task, rep) {
   if (arm.plugin) args.push('--plugin-dir', P.plugin(arm.id))
   if (arm.pluginDir) args.push('--plugin-dir', arm.pluginDir)
   if (arm.systemPrompt) args.push('--append-system-prompt', arm.systemPrompt)
-  args.push('--allowedTools', [...TOOLS, ...(arm.tools ?? [])].join(','))
+  // A task of a tasks file names its own shell commands: the benchmark's own fit the sample project only.
+  const tools = task.other ? [...TOOLS.filter((tool) => !tool.startsWith('Bash(')), ...task.tools] : TOOLS
+  args.push('--allowedTools', [...tools, ...(arm.tools ?? [])].join(','))
   const started = Date.now()
-  const r = await claude(args, { cwd: work, env: sessionEnv(arm), timeoutMs: minutes * 60_000 })
+  const r = await claude(args, { cwd: work, env: sessionEnv(arm, task), timeoutMs: minutes * 60_000 })
   const ended = Date.now()
 
   let reported
@@ -148,10 +171,19 @@ async function runOne(arm, task, rep) {
     // The session ended without a result, for example at the time limit.
   }
   const kept = P.kept(arm.id, task.id, rep)
-  rmSync(kept, { recursive: true, force: true })
-  cpSync(work, kept, { recursive: true, filter: (path) => !path.endsWith('/.git') })
+  let scored
+  if (task.other) {
+    // Another project is too large to keep whole: the changed files and a patch are kept, and the tests run in the work folder.
+    scored = scoreOther(task, work, kept)
+  } else {
+    rmSync(kept, { recursive: true, force: true })
+    cpSync(work, kept, { recursive: true, filter: (path) => !path.endsWith('/.git') })
+    scored = score(task.id, kept)
+  }
   const record = {
     arm: arm.id, task: task.id, taskNumber: task.number, taskHash: taskHash(task), rep, ticket, branch, cwd: work, setup, settings: readJson(settingsFile(arm)),
+    // The set of a task of a tasks file. Such a run is never exported.
+    ...(task.other ? { taskSet: taskSet() } : {}),
     // The effort level that the session got on the command line, when the arm names one.
     ...(arm.effort ? { effort: arm.effort } : {}),
     // An arm of an arms file: what it added to the session, next to the settings.
@@ -163,7 +195,7 @@ async function runOne(arm, task, rep) {
       denials: (reported.permission_denials ?? []).map((d) => `${d.tool_name}${d.tool_input?.command ? `: ${String(d.tool_input.command).slice(0, 80)}` : ''}`),
     },
     stderr: reported ? undefined : r.stderr.slice(-400),
-    score: score(task.id, kept),
+    score: scored,
   }
   writeJson(file, record)
   return record
@@ -174,6 +206,7 @@ const line = (r) =>
 
 // Fails before any agent starts when the arm's settings are missing.
 for (const arm of arms) settingsFile(arm)
+writeFileSync(taskSetFile, `${taskSet()}\n`)
 writeFileSync(join(out, 'README.txt'), 'A run of the Widal.Code benchmark (bench/ in the Widal.Code repository). The folders: w = where the agents work, kept = what they left, runs = the records, widal = a home of its own for Widal.Code per arm.\n')
 /** One run, with its line printed. A failure of the run itself ends neither the arm nor the command. */
 async function attempt(arm, task, rep) {

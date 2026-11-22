@@ -61,6 +61,17 @@ export function taskHash(task) {
   const hash = createHash('sha256')
   const add = (name, content) => hash.update(`${name}\0`).update(content).update('\0')
   add('prompt', task.prompt)
+  if (task.other) {
+    // A task of a tasks file: the state it starts from by its name, and the tests that score it.
+    add('version', task.version ?? '')
+    add('expect', readFileSync(task.hidden.expect))
+    if (task.hidden.failing) add('failing', readFileSync(task.hidden.failing))
+    add('passing', readFileSync(task.still.passing))
+    for (const file of filesOf(task.hidden.files)) add(file, readFileSync(join(task.hidden.files, file)))
+    const value = hash.digest('hex').slice(0, 16)
+    hashes.set(task.id, value)
+    return value
+  }
   add('checks', readFileSync(join(HERE, 'checks', `${task.checksOf ?? task.id}.mjs`)))
   add('runner', readFileSync(join(HERE, 'checks', 'run.mjs')))
   const dir = mkdtempSync(join(tmpdir(), 'bench-hash-'))

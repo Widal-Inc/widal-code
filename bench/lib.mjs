@@ -33,8 +33,9 @@ export const paths = (out) => ({
   /**
    * The folder in which an arm's agents work. One folder per arm, so that an arm is one project in
    * the logs. A lane is a second folder of the same arm, so that two of its tasks can run at once.
+   * The folder has the name of the sample project, or the name that a task of a tasks file gives.
    */
-  work: (arm, lane) => join(out, 'w', arm, ...(lane ? [`lane${lane}`] : []), 'ledger'),
+  work: (arm, lane, folder = 'ledger') => join(out, 'w', arm, ...(lane ? [`lane${lane}`] : []), folder),
   /** What an agent left behind, kept for the score. */
   kept: (arm, task, rep) => join(out, 'kept', arm, `${task}-r${rep}`),
   /** The record of one run: what Claude Code reported, and the score. */
@@ -45,16 +46,20 @@ export const paths = (out) => ({
   plugin: (arm) => join(out, 'plugin', arm),
 })
 
-/** The work folders of an arm that are there: its own, and one per lane. */
+/** The work folders of an arm that are there: its own, and those of each lane. */
 export function workFolders(out, arm) {
   const root = join(out, 'w', arm)
-  let names = []
-  try {
-    names = readdirSync(root)
-  } catch {
-    // The arm has not run.
+  const foldersIn = (dir) => {
+    try {
+      return readdirSync(dir, { withFileTypes: true }).filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort()
+    } catch {
+      // The arm has not run.
+      return []
+    }
   }
-  return [join(root, 'ledger'), ...names.filter((name) => /^lane\w+$/.test(name)).map((name) => join(root, name, 'ledger'))].filter((dir) => existsSync(dir))
+  const isLane = (name) => /^lane\w+$/.test(name)
+  const names = foldersIn(root)
+  return [...names.filter((name) => !isLane(name)).map((name) => join(root, name)), ...names.filter(isLane).flatMap((lane) => foldersIn(join(root, lane)).map((name) => join(root, lane, name)))]
 }
 
 /** The environment in which Widal.Code runs for an arm: its own home, tool folder and Claude Code folder. */
@@ -97,4 +102,15 @@ export function runsOf(out, arm, { all = false } = {}) {
     // The arm has not run.
   }
   return names.map((name) => readJson(join(dir, name))).filter((r) => r && (all || !r.void)).sort((a, b) => a.taskNumber - b.taskNumber || a.rep - b.rep)
+}
+
+/**
+ * Notes the set of tasks that a folder of a benchmark run holds, and fails when the folder holds
+ * runs of another set. The ids of two sets can be the same, so one folder holds one set.
+ */
+export function oneTaskSet(out, set, own) {
+  const file = join(out, 'task-set.txt')
+  const before = existsSync(file) ? readFileSync(file, 'utf8').trim() : existsSync(join(out, 'runs')) ? own : undefined
+  if (before !== undefined && before !== set) throw new Error(`The folder ${out} holds runs of the task set "${before}". Use another folder for the task set "${set}".`)
+  return file
 }

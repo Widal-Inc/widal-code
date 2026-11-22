@@ -1,6 +1,6 @@
 // The results of a benchmark run, as Markdown on the screen and as <folder>/results.json.
 //
-//   node bench/report.mjs --out <folder> [--rate 100] [--review 5] [--arms-file <file>]
+//   node bench/report.mjs --out <folder> [--rate 100] [--review 5] [--arms-file <file>] [--tasks-file <file>]
 //
 // --rate is what an hour of an engineer costs, in dollars. --review is the minutes a person needs
 // to look at what an agent left, for every run, closed or not. Both are assumptions: they only
@@ -10,13 +10,16 @@ import { join } from 'node:path'
 import { verdict } from '../src/advise.mjs'
 import { ARMS, BASELINE, EFFORTS, addArms, armOf, effortOf } from './arms.mjs'
 import { collect } from './collect.mjs'
-import { ROOT, flags, outDir, paths, readJson, runsOf, writeJson } from './lib.mjs'
-import { TASKS, taskOf } from './tasks.mjs'
+import { ROOT, flags, oneTaskSet, outDir, paths, readJson, runsOf, writeJson } from './lib.mjs'
+import { OWN_SET, TASKS, taskOf, taskSet, useTasks } from './tasks.mjs'
 
 const f = flags()
 const out = outDir(f)
 // The arms of an arms file are in the report when the same file is given here.
 if (typeof f['arms-file'] === 'string') addArms(f['arms-file'], out)
+// The tasks of a tasks file are the tasks of the report when the same file is given here.
+if (typeof f['tasks-file'] === 'string') useTasks(f['tasks-file'])
+oneTaskSet(out, taskSet(), OWN_SET)
 const RATE = Number(f.rate ?? 100)
 const REVIEW = Number(f.review ?? 5)
 
@@ -290,7 +293,8 @@ for (const a of arms) {
 // lines or more count, because a small fix reads the same in every run.
 const added = (r) => {
   const dir = paths(out).kept(r.arm, r.task, r.rep)
-  const startDir = join(ROOT, 'bench', 'project')
+  // What the files held at the start: the sample project, or the start folder of a task of a tasks file.
+  const startDir = taskOf(r.task).start ?? join(ROOT, 'bench', 'project')
   const lines = new Set()
   for (const file of r.score.changed) {
     if (!existsSync(join(dir, file))) continue
