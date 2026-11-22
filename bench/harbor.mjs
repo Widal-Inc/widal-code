@@ -97,14 +97,25 @@ export function costOf(agent, model) {
   return c.known ? { cost: c.total, costSource: 'tokens' } : { cost: null, costSource: null }
 }
 
-/** Reads every trial of a jobs folder and writes its record. Returns the records. */
-export function importJobs(jobs, out, { arm, rep = 1, extra = {} } = {}) {
+/**
+ * Reads every trial of a jobs folder and writes its record. Returns the records it wrote.
+ *
+ * With `setup`, a trial whose own setup (Harbor's agent option "setup") is another one is skipped: two
+ * runs of one arm must never be filed as each other. A record of a trial that finished is never replaced
+ * by one that ended on an error of the harness, so running a block again after a failure keeps what was done.
+ */
+export function importJobs(jobs, out, { arm, rep = 1, setup = null, extra = {} } = {}) {
   const records = []
   for (const folder of trialFolders(jobs)) {
-    const record = recordOf(JSON.parse(readFileSync(join(folder, 'result.json'), 'utf8')), { arm, rep, extra })
+    const result = JSON.parse(readFileSync(join(folder, 'result.json'), 'utf8'))
+    const own = result.config?.agent?.kwargs?.setup
+    if (setup && own && own !== setup) continue
+    const record = recordOf(result, { arm, rep, extra })
     const dir = join(out, 'harbor', record.arm)
+    const file = join(dir, `${taskFile(record.task)}-r${rep}.json`)
+    if (record.harnessError && existsSync(file) && !JSON.parse(readFileSync(file, 'utf8')).harnessError) continue
     mkdirSync(dir, { recursive: true })
-    writeFileSync(join(dir, `${taskFile(record.task)}-r${rep}.json`), `${JSON.stringify(record, null, 2)}\n`)
+    writeFileSync(file, `${JSON.stringify(record, null, 2)}\n`)
     records.push(record)
   }
   return records

@@ -34,6 +34,9 @@
 //   blockSize     tasks per block (default 25)
 //   seed          the seed of the shuffle
 //   concurrency   trials at a time per setup (default 2)
+//   setupTimeoutMultiplier   Harbor's --agent-setup-timeout-multiplier (default 2): installing Claude Code
+//                 in many containers at once can take longer than Harbor's 360 seconds, and the setup
+//                 ends before the agent starts, so a longer limit changes no measure
 //   cap           the most the stage may spend, in dollars
 //   providerCaps  the most each provider may spend over all stages, for example {"api": 1500, "bedrock": 1500}
 //   stopAt, maxHarnessErrors, safetyGap   the stop rules (defaults 0.9, 0.1, 0.2)
@@ -67,7 +70,7 @@ export const blocksOf = (tasks, size, seed) => {
 
 /** The defaults of a stage file, filled in and checked. */
 export function stageOf(config) {
-  const c = { blockSize: 25, concurrency: 2, stopAt: 0.9, maxHarnessErrors: 0.1, safetyGap: 0.2, env: {}, ...config }
+  const c = { blockSize: 25, concurrency: 2, setupTimeoutMultiplier: 2, stopAt: 0.9, maxHarnessErrors: 0.1, safetyGap: 0.2, env: {}, ...config }
   for (const key of ['name', 'out', 'jobs', 'setupsFile', 'claudeCode']) if (typeof c[key] !== 'string' || !c[key]) throw new Error(`The stage needs "${key}".`)
   if (!(c.cap > 0)) throw new Error('The stage needs a "cap" in dollars.')
   if (!Array.isArray(c.setups) || !c.setups.length) throw new Error('The stage needs "setups".')
@@ -188,7 +191,9 @@ export function commandsOf(stage, setup, block, n) {
     const agent = setup.agent
       ? ['-a', setup.agent]
       : ['-a', 'bench.harbor.setup_agent:SetupAgent', '--ak', `setups=${stage.setupsFile}`, '--ak', `setup=${setup.id}`, '--ak', `version=${stage.claudeCode}`]
-    const folder = join(stage.jobs, stage.name, setup.arm, `block-${n}`)
+    // One folder per setup, not per arm: two runs of one arm that start a task set in the same second
+    // would otherwise get the same job folder from Harbor, and one would overwrite the other's trials.
+    const folder = join(stage.jobs, stage.name, setup.id, `block-${n}`)
     const args = [
       ...stage.commands[setup.provider].slice(1),
       'run', '-d', dataset,
@@ -197,6 +202,7 @@ export function commandsOf(stage, setup, block, n) {
       ...agent,
       ...env,
       '-o', folder, '-n', String(stage.concurrency), '--delete',
+      ...(stage.setupTimeoutMultiplier ? ['--agent-setup-timeout-multiplier', String(stage.setupTimeoutMultiplier)] : []),
     ]
     return { program: stage.commands[setup.provider][0], args, folder, tasks: list.map((t) => t.task) }
   })
@@ -222,7 +228,10 @@ export function mask(text) {
 
 function runCommand({ program, args }, log) {
   return new Promise((resolve) => {
-    const child = spawn(program, args, { cwd: ROOT, env: { ...process.env, PYTHONPATH: ROOT, HARBOR_TELEMETRY: 'off' }, stdio: ['ignore', 'pipe', 'pipe'] })
+    // bench/harbor/bin comes first in PATH: its "docker" locks the build of a task's image across the
+    // Harbor processes of the setups, which Harbor itself does only inside one process.
+    const PATH = `${join(ROOT, 'bench', 'harbor', 'bin')}:${process.env.PATH ?? ''}`
+    const child = spawn(program, args, { cwd: ROOT, env: { ...process.env, PATH, PYTHONPATH: ROOT, HARBOR_TELEMETRY: 'off' }, stdio: ['ignore', 'pipe', 'pipe'] })
     const out = []
     child.stdout.on('data', (d) => out.push(d))
     child.stderr.on('data', (d) => out.push(d))
@@ -266,7 +275,7 @@ async function main() {
         for (const c of commandsOf(stage, setup, block, n + 1)) {
           mkdirSync(c.folder, { recursive: true })
           await runCommand(c, join(c.folder, 'harbor.log'))
-          importJobs(c.folder, stage.out, { arm: setup.arm, rep: setup.rep, extra: { stage: stage.name, provider: setup.provider, setup: setup.id } })
+          importJobs(c.folder, stage.out, { arm: setup.arm, rep: setup.rep, setup: setup.agent ? null : setup.id, extra: { stage: stage.name, provider: setup.provider, setup: setup.id } })
         }
       }),
     )

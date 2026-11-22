@@ -172,3 +172,27 @@ the main stage starts:
 The pilot's report was read after these files were made and before the main stage started. No part of
 the plan changed after it. The only edit in this commit to the text above replaces the other tools'
 names with their roles. The report names them, with their versions and settings.
+
+## Correction, 22 Nov 2026, after the first start of the main stage
+
+Two faults of the stage runner were found after the section above was written. Neither changes the plan.
+
+- **Two runs of one setup shared a job folder.** The pilot's two baseline runs wrote into the same folder
+  per block. Once in each block both started a task set in the same second, Harbor gave them the same job
+  folder, and 13 of the first run's 40 trials were lost. The import also read the whole folder for each
+  run, so 32 of the second run's trials were filed as the first run's. Widal.Code's proposals are not
+  affected: `widal advise` read the 67 sessions that remained, and all of them are baseline sessions of the
+  pilot. The noise between two runs is measured on the 27 tasks that kept both runs. The ledger counts only
+  the trials it could read, so the spend of the 13 lost trials is missing from it. The providers' bills are
+  set against the ledger in the report.
+- **The first start of the main stage failed in the harness.** It began at 23:00 UTC with ten setups of
+  three trials each at once. Ten Harbor processes built the same task images at the same time, and the
+  builds and the setup of the agent failed: 62 of the first 74 trials ended on an error of the harness. It
+  was stopped at 23:32 UTC. All of its trials are set aside and listed in the report with their spend,
+  and the stage starts again from the first block.
+
+The fix (widal-code PR 17): every setup has job folders of its own, the import files a trial only under
+the setup that ran it and never replaces a finished trial with a failed one, builds of one task image are
+locked across Harbor's processes, and Harbor gets twice its usual time to set up the agent. The main
+stage runs two trials at a time per setup instead of three.
+

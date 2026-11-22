@@ -143,3 +143,22 @@ test('a trial with tokens but no reported cost is priced from its tokens', async
   assert.ok(Math.abs(c.cost - 0.2) < 1e-9, String(c.cost))
   assert.deepEqual(costOf({ n_input_tokens: 5, n_output_tokens: 5 }, 'no-such-model'), { cost: null, costSource: null })
 })
+
+test('import files a trial only under its own setup, and keeps a finished trial over a failed rerun', () => {
+  const jobs = join(dir, 'jobs-two-runs')
+  const out = join(dir, 'out-two-runs')
+  const first = result({ task: 'a/t1', setup: 'baseline', cost: 2 })
+  const second = result({ task: 'a/t1', setup: 'baseline-2', cost: 3 })
+  writeTrial(jobs, first)
+  writeTrial(jobs, second)
+  importJobs(jobs, out, { arm: 'baseline', rep: 1, setup: 'baseline' })
+  importJobs(jobs, out, { arm: 'baseline', rep: 2, setup: 'baseline-2' })
+  const back = readRecords(out).sort((x, y) => x.rep - y.rep)
+  assert.deepEqual(back.map((r) => [r.rep, r.cost]), [[1, 2], [2, 3]])
+
+  const again = join(dir, 'jobs-rerun')
+  writeTrial(again, { ...result({ task: 'a/t1', setup: 'baseline', cost: null, reward: null, error: 'AgentSetupTimeoutError' }), trial_name: 'a/t1__rerun' })
+  const written = importJobs(again, out, { arm: 'baseline', rep: 1, setup: 'baseline' })
+  assert.equal(written.length, 0)
+  assert.equal(readRecords(out).find((r) => r.rep === 1).cost, 2, 'the finished trial stays')
+})
