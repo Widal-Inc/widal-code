@@ -144,8 +144,19 @@ node bench/run.mjs --out <folder> --arms fable-xhigh,widal-on,fable-high,fable-m
 ```
 
 The report sets each arm of a paired round against the baseline of the same round, for cost and
-for time, and adds a sign test: how likely such a split of the tasks is when the arm makes no
-difference. Cost can be compared in any round, because it comes from the token counts.
+for time, with a 95% interval and a sign test. The interval comes from resampling the tasks (a
+bootstrap with a fixed seed, so the same records give the same interval), and the sign test says
+how likely such a split of the tasks is when the arm makes no difference. Cost can be compared in
+any round, because it comes from the token counts. The interval covers the choice of tasks, not
+the drift between rounds: an arm's own total can differ by a third between two rounds.
+
+For an arm that ran in more than one round, the report also sets all its runs against the
+baseline of their own rounds, together, with the share of tasks closed (a Wilson interval), the
+cost and the time, each with its interval. Its last section measures the noise: how much the
+baseline differs from itself between rounds on the same task, and from that the number of tasks a
+paired comparison needs to tell a true cost difference of 30%, 20%, 10% or 5% from noise. With the
+noise of the sample project, a 10% difference needs about 50 to 90 tasks, many more than the 13
+here. `bench/stats.mjs` holds these computations.
 
 A paired round does not need the baseline. In a round without it, the report sets each arm against
 the arm at effort xhigh with no other change, so a round of one model's arms is read against that
@@ -346,6 +357,8 @@ checks its cost and ticket.
   the three hard ones. So this set shows what a setup costs for the same outcome, and whether a
   change breaks something. It does not yet show where a cheaper model stops being good enough.
   That needs tasks from a larger codebase, with issues that leave things open.
+- 13 tasks are enough to show a large difference, such as the effort level's, and too few for a
+  small one. The report's last section gives the number of tasks a difference needs.
 - Most arms run each task once. The same arm can close a task in one run and miss it in the next,
   and the cost of one task differs from run to run (the report's section on run to run difference
   gives the spread). So a small difference between two arms on one task means nothing. Use `--reps`
