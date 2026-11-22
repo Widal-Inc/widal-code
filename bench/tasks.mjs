@@ -302,8 +302,9 @@ const FILE_KEYS = ['id', 'number', 'slug', 'kind', 'minutes', 'prompt', 'promptF
  *   runs in.
  * - `still`: the tests that passed at the start. `command` runs the tests that belong to the
  *   files in "${changed}" (the files the session changed) and writes the same kind of report.
- *   `passing` is a file with the list of tests that passed at the start. `tests` is a pattern for
- *   the paths of test files: a test file of the start that the session changed is put back first.
+ *   `passing` is a file with the list of tests that passed at the start. `tests` lists the endings
+ *   of the names of test files, for example ".test.ts": a test file of the start that the session
+ *   changed is put back first.
  *
  * The runs of such tasks are never part of the records that may be shared (bench/export.mjs).
  * @returns {object[]} The tasks.
@@ -356,12 +357,7 @@ export function useTasks(file) {
     if (typeof task.hidden.expect !== 'string' || !existsSync(task.hidden.expect)) throw wrong('needs "hidden" with an "expect" file that is there')
     if (typeof task.still.passing !== 'string' || !existsSync(task.still.passing)) throw wrong('needs "still" with a "passing" file that is there')
     if (!task.still.command.includes('${changed}')) throw wrong('needs "${changed}" as one part of the "command" in "still"')
-    try {
-      new RegExp(task.still.tests)
-    } catch {
-      throw wrong('needs "still" with "tests": a pattern for the paths of test files')
-    }
-    if (typeof task.still.tests !== 'string') throw wrong('needs "still" with "tests": a pattern for the paths of test files')
+    if (!texts(task.still.tests) || !task.still.tests.every((end) => !end.includes('/'))) throw wrong('needs "still" with "tests": the endings of the names of test files, for example ".test.ts"')
     const expect = JSON.parse(readFileSync(task.hidden.expect, 'utf8'))
     if (!texts(expect)) throw wrong('needs at least one test in the "expect" file of "hidden"')
     task.checks = expect.length

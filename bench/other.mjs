@@ -128,9 +128,9 @@ export function scoreOther(task, work, kept) {
   }
 
   // The start's own test files as they were: a session's changes to them do not count.
-  const isTest = new RegExp(task.still.tests)
+  const isTest = (file) => task.still.tests.some((end) => file.endsWith(end))
   const atStart = new Set(git(work, 'ls-tree', '-r', '--name-only', '-z', START).split('\0'))
-  const back = changed.filter((file) => isTest.test(file) && atStart.has(file))
+  const back = changed.filter((file) => isTest(file) && atStart.has(file))
   if (back.length) git(work, 'checkout', '-q', START, '--', ...back)
   // The hidden test files, over whatever the session put in their place.
   const hidden = filesOf(task.hidden.files)
@@ -144,7 +144,7 @@ export function scoreOther(task, work, kept) {
   let again
   // The tests that passed at the start, of the files that the session's changes reach. The
   // session's own new test files are left out, and so are the hidden files: those are the checks.
-  const reach = present.filter((file) => !isTest.test(file) || atStart.has(file))
+  const reach = present.filter((file) => !isTest(file) || atStart.has(file))
   try {
     ran = runTests(task, task.hidden, work)
     if (reach.length) again = runTests(task, task.still, work, reach)

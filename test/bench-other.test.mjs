@@ -61,7 +61,7 @@ writeFileSync(out, JSON.stringify({ testResults }))
     id: 'p1', number: 1, slug: 'count', kind: 'bug fix', minutes: 20, prompt: 'The total ignores the count of an item.', version: 'abc123',
     start: '${dir}/start', folder: 'shop', tools: ['Bash(node run-tests.mjs:*)'],
     hidden: { files: '${dir}/hidden', command: ['node', 'run-tests.mjs', '--out', '${report}', 'test/count.test.mjs'], expect: '${dir}/expect.json' },
-    still: { command: ['node', 'run-tests.mjs', '--out', '${report}', '--related', '${changed}'], passing: '${dir}/passing.json', tests: '\\.test\\.mjs$' },
+    still: { command: ['node', 'run-tests.mjs', '--out', '${report}', '--related', '${changed}'], passing: '${dir}/passing.json', tests: ['.test.mjs'] },
   }
   const file = join(dir, 'tasks.json')
   const write = (change = {}) => writeFileSync(file, JSON.stringify({ set: 'shop-issues', tasks: [{ ...task, ...change }] }))
@@ -92,7 +92,8 @@ test('a tasks file takes the place of the own tasks, with its folders filled in,
     [{ tools: ['node'] }, /"Bash\(\.\.\.\)" rules/],
     [{ folder: 'lane2' }, /needs a "folder"/],
     [{ secret: 'x' }, /has the field "secret"/],
-    [{ still: { command: ['node', 'run-tests.mjs', '${report}'], passing: '${dir}/passing.json', tests: 'x' } }, /needs "\$\{changed\}"/],
+    [{ still: { command: ['node', 'run-tests.mjs', '${report}'], passing: '${dir}/passing.json', tests: ['.test.mjs'] } }, /needs "\$\{changed\}"/],
+    [{ still: { command: ['node', 'run-tests.mjs', '--out', '${report}', '--related', '${changed}'], passing: '${dir}/passing.json', tests: '.test.mjs' } }, /the endings of the names of test files/],
     [{ hidden: { files: '${dir}/hidden', command: ['node', 'run-tests.mjs', '--out', '${report}', 'test/count.test.mjs'], expect: '${dir}/expect.json', failing: '${dir}/passing.json' } }, /all of them from the "expect" file/],
   ]) {
     write(change)

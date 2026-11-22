@@ -215,7 +215,7 @@ node bench/report.mjs --out <new folder> --tasks-file <file>
     "hidden": { "files": "${dir}/hidden/p1", "expect": "${dir}/hidden/p1.expect.json",
                 "failing": "${dir}/hidden/p1.failing.json",
                 "command": ["npx", "vitest", "run", "test/count.test.ts", "--reporter=json", "--outputFile=${report}"] },
-    "still": { "passing": "${dir}/start/p1.passing.json", "tests": "\\.test\\.ts$",
+    "still": { "passing": "${dir}/start/p1.passing.json", "tests": [".test.ts", ".test.tsx"],
                "command": ["npx", "vitest", "related", "${changed}", "--run", "--reporter=json", "--outputFile=${report}"] }
   }] }
 ```
@@ -224,7 +224,8 @@ node bench/report.mjs --out <new folder> --tasks-file <file>
 and Vitest to `${report}`. `${changed}` stands for the files the session changed, so the second
 command runs only the tests that those files reach. `expect`, `failing` and `passing` are lists
 of tests as "file > name": the hidden tests that pass on the real fix, the ones of them that fail
-at the start, and the tests of the project that pass at the start.
+at the start, and the tests of the project that pass at the start. `tests` lists the endings of
+the names of test files, so that the benchmark can tell a test file from a source file.
 `useTasks` in `tasks.mjs` describes every field, and `passingNow` in `other.mjs` makes such a list.
 
 Before you use a finished ticket as a task, check three things:
