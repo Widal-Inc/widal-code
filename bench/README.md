@@ -303,6 +303,12 @@ of a stage use one provider. Run it again after a stop and it skips what is done
 (`node bench/harbor-stage.mjs --config <stage.json>`, and `--plan` to see the blocks first; the
 comment at the top of the file describes the stage file).
 
+Each setup writes its own job folders (`<jobs>/<stage>/<setup>/block-<n>`), and the import files a
+trial only under the setup that ran it. A run of the stage puts `bench/harbor/bin` first in PATH: its
+`docker` lets only one Harbor process at a time build the image of a task's environment, and the
+others then find the image in Docker's cache. Harbor gets twice its usual time to set up the agent
+(`setupTimeoutMultiplier`), because installing Claude Code in many containers at once is slow.
+
 In version 0.1 Widal.Code proposed its changes from the baseline's own sessions. For a new task
 set, run the baseline first, point `widal advise` at the sessions Harbor kept for it (in each
 trial's `agent/sessions` folder), and put what it proposes into the setup.

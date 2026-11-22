@@ -1,0 +1,27 @@
+#!/bin/sh
+# "docker" for Harbor runs of bench/harbor-stage.mjs. Harbor builds the image of a task's environment
+# with "docker compose ... build", and it lets only one build of an environment run at a time inside one
+# Harbor process. The stage runner starts one Harbor process per setup, so several setups built the same
+# image at the same moment and the builds failed. This wrapper takes a lock per environment folder
+# (Harbor's --project-directory) across processes: the first build makes the image, and the others then
+# find it in Docker's cache. Every other command goes to the real docker unchanged.
+self=$(cd "$(dirname "$0")" && pwd)
+real=""
+old_ifs=$IFS
+IFS=:
+for d in $PATH; do
+  [ "$d" = "$self" ] && continue
+  if [ -x "$d/docker" ]; then real="$d/docker"; break; fi
+done
+IFS=$old_ifs
+[ -n "$real" ] || { echo "docker: not found in PATH" >&2; exit 127; }
+compose=0; build=0; dir=""; prev=""
+for a in "$@"; do
+  [ "$a" = compose ] && compose=1
+  [ "$compose" = 1 ] && [ "$a" = build ] && build=1
+  [ "$prev" = --project-directory ] && dir=$a
+  prev=$a
+done
+if [ "$build" = 0 ] || ! command -v flock >/dev/null 2>&1; then exec "$real" "$@"; fi
+lock="${TMPDIR:-/tmp}/harbor-build-$(printf '%s' "$dir" | cksum | cut -d' ' -f1).lock"
+exec flock "$lock" "$real" "$@"

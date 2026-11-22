@@ -132,3 +132,29 @@ test('a setup with another Harbor agent gets no setup of setup_agent.py', async 
   assert.equal(c.args[c.args.indexOf('-a') + 1], 'codex')
   assert.ok(!c.args.includes('--ak'))
 })
+
+test('each setup, also a second run of an arm, gets a job folder of its own', () => {
+  const s = stageOf({ ...base, setups: [...base.setups, { id: 'baseline-2', arm: 'baseline', rep: 2, model: 'anthropic/claude-sonnet-5-5', provider: 'api' }] })
+  const [one] = commandsOf(s, s.setups[0], [tasks[3]], 1)
+  const [two] = commandsOf(s, s.setups[2], [tasks[3]], 1)
+  assert.equal(one.folder, join(s.jobs, 'pilot', 'baseline', 'block-1'))
+  assert.equal(two.folder, join(s.jobs, 'pilot', 'baseline-2', 'block-1'))
+  const i = one.args.indexOf('--agent-setup-timeout-multiplier')
+  assert.equal(one.args[i + 1], '2', 'the setup of an agent gets twice Harbor\'s time by default')
+  const none = stageOf({ ...base, setupTimeoutMultiplier: 0 })
+  assert.ok(!commandsOf(none, none.setups[0], [tasks[3]], 1)[0].args.includes('--agent-setup-timeout-multiplier'))
+})
+
+test('the docker of bench/harbor/bin passes commands on and locks only builds', async () => {
+  const { execFileSync } = await import('node:child_process')
+  const { chmodSync } = await import('node:fs')
+  const fake = mkdtempSync(join(tmpdir(), 'widal-code-fake-docker-'))
+  writeFileSync(join(fake, 'docker'), '#!/bin/sh\necho "real $*"\n')
+  chmodSync(join(fake, 'docker'), 0o755)
+  const bin = join(import.meta.dirname, '..', 'bench', 'harbor', 'bin')
+  const env = { ...process.env, PATH: `${bin}:${fake}:/usr/bin:/bin`, TMPDIR: fake }
+  const run = (...args) => execFileSync(join(bin, 'docker'), args, { env, encoding: 'utf8' }).trim()
+  assert.equal(run('ps', '-q'), 'real ps -q')
+  assert.equal(run('compose', '--project-name', 'p', '--project-directory', '/x/task', 'build'), 'real compose --project-name p --project-directory /x/task build')
+  assert.equal(run('compose', '--project-directory', '/x/task', 'up', '-d'), 'real compose --project-directory /x/task up -d')
+})
