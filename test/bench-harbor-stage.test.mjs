@@ -109,3 +109,26 @@ test('the Harbor commands of a block, one per task set, without the tasks alread
   const [again] = commandsOf(s, s.setups[0], block, 1)
   assert.deepEqual(again.tasks, ['org/task-1'], 'a finished task is not run again')
 })
+
+test('a value ${env:NAME} is read from the environment and masked in logs', async () => {
+  const { expand, mask } = await import('../bench/harbor-stage.mjs')
+  process.env.BENCH_TEST_SECRET = 'very-secret-value-123'
+  assert.equal(expand('${env:BENCH_TEST_SECRET}'), 'very-secret-value-123')
+  assert.equal(expand('plain'), 'plain')
+  assert.throws(() => expand('${env:BENCH_TEST_MISSING}'), /BENCH_TEST_MISSING/)
+  assert.equal(mask('a very-secret-value-123 b sk-proj-abcdefghijklmnop1234 c'), 'a [key] b [key] c')
+  delete process.env.BENCH_TEST_SECRET
+})
+
+test('a setup with another Harbor agent gets no setup of setup_agent.py', async () => {
+  const { commandsOf, stageOf } = await import('../bench/harbor-stage.mjs')
+  const stage = stageOf({
+    name: 'x', out: '/tmp/widal-bench-none', jobs: '/tmp/j', setupsFile: '/s.json', claudeCode: '2.1.330', cap: 10,
+    commands: { openai: ['/run.sh', '/harbor.sh'] },
+    setups: [{ id: 'codex', model: 'openai/gpt-6-astra', provider: 'openai', agent: 'codex' }],
+    tasks: [{ dataset: 'd', task: 'd/t1' }],
+  })
+  const [c] = commandsOf(stage, stage.setups[0], stage.tasks, 1)
+  assert.equal(c.args[c.args.indexOf('-a') + 1], 'codex')
+  assert.ok(!c.args.includes('--ak'))
+})

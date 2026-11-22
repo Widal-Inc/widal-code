@@ -22,10 +22,13 @@
 //   jobs          the folder of Harbor's job folders
 //   commands      per provider, the command that starts Harbor, for example
 //                 {"api": ["/opt/bench/with-key.sh", "/opt/bench/harbor.sh"], "bedrock": ["/opt/bench/harbor.sh"]}
-//   env           per provider, variables for the agent (Harbor's --ae), for example {"bedrock": {"CLAUDE_CODE_USE_BEDROCK": "1"}}
+//   env           per provider, variables for the agent (Harbor's --ae), for example {"bedrock": {"CLAUDE_CODE_USE_BEDROCK": "1"}}.
+//                 A value "${env:NAME}" is read from the runner's environment when the command is made, so
+//                 a key is never written into the stage file; every such value is masked in the logs.
 //   setupsFile    the file of setups for bench/harbor/setup_agent.py
 //   claudeCode    the version of Claude Code to install
-//   setups        [{"id", "model", "provider", "arm" (default: id), "rep" (default: 1)}]
+//   setups        [{"id", "model", "provider", "arm" (default: id), "rep" (default: 1), "agent"}]. "agent" is
+//                 another Harbor agent (for example "codex"); it then gets no setup of setup_agent.py.
 //   reference     the setup the safety rule compares with (default: the first)
 //   tasks         [{"dataset", "task"}]
 //   blockSize     tasks per block (default 25)
@@ -181,20 +184,40 @@ export function commandsOf(stage, setup, block, n) {
   const byDataset = new Map()
   for (const t of block) if (!done(stage, setup, t)) byDataset.set(t.dataset, [...(byDataset.get(t.dataset) ?? []), t])
   return [...byDataset.entries()].map(([dataset, list]) => {
-    const env = Object.entries(stage.env[setup.provider] ?? {}).flatMap(([k, v]) => ['--ae', `${k}=${v}`])
+    const env = Object.entries(stage.env[setup.provider] ?? {}).flatMap(([k, v]) => ['--ae', `${k}=${expand(v)}`])
+    const agent = setup.agent
+      ? ['-a', setup.agent]
+      : ['-a', 'bench.harbor.setup_agent:SetupAgent', '--ak', `setups=${stage.setupsFile}`, '--ak', `setup=${setup.id}`, '--ak', `version=${stage.claudeCode}`]
     const folder = join(stage.jobs, stage.name, setup.arm, `block-${n}`)
     const args = [
       ...stage.commands[setup.provider].slice(1),
       'run', '-d', dataset,
       ...list.flatMap((t) => ['-i', `*${t.task.split('/').pop()}`]),
       '-m', setup.model,
-      '-a', 'bench.harbor.setup_agent:SetupAgent',
-      '--ak', `setups=${stage.setupsFile}`, '--ak', `setup=${setup.id}`, '--ak', `version=${stage.claudeCode}`,
+      ...agent,
       ...env,
       '-o', folder, '-n', String(stage.concurrency), '--delete',
     ]
     return { program: stage.commands[setup.provider][0], args, folder, tasks: list.map((t) => t.task) }
   })
+}
+
+/** A value of the stage's env: "${env:NAME}" is read from the runner's environment, and remembered for masking. */
+const secrets = new Set()
+export function expand(value) {
+  const m = /^\$\{env:([A-Z0-9_]+)\}$/.exec(String(value))
+  if (!m) return String(value)
+  const found = process.env[m[1]]
+  if (!found) throw new Error(`The stage needs the variable ${m[1]} in the runner's environment.`)
+  secrets.add(found)
+  return found
+}
+
+/** Masks keys in a log: Anthropic and OpenAI keys by their shape, and every value read with ${env:...}. */
+export function mask(text) {
+  let out = text.replace(/sk-(ant-|proj-)?[A-Za-z0-9_-]{16,}/g, '[key]')
+  for (const s of secrets) if (s.length >= 8) out = out.split(s).join('[key]')
+  return out
 }
 
 function runCommand({ program, args }, log) {
@@ -205,7 +228,7 @@ function runCommand({ program, args }, log) {
     child.stderr.on('data', (d) => out.push(d))
     child.on('close', (code) => {
       // A key never reaches the log: Harbor does not print it, and this masks it all the same.
-      writeFileSync(log, Buffer.concat(out).toString('utf8').replace(/sk-ant-[A-Za-z0-9_-]+/g, '[key]'))
+      writeFileSync(log, mask(Buffer.concat(out).toString('utf8')))
       resolve(code)
     })
   })

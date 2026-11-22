@@ -1,0 +1,4514 @@
+{
+ "note": "Extra tasks of the quality stage of version 1, picked by select-extra.mjs with the seed 20261123 on 22 Nov 2026, before any result of version 1 was seen. None is in v1-tasks.json.",
+ "seed": 20261123,
+ "tasks": [
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-0dc5b20fa186f9714f8a838178597e69f549d026-v2d9a6c849c60ed19fd0858ce9e40b7cc8e097e59",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-e9e6001263f51103e96e58ad382660df0f3d0e39-v30a923fb5c164d6cd18280c02422f75e611e8fb2",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-a25e8a09873838ca9efefd36ea8a45170bbeb95c-vc2f56a753b62a190ddb23cd330c257b9cf560d12",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-77c16d530b4d5c0f33d68bead2c6b329aee9b996-ve8c8d62a2b60610a3c4631f5f23ed866bada9818",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-d33bedc48fdd933b5abd65a77c081876298e2f07-v0f01c69f1e2528b935359cfe578530722bca2c59",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-3d01c201b8aa54dd71d4f801b1dd12feb4c0a08a-v5fc38aaf22415ab0b70567368332beee7955b367",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-08ac40d050a64e1d2646ece4959af0c42bf6b7b5-v0f5aece3601a5b4419f7ccec1dbda2071be28ee4",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-1bd7dcf339dd8b6c50bc16670be2448a206f4fdb-vba6da65a0f3baefda7a058ebbd0a8dcafb8512f5",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-16de05407111ddd82fa12e54389d532362489da9-v363c8a7e5ccdf6968fc7ab84a2053ac78036691d",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-308a35d6999427c02b1dbf5211c033ad3b352556-ve8c8d62a2b60610a3c4631f5f23ed866bada9818",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-984216f52e76b904e5b0fa0fb956ab4f1e0a7751-v1055803c3a812189a1133297f7f5468579283f86",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-a84ecfb80a00f8ab7e341372560458e3f9cfffa2-v2ef375ac784985212b1805e1d0431dc8f1b3c171",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-111347e9583372e8ef91c82e0612ea437ae3a9c9-v2d9a6c849c60ed19fd0858ce9e40b7cc8e097e59",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-42355d181a11b51ebfc56f6f4b3d9c74e01cb13b-v1055803c3a812189a1133297f7f5468579283f86",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-c580ebf0801e5a3ecabc54f327498bb753c6d5f2-v2ef375ac784985212b1805e1d0431dc8f1b3c171",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-4a5d2a7d24c9e4c11d3069220c0685b736d5ecde-v13642507b4fc1f8d234172bf8129942da2c2ca26",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-de01db08d00c8d2438e1ba5989c313ba16a145b0-vba6da65a0f3baefda7a058ebbd0a8dcafb8512f5",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-34a13afd36b5e529d553892b1cd8b9d5ce8881c4-vafb3e8e01b31319c66c4e666b8a3b1d8ba55db24",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-7edd1ef09d91fe0b435707633c5cc9af41dedddf-v76304ecdb3a5954fcf13feb710e8c40fcf24b73c",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-502270c804c33d3bc963930dc85e0f4ca359674d-v7eee2454f617569fd6889f2211f75bc02a35f9f8",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-3fd8e12949b8feda401930574facf09dd4180bba",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-a7b7dc5735a1b3a9824376b1b469b556dd413981-va4315b5dc369c1ef66ae22f9ae4267aa3114e1b3",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-39bd8b99ec8c6624207bf3556ac7f9626dad9173-v1055803c3a812189a1133297f7f5468579283f86",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-e15d26630934d0b6415ed2295ac42fd570a57620-va0fd88aac89cde702ec1ba84877234da33adce8a",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-322d7a46cdc965bfabbf9500e98fde098c9d95b2-v13642507b4fc1f8d234172bf8129942da2c2ca26",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-185d41031660a676c43fbb781cd1335902024bfe-vba6da65a0f3baefda7a058ebbd0a8dcafb8512f5",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-ef5ba1a0360b39f9eff027fbdc57f363597c3c3b-v363c8a7e5ccdf6968fc7ab84a2053ac78036691d",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-c12943be1db80cf1114bc267ddf4f9933aca9b28-v2c55207218fb8a0138425cbf7d9675272e240b90",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-ecea15c508f0e081525be036cf76bbb56dbcdd9d-vba6da65a0f3baefda7a058ebbd0a8dcafb8512f5",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-54bcdc1eefa86cc20790973d6997b60c3bba884c-v2ef375ac784985212b1805e1d0431dc8f1b3c171",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-11838fad1028672eb975c79d8984f03348500173-v0f5aece3601a5b4419f7ccec1dbda2071be28ee4",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-ea04e0048dbb3b63f876aad7020e1de8eee9f362-v1055803c3a812189a1133297f7f5468579283f86",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-44e64199ed38003253f0296badd4a447645067b6-v2ef375ac784985212b1805e1d0431dc8f1b3c171",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-6fdbbeee4c0a7e976ff3e46fb1d36f4eb110c428-v08d8e8889ec945ab821fb156c04c7d2e2810debb",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-40ade1f84b8bb10a63576b0ac320c13f57c87d34-v6382ea168a93d80a64aab1fbd8c4f02dc5ada5bf",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-77c3557995704a683cdb67e2a3055f7547fa22c3-v363c8a7e5ccdf6968fc7ab84a2053ac78036691d",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-9c392b60e2c6fa1d68cb68084b4b4ff04d0cb35c-v2d9a6c849c60ed19fd0858ce9e40b7cc8e097e59",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-fb144c44144f8bd3542e71f5db62b6d322c7bd85-vba6da65a0f3baefda7a058ebbd0a8dcafb8512f5",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-0d2afd58f3d0e34af21cee7d8a3fc9d855594e9f-vnan",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-7c8dc180281491ccaa1b4b43518506323750d1e4-v298a7a812ceed28c4c18355a091f1b268fe56d86",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-1c06c46cc14324df35ac4f39a45fb3ccd602195d-v0f01c69f1e2528b935359cfe578530722bca2c59",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-fea33d607fde83cf505b228238cf365936437a63-v9f8e9d96c85c85a605e382f1510bd08563afc566",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-91efee627df01e32007abf2d6ebf73f9d9053076-vbee42ad1b72fb23c6a1c874868a720b370983ed2",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-7e1a347695c7987ae56ef1b6919156d9254010ad-v390e508d27db7a51eece36bb6d9698b63a5b638a",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-0b621cb0ce2b54d3f93d8d41d8ff4257888a87e5-v2ef375ac784985212b1805e1d0431dc8f1b3c171",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-acdddc590d0b3688f8f6386f43709049622a6e19-vfa6ff903cb27f336e17654595dd900fa943dcd91",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-a7d2a4e03209cff1e97e59fd54bb2b05fdbdbec6-v0f01c69f1e2528b935359cfe578530722bca2c59",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-01d1d1494411380d97cac14614a829d3a69cecaf-v2ef375ac784985212b1805e1d0431dc8f1b3c171",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-89e4b4431fe7506c365a6f6eb6f6d048d04c044c-v08d8e8889ec945ab821fb156c04c7d2e2810debb",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-935528e22e5283ee3f63a8772830d3d01f55ed8c-vba6da65a0f3baefda7a058ebbd0a8dcafb8512f5",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-cf06f4e3708f886032d4d2a30108c2fddb042d81-v2ef375ac784985212b1805e1d0431dc8f1b3c171",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-5fb312632097be7e9ac6ab657964af115224d15d-v0f5aece3601a5b4419f7ccec1dbda2071be28ee4",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-379058e10f3dbc0fdcaf80394bd09b18927e7d33-v1055803c3a812189a1133297f7f5468579283f86",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-c09e1439f145c66ee3af574386e277dd2388d094-v2ef375ac784985212b1805e1d0431dc8f1b3c171",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-d8162c226a9d576f094dc1830c4c1ffd0be2dd17-v76304ecdb3a5954fcf13feb710e8c40fcf24b73c",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-709484969c8a4ffd74b839a673431a8c5caa6457-vba6da65a0f3baefda7a058ebbd0a8dcafb8512f5",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-322834d0e6bf17e5661145c9f085b41215c280e8-v488d33dd1b2540b234cbb0468af6b6614941ce8f",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-910b08570210509f3bcfebf35c093a48243fe754-v0f5aece3601a5b4419f7ccec1dbda2071be28ee4",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-949c503f2ef4b2c5d668af0492a5c0db1ab86140-v0f01c69f1e2528b935359cfe578530722bca2c59",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-e5340c449f23608803c286da0563b62f58ba25b0-v059c6fdc75567943479b23ebca7c07b5e9a7f34c",
+   "language": "python",
+   "created": null,
+   "why": "60 more python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_gravitational__teleport-32bcd71591c234f0d8b091ec01f1f5cbfdc0f13c-vee9b09fb20c43af7e520f57e9239bbcf46b7113d",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_flipt-io__flipt-6fe76d024ee0c50ddb09c86f4ae0bd4c208fd65f",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_future-architect__vuls-3c1489e588dacea455ccf4c352a3b1006902e2d4",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_navidrome__navidrome-29bc17acd71596ae92131aca728716baf5af9906",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_gravitational__teleport-6eaaf3a27e64f4ef4ef855bd35d7ec338cf17460-v626ec2a48416b10a88641359a169d99e935ff037",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_flipt-io__flipt-524f277313606f8cd29b299617d6565c01642e15",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_future-architect__vuls-61c39637f2f3809e1b5dad05f0c57c799dce1587",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_navidrome__navidrome-d613b1930688422122796b43acb3caf2538c8fd1",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_gravitational__teleport-96019ce0be7a2c8e36363f359eb7c943b41dde70",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_flipt-io__flipt-9d25c18b79bc7829a6fb08ec9e8793d5d17e2868",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_future-architect__vuls-54e73c2f5466ef5daec3fb30922b9ac654e4ed25",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_navidrome__navidrome-3977ef6e0f287f598b6e4009876239d6f13b686d",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_gravitational__teleport-b4e7cd3a5e246736d3fe8d6886af55030b232277",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_flipt-io__flipt-e91615cf07966da41756017a7d571f9fc0fdbe80",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_future-architect__vuls-f6cc8c263dc00329786fa516049c60d4779c4a07",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_navidrome__navidrome-3853c3318f67b41a9e4cb768618315ff77846fdb",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_gravitational__teleport-bb69574e02bd62e5ccd3cebb25e1c992641afb2a",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_flipt-io__flipt-e594593dae52badf80ffd27878d2275c7f0b20e9",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_future-architect__vuls-ad2edbb8448e2c41a097f1c0b52696c0f6c5924d",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_navidrome__navidrome-55730514ea59d5f1d0b8e3f8745569c29bdbf7b4",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_gravitational__teleport-4f771403dc4177dc26ee0370f7332f3fe54bee0f-vee9b09fb20c43af7e520f57e9239bbcf46b7113d",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_flipt-io__flipt-e5fe37c379e1eec2dd3492c5737c0be761050b26",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_future-architect__vuls-6682232b5c8a9d08c0e9f15bd90d41bff3875adc",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_navidrome__navidrome-d21932bd1b2379b0ebca2d19e5d8bae91040268a",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_gravitational__teleport-4d0117b50dc8cdb91c94b537a4844776b224cd3d",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_flipt-io__flipt-ebb3f84c74d61eee4d8c6875140b990eee62e146",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_future-architect__vuls-e1df74cbc1a1d1889428b3333a3b2405c4651993",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_navidrome__navidrome-ee21f3957e0de91624427e93c62b8ee390de72e3",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_gravitational__teleport-c782838c3a174fdff80cafd8cd3b1aa4dae8beb2",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_flipt-io__flipt-3ef34d1fff012140ba86ab3cafec8f9934b492be",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_future-architect__vuls-457a3a9627fb9a0800d0aecf1d4713fb634a9011",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_navidrome__navidrome-55bff343cdaad1f04496f724eda4b55d422d7f17",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_gravitational__teleport-46a13210519461c7cec8d643bfbe750265775b41",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_flipt-io__flipt-c1fd7a81ef9f23e742501bfb26d914eb683262aa",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_future-architect__vuls-999529a05b202b0fd29c6fca5039a4c47a3766bb",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_navidrome__navidrome-56303cde23a4122d2447cbb266f942601a78d7e4",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_gravitational__teleport-005dcb16bacc6a5d5890c4cd302ccfd4298e275d-vee9b09fb20c43af7e520f57e9239bbcf46b7113d",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_flipt-io__flipt-492cc0b158200089dceede3b1aba0ed28df3fb1d",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_future-architect__vuls-e52fa8d6ed1d23e36f2a86e5d3efe9aa057a1b0d",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_navidrome__navidrome-e12a14a87d392ac70ee4cc8079e3c3e0103dbcb2",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_gravitational__teleport-f432a71a13e698b6e1c4672a2e9e9c1f32d35c12",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_flipt-io__flipt-b3cd920bbb25e01fdb2dab66a5a913363bc62f6c",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_future-architect__vuls-4b680b996061044e93ef5977a081661665d3360a",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_navidrome__navidrome-9c3b4561652a15846993d477003e111f0df0c585",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_gravitational__teleport-87a593518b6ce94624f6c28516ce38cc30cbea5a",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_flipt-io__flipt-7161f7b876773a911afdd804b281e52681cb7321",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_future-architect__vuls-7e91f5ef7e5712b1a3d7d5066ad6607e9debc21c",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_navidrome__navidrome-7073d18b54da7e53274d11c9e2baef1242e8769e",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_gravitational__teleport-b8fbb2d1e90ffcde88ed5fe9920015c1be075788-vee9b09fb20c43af7e520f57e9239bbcf46b7113d",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_flipt-io__flipt-c1728053367c753688f114ec26e703c8fdeda125",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_future-architect__vuls-a76302c11174ca081f656c63a000ffa746e350af",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_navidrome__navidrome-1e96b858a91c640fe64e84c5e5ad8cc0954ea38d",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_gravitational__teleport-629dc432eb191ca479588a8c49205debb83e80e2",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_flipt-io__flipt-5c7037ececb0bead0a8eb56054e224bcd7ac5922",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_future-architect__vuls-cc63a0eccfdd318e67c0a6edeffc7bf09b6025c0",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_navidrome__navidrome-31799662706fedddf5bcc1a76b50409d1f91d327",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_gravitational__teleport-7744f72c6eb631791434b648ba41083b5f6d2278-vce94f93ad1030e3136852817f2423c1b3ac37bc4",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_flipt-io__flipt-72d06db14d58692bfb4d07b1aa745a37b35956f3",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_future-architect__vuls-ca3f6b1dbf2cd24d1537bfda43e788443ce03a0c",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_navidrome__navidrome-dfa453cc4ab772928686838dc73d0130740f054e",
+   "language": "go",
+   "created": null,
+   "why": "60 more go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-18c03daa865d3c5b10e52b669cd50be34c67b2e5-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-18c45b44613aecd53e9f60457b9812049ab2998d-v0495b863a912fbff5749c67e860612b91825407c",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-cba6ebbd0707caa524ffee51c62b197f6122c902",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-ec0f940ef0e8e3b61078f145f34dc40d1938e6c5-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-7b8bffd763e2155cf88f3ebc258fa68ebe18188d-vf2cf3cbd463b7ad942381f1c6d077626485a1e9e",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-0d0267c4438cf378bda90bc85eed3a3615871ac4",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-9bf77963ee5e036d54b2a3ca202fbf6378464a5e-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-0c81642997ea1d827dbd02c311db9d4976112cd4-vf2cf3cbd463b7ad942381f1c6d077626485a1e9e",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-6dcf0d0b0f7965ad94be3f84971afeb437f25b02",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-ca58617cee8aa91c93553449bfdf9b3465a5119b-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-eb49a64974ca844bca061744fb3383f5d13b02ad-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-708ed4a299711f0fa79a907cc5847cfd39c0fc71",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-f0359a5c180b8fec4329c77adcf967c8d3b7b787-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-05f2236193f407cf8e2072757fbd6bb170bc13f0-vf2cf3cbd463b7ad942381f1c6d077626485a1e9e",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-5e815cfa518b223a088fa9bb232a5fc90ab15691",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-72a8f8f03b1a01bb70ef8a5bb61759416991b32c-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-22368b996ee0e5f11a5189b400b33af3cc8d925a-v4fbcfae8b15e4ce5d132c408bca69ebb9cf146ed",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-4817fe14e1356789c90165c2a53f6a043c2c5f83",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-d405160080bbe804f7e9294067d004a7d4dad9d6-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-767973717be700f46f06f3e7f4fc550c63509046-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-3a6790f480309130b5d6332dce6c9d5ccca13ee3",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-aeabf3b18896ac1eb7ae9757e66ce886120f8309-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-6ea3b51f128dd270281db576a1b59270d5e45db0-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-32ff10999a06455cb2147f6873d627456924ae13",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-ad26925bb6628260cfe0fcf90ec0a8cba381f4a4-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-f9ce92df988db7c1ae55d9ef96d247d27478bc70-vf2cf3cbd463b7ad942381f1c6d077626485a1e9e",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-01ea5214d11e0df8b7170d91bafd34f23cb0f2b1",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-1077729a19c0ce902e713cf6fab42c91fb7907f1-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-445b70deda20201b7d9a68f7224da751b3db728c-v4fbcfae8b15e4ce5d132c408bca69ebb9cf146ed",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-a6e6f617026794e7b505d649d2a7a9cdf17658c8",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-494d9de6f0a94ffb491e74744d2735bce02dc0ab-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-b1f9ad5534bb3a44dab5364f659876a4b7fe34c1-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-bf2e89c0c488ae1a87d503e5b09fe9dd2f2a635f",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-ecfd1736e5dd9808e87911fc264e6c816653e1a9-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-087e6020e490b4a1759f38c1ad03869511928263-vf2cf3cbd463b7ad942381f1c6d077626485a1e9e",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-8be4f6cb9380fcd2e67bcb18cef931ae0d4b869c",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-d06cf09bf0b3d4a0fbe6bd32e4115caea2083168-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-f48ed3658aab7be0f1165d4c1f89af48d7865189-v0495b863a912fbff5749c67e860612b91825407c",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-0ec14e36ceb01ba45602a563e12352af8171ed39",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-a692fe21811f88d92e8f7047fc615e4f1f986b0f-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-04998908ba6721d64eba79ae3b65a351dcfbc5b5-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-dfe5604193d63bfcb91ce60d62db2f805c43bf11",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-56c7fc1948923b4b3f3507799e725ac16bcf8018-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-51d8f3b195bddb13a13ddc0de110722774d9bb1b-vf2cf3cbd463b7ad942381f1c6d077626485a1e9e",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-6f8916fbadf1d1f4a26640f53b5cf7f55e8bedb7",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-5e8488c2838ff4268f39db4a8cca7d74eecf5a7e-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-0f788b8eaa4bba3c142d171fd941d015c53b65fc-v0ec6d6c2baf3cb4797482ce4829bc25cd5716649",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-51742625834d3bd0d10fe0c7e76b8739a59c6b9f",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-8f3c8b35153d2227af45f32e46bd1e15bd60b71f-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-70b4a0e2aebebe8f2f559de6680093d96a697b2f-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-c5a2089ca2bfe9aa1d85a664b8ad87ef843a1c9c",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-dae13ac8522fc6d41e64d1ac6e3174486fdcce0c-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-a5afad27e52fd336163063ba40dcadc80233ae10-vd59a5728dfc977f44533186ace531248c2917516",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-5f0745dd6993bb1430a951c62a49807c6635cd77",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-5dfde12c1c1c0b6e48f17e3405468593e39d9492-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-9c576a0758690f45a6ca03b5884c601e473bf2c1-vd59a5728dfc977f44533186ace531248c2917516",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-c6f65d205c401350a226bb005f42fac1754b0b5b",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-4c6b0d35add7ae8d58f71ea1711587e31081444b-vnan",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-f1a80d48cc45877fcbadf34c2345dd9709722c7f-v4fbcfae8b15e4ce5d132c408bca69ebb9cf146ed",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-08bb09914d0d37b0cd6376d4cab5b77728a43e7b",
+   "language": "js",
+   "created": null,
+   "why": "60 more js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-db90ac26ab78addf72a8efaff3c7acc0fbd6d000-vbc0d9ba8f0071fbe982809910959a6ff8884dbbf",
+   "language": "ts",
+   "created": null,
+   "why": "60 more ts tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-40e94dee2bcec2b63f362da283123e9df1874cc1-vc4e41fd0029957297843cb9dec4a25c7c756f029",
+   "language": "ts",
+   "created": null,
+   "why": "60 more ts tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-d1aa0ecec288bfc800cfb9133b087c4f81ad8b38-vbc0d9ba8f0071fbe982809910959a6ff8884dbbf",
+   "language": "ts",
+   "created": null,
+   "why": "60 more ts tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-09c2776c0fce3db5c6e18da92b5a45dce9f013aa-vbc0d9ba8f0071fbe982809910959a6ff8884dbbf",
+   "language": "ts",
+   "created": null,
+   "why": "60 more ts tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-1ff82aa365763cee2d609c9d19360ad87fdf2ec7-vc4e41fd0029957297843cb9dec4a25c7c756f029",
+   "language": "ts",
+   "created": null,
+   "why": "60 more ts tasks, one repository after another"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/sympy__sympy-28075",
+   "language": null,
+   "created": "2025-05-17",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pgmpy__pgmpy-2271",
+   "language": null,
+   "created": "2025-08-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/probabl-ai__skore-1229",
+   "language": null,
+   "created": "2025-01-27",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/imperialcollegelondon__pyrealm-593",
+   "language": null,
+   "created": "2026-01-19",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/astropy__astropy-18424",
+   "language": null,
+   "created": "2025-07-13",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/intel__code-base-investigator-178",
+   "language": null,
+   "created": "2025-03-21",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/Cambridge-ICCS__TCTrack-118",
+   "language": null,
+   "created": "2025-12-04",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/neuroinformatics-unit__movement-432",
+   "language": null,
+   "created": "2025-02-24",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pytorch__ignite-3532_interface",
+   "language": null,
+   "created": "2026-02-13",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/boxed__mutmut-363",
+   "language": null,
+   "created": "2025-02-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/zarr-developers__zarr-python-2817",
+   "language": null,
+   "created": "2025-02-12",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pgmpy__pgmpy-1905",
+   "language": null,
+   "created": "2025-01-26",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/omni-us__jsonargparse-707",
+   "language": null,
+   "created": "2025-04-16",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/PyPSA__PyPSA-1498",
+   "language": null,
+   "created": "2025-12-17",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/ASPP__pelita-875",
+   "language": null,
+   "created": "2025-04-29",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/davep__braindrop-96",
+   "language": null,
+   "created": "2025-01-13",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/schemathesis__schemathesis-3388",
+   "language": null,
+   "created": "2025-12-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tobymao__sqlglot-6383",
+   "language": null,
+   "created": "2025-11-21",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/genericmappingtools__pygmt-4371",
+   "language": null,
+   "created": "2026-01-27",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/instructlab__sdg-484",
+   "language": null,
+   "created": "2025-01-17",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/iris-hep__func_adl-199",
+   "language": null,
+   "created": "2025-07-05",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/beeware__briefcase-2651",
+   "language": null,
+   "created": "2026-01-28",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tobymao__sqlglot-7457",
+   "language": null,
+   "created": "2026-04-05",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/sympy__sympy-27489",
+   "language": null,
+   "created": "2025-01-18",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/openai__openai-agents-python-2144",
+   "language": null,
+   "created": "2025-12-04",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/schemathesis__schemathesis-3195",
+   "language": null,
+   "created": "2025-10-22",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/avaiga__taipy-2797",
+   "language": null,
+   "created": "2026-01-29",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/koxudaxi__datamodel-code-generator-3046",
+   "language": null,
+   "created": "2026-03-10",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pytransitions__transitions-694",
+   "language": null,
+   "created": "2025-03-25",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tobymao__sqlglot-6374",
+   "language": null,
+   "created": "2025-11-21",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/basicmachines-co__basic-memory-341",
+   "language": null,
+   "created": "2025-10-08",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/raullenchai__rapid-mlx-341_interface",
+   "language": null,
+   "created": "2026-05-10",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/google__secops-wrapper-119",
+   "language": null,
+   "created": "2025-09-17",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/gerlero__foamlib-329",
+   "language": null,
+   "created": "2025-03-09",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/icloud-photos-downloader__icloud_photos_downloader-1060",
+   "language": null,
+   "created": "2025-01-18",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pydata__sparse-870",
+   "language": null,
+   "created": "2025-05-10",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/sympy__sympy-27650",
+   "language": null,
+   "created": "2025-02-23",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/bluesky__ophyd-async-1165",
+   "language": null,
+   "created": "2025-12-17",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/BerriAI__litellm-15753",
+   "language": null,
+   "created": "2025-10-21",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/PennyLaneAI__pennylane-7671",
+   "language": null,
+   "created": "2025-06-13",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/streamlink__streamlink-6455",
+   "language": null,
+   "created": "2025-03-01",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/feder-observatory__stellarphot-519",
+   "language": null,
+   "created": "2025-06-09",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/probabl-ai__skore-1335",
+   "language": null,
+   "created": "2025-02-16",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/sphinx-doc__sphinx-13261",
+   "language": null,
+   "created": "2025-01-23",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/scrapy__scrapy-6671",
+   "language": null,
+   "created": "2025-02-13",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/scikit-rf__scikit-rf-1336",
+   "language": null,
+   "created": "2025-10-15",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/PyPSA__linopy-412",
+   "language": null,
+   "created": "2025-02-05",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/python-scim__scim2-models-90",
+   "language": null,
+   "created": "2025-03-08",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pymc-devs__pytensor-1668",
+   "language": null,
+   "created": "2025-10-15",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/Ljzd-PRO__KToolBox-302",
+   "language": null,
+   "created": "2025-08-02",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/sdv-dev__SDMetrics-749",
+   "language": null,
+   "created": "2025-03-18",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/OpenMDAO__dymos-1204",
+   "language": null,
+   "created": "2025-08-08",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/zarr-developers__VirtualiZarr-395",
+   "language": null,
+   "created": "2025-01-29",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/marshmallow-code__marshmallow-2800",
+   "language": null,
+   "created": "2025-01-22",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/psf__black-4676",
+   "language": null,
+   "created": "2025-06-01",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/newton-physics__newton-1582",
+   "language": null,
+   "created": "2026-02-09",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/newton-physics__newton-1653",
+   "language": null,
+   "created": "2026-02-16",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/omni-us__jsonargparse-827",
+   "language": null,
+   "created": "2026-01-08",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/careamics__careamics-688",
+   "language": null,
+   "created": "2026-01-20",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pyccel__pyccel-2454",
+   "language": null,
+   "created": "2025-09-23",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/GoogleCloudPlatform__cloud-sql-python-connector-1221",
+   "language": null,
+   "created": "2025-01-11",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/marimo-team__marimo-6819",
+   "language": null,
+   "created": "2025-10-17",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/python-babel__babel-1163",
+   "language": null,
+   "created": "2025-01-08",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/idaholab__montepy-933_interface",
+   "language": null,
+   "created": "2026-03-20",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/angr__claripy-603",
+   "language": null,
+   "created": "2025-03-04",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/scipy__scipy-24454",
+   "language": null,
+   "created": "2026-01-28",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/probabl-ai__skore-1085",
+   "language": null,
+   "created": "2025-01-10",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/dask__dask-11723",
+   "language": null,
+   "created": "2025-02-07",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/opsmill__infrahub-8423",
+   "language": null,
+   "created": "2026-02-20",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/deepset-ai__haystack-10171",
+   "language": null,
+   "created": "2025-12-02",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/schemathesis__schemathesis-2985",
+   "language": null,
+   "created": "2025-08-01",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/astropy__astropy-18005",
+   "language": null,
+   "created": "2025-04-11",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/microsoft__fabric-cicd-465",
+   "language": null,
+   "created": "2025-08-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/sigstore__sigstore-python-1652",
+   "language": null,
+   "created": "2026-01-12",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/lincc-frameworks__nested-pandas-236",
+   "language": null,
+   "created": "2025-04-09",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/PennLINC__CuBIDS-438",
+   "language": null,
+   "created": "2025-02-20",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/sympy__sympy-27559",
+   "language": null,
+   "created": "2025-02-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/NeurodataWithoutBorders__pynwb-2056",
+   "language": null,
+   "created": "2025-03-11",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/ultraplot__ultraplot-696",
+   "language": null,
+   "created": "2026-04-17",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/CrossGL__crosstl-257",
+   "language": null,
+   "created": "2025-01-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pandas-dev__pandas-60896",
+   "language": null,
+   "created": "2025-02-09",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/AzureAD__microsoft-authentication-library-for-python-795",
+   "language": null,
+   "created": "2025-03-07",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/Colin-b__httpx_auth-105",
+   "language": null,
+   "created": "2025-01-07",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/ardupilot__methodicconfigurator-1201",
+   "language": null,
+   "created": "2026-01-23",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/scipp__plopp-513",
+   "language": null,
+   "created": "2026-01-22",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/niconoe__pyinaturalist-643",
+   "language": null,
+   "created": "2026-01-08",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/lmfit__lmfit-py-989",
+   "language": null,
+   "created": "2025-01-28",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pipecat-ai__pipecat-4283",
+   "language": null,
+   "created": "2026-04-14",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/marcosschroh__dataclasses-avroschema-870",
+   "language": null,
+   "created": "2025-06-26",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/agronholm__sqlacodegen-368",
+   "language": null,
+   "created": "2025-02-16",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/astropy__astroquery-3199",
+   "language": null,
+   "created": "2025-02-03",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/astropy__ccdproc-901",
+   "language": null,
+   "created": "2025-07-13",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/iterative__dvc-10844",
+   "language": null,
+   "created": "2025-08-15",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/probabl-ai__skore-1133",
+   "language": null,
+   "created": "2025-01-16",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/fjosw__pyerrors-253",
+   "language": null,
+   "created": "2025-01-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tefra__xsdata-1126",
+   "language": null,
+   "created": "2025-03-08",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/agronholm__sqlacodegen-391",
+   "language": null,
+   "created": "2025-03-28",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/zarr-developers__zarr-python-2996",
+   "language": null,
+   "created": "2025-04-18",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pandas-dev__pandas-61105",
+   "language": null,
+   "created": "2025-03-12",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/getsentry__sentry-python-3942",
+   "language": null,
+   "created": "2025-01-17",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/Ultraplot__UltraPlot-346",
+   "language": null,
+   "created": "2025-09-15",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/owkin__PyDESeq2-356",
+   "language": null,
+   "created": "2025-01-10",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pasqal-io__Pulser-936",
+   "language": null,
+   "created": "2025-09-18",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/keras-team__keras-22138",
+   "language": null,
+   "created": "2026-02-10",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/sktime__sktime-8723",
+   "language": null,
+   "created": "2025-08-21",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/canonical__charmcraft-2084",
+   "language": null,
+   "created": "2025-01-17",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/getmoto__moto-9356",
+   "language": null,
+   "created": "2025-10-11",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/adrn__gala-495",
+   "language": null,
+   "created": "2025-10-21",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/sympy__sympy-28207",
+   "language": null,
+   "created": "2025-07-03",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/scipp__plopp-435",
+   "language": null,
+   "created": "2025-04-09",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/brightway-lca__brightway2-io-294",
+   "language": null,
+   "created": "2025-01-09",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/sympy__sympy-28639",
+   "language": null,
+   "created": "2025-11-24",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/scipp__plopp-422",
+   "language": null,
+   "created": "2025-03-10",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/calliope-project__calliope-854",
+   "language": null,
+   "created": "2025-12-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/astropy__astropy-18868",
+   "language": null,
+   "created": "2025-11-11",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/simonw__files-to-prompt-44",
+   "language": null,
+   "created": "2025-02-19",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/iris-hep__func_adl-185",
+   "language": null,
+   "created": "2025-03-22",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/PyPSA__linopy-494",
+   "language": null,
+   "created": "2025-09-07",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/jsonpickle__jsonpickle-588",
+   "language": null,
+   "created": "2026-01-13",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/rollbar__pyrollbar-468",
+   "language": null,
+   "created": "2025-01-18",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/getmoto__moto-9841",
+   "language": null,
+   "created": "2026-03-10",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/huggingface__trl-5135",
+   "language": null,
+   "created": "2026-02-20",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/SpikeInterface__spikeinterface-3737",
+   "language": null,
+   "created": "2025-03-05",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/meilisearch__meilisearch-mcp-39",
+   "language": null,
+   "created": "2025-06-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/stfc__PSyclone-3000",
+   "language": null,
+   "created": "2025-05-20",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/python-pillow__Pillow-8938",
+   "language": null,
+   "created": "2025-04-29",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/DiamondLightSource__mx-bluesky-1519",
+   "language": null,
+   "created": "2025-12-11",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/ryanhiebert__django-cmd-19",
+   "language": null,
+   "created": "2025-01-10",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/noppanut15__depthviz-55",
+   "language": null,
+   "created": "2025-01-21",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/dstackai__gpuhunt-197",
+   "language": null,
+   "created": "2025-11-04",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/sphinx-doc__sphinx-13318",
+   "language": null,
+   "created": "2025-02-08",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/scipp__plopp-459",
+   "language": null,
+   "created": "2025-06-19",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/nilearn__nilearn-6031_interface",
+   "language": null,
+   "created": "2026-02-18",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/cs-si__eodag-2176",
+   "language": null,
+   "created": "2026-05-11",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/vitalik__django-ninja-1427",
+   "language": null,
+   "created": "2025-03-21",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/statsmodels__statsmodels-9468",
+   "language": null,
+   "created": "2025-01-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pab1it0__prometheus-mcp-server-76",
+   "language": null,
+   "created": "2025-09-21",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/yukinarit__pyserde-682",
+   "language": null,
+   "created": "2025-12-13",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/databricks__dbt-databricks-1428",
+   "language": null,
+   "created": "2026-04-28",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pandas-dev__pandas-63945",
+   "language": null,
+   "created": "2026-01-30",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/allenai__rslearn-142",
+   "language": null,
+   "created": "2025-02-20",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/equinor__ert-11988",
+   "language": null,
+   "created": "2025-10-02",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/catalystneuro__neuroconv-1406",
+   "language": null,
+   "created": "2025-06-24",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pydata__xarray-10863",
+   "language": null,
+   "created": "2025-10-17",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/omni-us__jsonargparse-667",
+   "language": null,
+   "created": "2025-02-03",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/brightway-lca__brightway2-data-235",
+   "language": null,
+   "created": "2025-01-28",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/cea-hpc__clustershell-592",
+   "language": null,
+   "created": "2025-08-08",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/dask__dask-12096",
+   "language": null,
+   "created": "2025-10-09",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/openai__openai-agents-python-1782",
+   "language": null,
+   "created": "2025-09-22",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/holoviz__param-1073",
+   "language": null,
+   "created": "2025-09-24",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/streamlink__streamlink-6439",
+   "language": null,
+   "created": "2025-02-19",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tlsfuzzer__python-ecdsa-358",
+   "language": null,
+   "created": "2025-03-13",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tobymao__sqlglot-6563",
+   "language": null,
+   "created": "2025-12-16",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/wemake-services__wemake-python-styleguide-3382",
+   "language": null,
+   "created": "2025-04-09",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/materialsproject__custodian-379",
+   "language": null,
+   "created": "2025-05-13",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/kubeflow__pipelines-13112",
+   "language": null,
+   "created": "2026-03-24",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tox-dev__tox-3759",
+   "language": null,
+   "created": "2026-02-18",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/oemof__oemof-solph-1180",
+   "language": null,
+   "created": "2025-03-15",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pandas-dev__pandas-61183",
+   "language": null,
+   "created": "2025-03-26",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pydicom__pydicom-2251",
+   "language": null,
+   "created": "2025-07-20",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/sympy__sympy-28183",
+   "language": null,
+   "created": "2025-06-25",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/scikit-rf__scikit-rf-1256",
+   "language": null,
+   "created": "2025-02-23",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/jawah__niquests-277",
+   "language": null,
+   "created": "2025-08-15",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/astropy__astropy-18681",
+   "language": null,
+   "created": "2025-10-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pandas-dev__pandas-64104",
+   "language": null,
+   "created": "2026-02-10",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/feder-observatory__stellarphot-526",
+   "language": null,
+   "created": "2025-06-12",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/plone__cookieplone-templates-322",
+   "language": null,
+   "created": "2025-12-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/deepset-ai__haystack-9322",
+   "language": null,
+   "created": "2025-04-29",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/biopython__biopython-5005",
+   "language": null,
+   "created": "2025-06-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/ets-labs__python-dependency-injector-886",
+   "language": null,
+   "created": "2025-05-18",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/libp2p__py-libp2p-533",
+   "language": null,
+   "created": "2025-03-07",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/collective__icalendar-921",
+   "language": null,
+   "created": "2025-10-19",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/Delgan__loguru-1306",
+   "language": null,
+   "created": "2025-02-20",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tobymao__sqlglot-6556",
+   "language": null,
+   "created": "2025-12-15",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pyjanitor-devs__pyjanitor-1593",
+   "language": null,
+   "created": "2026-02-11",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/ethereum__eth-account-317",
+   "language": null,
+   "created": "2025-03-22",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/AbsaOSS__generate-release-notes-207",
+   "language": null,
+   "created": "2025-11-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/IAMconsortium__nomenclature-456",
+   "language": null,
+   "created": "2025-01-14",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/juaAI__stationbench-41",
+   "language": null,
+   "created": "2025-02-26",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/BrianPugh__cyclopts-701",
+   "language": null,
+   "created": "2025-11-22",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/marshmallow-code__marshmallow-sqlalchemy-648",
+   "language": null,
+   "created": "2025-01-12",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/microsoft__Agents-for-python-264",
+   "language": null,
+   "created": "2025-12-02",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tobymao__sqlglot-4683",
+   "language": null,
+   "created": "2025-01-30",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/isledecomp__reccmp-166",
+   "language": null,
+   "created": "2025-07-05",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/spacetelescope__jwst-9967",
+   "language": null,
+   "created": "2025-10-28",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/dask__dask-11698",
+   "language": null,
+   "created": "2025-01-24",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/RDFLib__pySHACL-285",
+   "language": null,
+   "created": "2025-02-09",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/PennLINC__xcp_d-1433",
+   "language": null,
+   "created": "2025-04-17",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pipecat-ai__pipecat-2413",
+   "language": null,
+   "created": "2025-08-11",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/lincc-frameworks__nested-pandas-190",
+   "language": null,
+   "created": "2025-01-28",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/jsonpickle__jsonpickle-587",
+   "language": null,
+   "created": "2026-01-12",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/UXARRAY__uxarray-1369",
+   "language": null,
+   "created": "2025-09-15",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/joke2k__django-environ-592",
+   "language": null,
+   "created": "2026-02-21",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/dandi__dandi-cli-1584",
+   "language": null,
+   "created": "2025-03-03",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/narwhals-dev__narwhals-3480",
+   "language": null,
+   "created": "2026-02-19",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/graphistry__pygraphistry-1107_interface",
+   "language": null,
+   "created": "2026-04-09",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/gitpython-developers__GitPython-2051",
+   "language": null,
+   "created": "2025-06-11",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/chaoss__augur-3512",
+   "language": null,
+   "created": "2026-01-07",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/apache__iceberg-python-2797",
+   "language": null,
+   "created": "2025-12-08",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/docling-project__docling-2998",
+   "language": null,
+   "created": "2026-02-16",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/BerriAI__litellm-16487",
+   "language": null,
+   "created": "2025-11-11",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/a2aproject__a2a-python-682_interface",
+   "language": null,
+   "created": "2026-02-11",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/yt-dlp__yt-dlp-13403",
+   "language": null,
+   "created": "2025-06-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/py-pdf__pdfly-219",
+   "language": null,
+   "created": "2025-12-19",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pydata__xarray-10723",
+   "language": null,
+   "created": "2025-09-09",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/scitokens__scitokens-202",
+   "language": null,
+   "created": "2025-02-19",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/quantumlib__ReCirq-410",
+   "language": null,
+   "created": "2025-08-01",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/Materials-Consortia__optimade-python-tools-2250",
+   "language": null,
+   "created": "2025-03-20",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/strands-agents__sdk-python-1734",
+   "language": null,
+   "created": "2026-02-20",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/mlte-team__mlte-809",
+   "language": null,
+   "created": "2025-11-14",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/deepset-ai__haystack-9242",
+   "language": null,
+   "created": "2025-04-16",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/olofk__fusesoc-724",
+   "language": null,
+   "created": "2025-01-19",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/yt-project__unyt-628",
+   "language": null,
+   "created": "2026-01-30",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/SciTools__iris-6772",
+   "language": null,
+   "created": "2025-10-30",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/Lightning-AI__litdata-499",
+   "language": null,
+   "created": "2025-03-07",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pasteurlabs__tesseract-core-302",
+   "language": null,
+   "created": "2025-08-01",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tox-dev__sphinx-autodoc-typehints-607",
+   "language": null,
+   "created": "2026-02-18",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/beever-ai__beever-atlas-102",
+   "language": null,
+   "created": "2026-04-29",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/networkx__networkx-8369",
+   "language": null,
+   "created": "2025-12-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/BrianPugh__cyclopts-609",
+   "language": null,
+   "created": "2025-10-16",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/reagento__dishka-512",
+   "language": null,
+   "created": "2025-08-02",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/unit8co__darts-2811",
+   "language": null,
+   "created": "2025-05-28",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/piskvorky__smart_open-889",
+   "language": null,
+   "created": "2025-10-11",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tskit-dev__tskit-3274",
+   "language": null,
+   "created": "2025-09-19",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/psd-tools__psd-tools-551",
+   "language": null,
+   "created": "2026-02-24",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/travisghansen__hass-opnsense-433",
+   "language": null,
+   "created": "2025-09-05",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/schemathesis__schemathesis-3291",
+   "language": null,
+   "created": "2025-11-08",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/astropy__astropy-17642",
+   "language": null,
+   "created": "2025-01-17",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/schemathesis__schemathesis-3405",
+   "language": null,
+   "created": "2025-12-10",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/scipp__plopp-445",
+   "language": null,
+   "created": "2025-04-25",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/prometheus__client_python-1134",
+   "language": null,
+   "created": "2025-09-12",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/USNavalResearchLaboratory__eispac-124",
+   "language": null,
+   "created": "2025-09-03",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/python-scim__scim2-models-126",
+   "language": null,
+   "created": "2026-01-30",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pandas-dev__pandas-60691",
+   "language": null,
+   "created": "2025-01-10",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pydata__xarray-10838",
+   "language": null,
+   "created": "2025-10-10",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pydy__pydy-525",
+   "language": null,
+   "created": "2025-09-03",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/boxed__mutmut-403",
+   "language": null,
+   "created": "2025-07-03",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/python-markdown__markdown-1587",
+   "language": null,
+   "created": "2026-01-21",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tobymao__sqlglot-6991",
+   "language": null,
+   "created": "2026-02-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/python-wheel-build__fromager-653",
+   "language": null,
+   "created": "2025-07-01",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pandas-dev__pandas-61017",
+   "language": null,
+   "created": "2025-02-28",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/stellarmesh__stellarmesh-51",
+   "language": null,
+   "created": "2025-09-05",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/facelessuser__pymdown-extensions-2576",
+   "language": null,
+   "created": "2025-01-21",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/probabl-ai__skore-1064",
+   "language": null,
+   "created": "2025-01-09",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/qBraid__pyqasm-120",
+   "language": null,
+   "created": "2025-01-09",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/Marker-Inc-Korea__AutoRAG-1150",
+   "language": null,
+   "created": "2025-09-23",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/macbre__sql-metadata-583",
+   "language": null,
+   "created": "2025-08-25",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/nhairs__python-json-logger-39",
+   "language": null,
+   "created": "2025-01-05",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/getmoto__moto-9549",
+   "language": null,
+   "created": "2025-12-14",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/BerriAI__litellm-16526",
+   "language": null,
+   "created": "2025-11-12",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/scrapy__scrapy-7351_interface",
+   "language": null,
+   "created": "2026-03-24",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/bvanelli__actualpy-117",
+   "language": null,
+   "created": "2025-03-01",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/openforcefield__openff-toolkit-2026",
+   "language": null,
+   "created": "2025-02-27",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/huggingface__transformers-44080",
+   "language": null,
+   "created": "2026-02-17",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/BerriAI__litellm-16899",
+   "language": null,
+   "created": "2025-11-21",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/radiasoft__pykern-578",
+   "language": null,
+   "created": "2025-06-28",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/materialsproject__fireworks-548",
+   "language": null,
+   "created": "2025-09-02",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/networkx__networkx-7804",
+   "language": null,
+   "created": "2025-01-22",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/zwicker-group__py-pde-712",
+   "language": null,
+   "created": "2025-09-05",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/movingpandas__movingpandas-469",
+   "language": null,
+   "created": "2025-05-13",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/probabl-ai__skore-1287",
+   "language": null,
+   "created": "2025-02-05",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/scipp__plopp-437",
+   "language": null,
+   "created": "2025-04-09",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/lincc-frameworks__nested-pandas-303",
+   "language": null,
+   "created": "2025-07-03",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/idaholab__MontePy-723",
+   "language": null,
+   "created": "2025-03-30",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/zarr-developers__zarr-python-2655",
+   "language": null,
+   "created": "2025-01-07",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/beeware__briefcase-2302",
+   "language": null,
+   "created": "2025-05-20",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/marimo-team__marimo-8387_interface",
+   "language": null,
+   "created": "2026-02-20",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/streamlink__streamlink-6420",
+   "language": null,
+   "created": "2025-02-03",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/valohai__valohai-cli-321",
+   "language": null,
+   "created": "2025-01-30",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/movingpandas__movingpandas-444",
+   "language": null,
+   "created": "2025-01-03",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pycqa__isort-2491",
+   "language": null,
+   "created": "2026-03-13",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/ImperialCollegeLondon__proCAT-503",
+   "language": null,
+   "created": "2025-12-18",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/sympy__sympy-27593",
+   "language": null,
+   "created": "2025-02-15",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/zarr-developers__zarr-python-2629",
+   "language": null,
+   "created": "2025-01-03",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/trinodb__trino-python-client-564",
+   "language": null,
+   "created": "2025-06-04",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tobymao__sqlglot-6413",
+   "language": null,
+   "created": "2025-11-26",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/zwicker-group__py-pde-733",
+   "language": null,
+   "created": "2025-12-01",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/dag-hammarskjold-library__dlx-534",
+   "language": null,
+   "created": "2025-03-28",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/agronholm__anyio-975",
+   "language": null,
+   "created": "2025-09-14",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/stfc__PSyclone-3093",
+   "language": null,
+   "created": "2025-08-14",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/python-scim__scim2-models-139_interface",
+   "language": null,
+   "created": "2026-04-03",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/cneud__alto-tools-29",
+   "language": null,
+   "created": "2025-02-11",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/sdv-dev__SDMetrics-723",
+   "language": null,
+   "created": "2025-02-12",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/networkx__networkx-8055",
+   "language": null,
+   "created": "2025-05-20",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/aiidateam__aiida-quantumespresso-1136",
+   "language": null,
+   "created": "2025-09-17",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/Ouranosinc__xclim-2225",
+   "language": null,
+   "created": "2025-08-15",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pymc-devs__pytensor-1701",
+   "language": null,
+   "created": "2025-10-28",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/jlowin__fastmcp-1011",
+   "language": null,
+   "created": "2025-07-02",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/BerriAI__litellm-16864",
+   "language": null,
+   "created": "2025-11-20",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/dag-hammarskjold-library__dlx-564",
+   "language": null,
+   "created": "2025-05-07",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/sktime__sktime-8937",
+   "language": null,
+   "created": "2025-10-09",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/vprusso__toqito-1484_interface",
+   "language": null,
+   "created": "2026-03-19",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/discos__srt-single-dish-tools-268",
+   "language": null,
+   "created": "2025-03-25",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pasqal-io__Pulser-865",
+   "language": null,
+   "created": "2025-05-16",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/vyperlang__vyper-4677",
+   "language": null,
+   "created": "2025-06-05",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/google__adk-python-3088",
+   "language": null,
+   "created": "2025-10-04",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/ethereum__web3.py-3594",
+   "language": null,
+   "created": "2025-01-28",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/geopython__pygeoapi-1923",
+   "language": null,
+   "created": "2025-02-05",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/VRSEN__agency-swarm-468",
+   "language": null,
+   "created": "2025-12-01",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/spdx__tools-python-855",
+   "language": null,
+   "created": "2025-07-01",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/python-babel__babel-1179",
+   "language": null,
+   "created": "2025-01-29",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pydata__xarray-9974",
+   "language": null,
+   "created": "2025-01-22",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/Delgan__loguru-1297",
+   "language": null,
+   "created": "2025-02-14",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/serge-sans-paille__beniget-121",
+   "language": null,
+   "created": "2025-01-29",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/Toloka__crowd-kit-128",
+   "language": null,
+   "created": "2025-01-12",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/All-Hands-AI__OpenHands-10628",
+   "language": null,
+   "created": "2025-08-26",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/BQSKit__bqskit-337",
+   "language": null,
+   "created": "2025-06-09",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/home-assistant__core-134506",
+   "language": null,
+   "created": "2025-01-03",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/facelessuser__pymdown-extensions-2807",
+   "language": null,
+   "created": "2025-12-15",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/bas-amop__PolarRoute-server-159",
+   "language": null,
+   "created": "2025-11-15",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/agronholm__anyio-935",
+   "language": null,
+   "created": "2025-06-29",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/Ultraplot__UltraPlot-357",
+   "language": null,
+   "created": "2025-10-04",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/destine-climate-dt__aqua-2768",
+   "language": null,
+   "created": "2026-03-12",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/a2aproject__a2a-python-576",
+   "language": null,
+   "created": "2025-12-03",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/astropy__astroquery-3275",
+   "language": null,
+   "created": "2025-03-26",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/modin-project__modin-7434",
+   "language": null,
+   "created": "2025-02-07",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/gammapy__gammapy-6409",
+   "language": null,
+   "created": "2026-02-18",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/unit8co__darts-2985",
+   "language": null,
+   "created": "2026-01-08",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/astropy__astropy-17748",
+   "language": null,
+   "created": "2025-02-10",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/astropy__astropy-18911",
+   "language": null,
+   "created": "2025-11-15",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pyfar__pyrato-113",
+   "language": null,
+   "created": "2026-01-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tobymao__sqlglot-5233",
+   "language": null,
+   "created": "2025-06-17",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/openmrslab__suspect-183",
+   "language": null,
+   "created": "2025-07-03",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/probabl-ai__skore-1136",
+   "language": null,
+   "created": "2025-01-16",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/terrapower__armi-2285",
+   "language": null,
+   "created": "2025-09-18",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/opsmill__infrahub-sdk-python-476",
+   "language": null,
+   "created": "2025-07-22",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/jmcgeheeiv__pyfakefs-1286",
+   "language": null,
+   "created": "2026-02-22",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/aws-cloudformation__cfn-python-lint-4368",
+   "language": null,
+   "created": "2026-02-11",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/mwouts__jupytext-1443",
+   "language": null,
+   "created": "2025-10-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/MindscapeHQ__raygun4py-119",
+   "language": null,
+   "created": "2025-05-20",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/mitmproxy__mitmproxy-7827",
+   "language": null,
+   "created": "2025-08-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tobymao__sqlglot-6385",
+   "language": null,
+   "created": "2025-11-21",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/Kozea__WeasyPrint-2494",
+   "language": null,
+   "created": "2025-07-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/NeurodataWithoutBorders__pynwb-2052",
+   "language": null,
+   "created": "2025-03-05",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/SpikeInterface__spikeinterface-3934",
+   "language": null,
+   "created": "2025-05-18",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/ethereum__web3.py-3604",
+   "language": null,
+   "created": "2025-02-05",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/jlowin__fastmcp-3237_interface",
+   "language": null,
+   "created": "2026-02-20",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/nolar__kopf-1225",
+   "language": null,
+   "created": "2026-01-31",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/modin-project__modin-7560",
+   "language": null,
+   "created": "2025-05-05",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/agronholm__sqlacodegen-375",
+   "language": null,
+   "created": "2025-02-26",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/reata__sqllineage-723",
+   "language": null,
+   "created": "2025-09-20",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/basicmachines-co__basic-memory-334",
+   "language": null,
+   "created": "2025-10-05",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tobymao__sqlglot-6067",
+   "language": null,
+   "created": "2025-10-10",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/rwth-i6__returnn-1764",
+   "language": null,
+   "created": "2025-09-19",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/ipython__ipython-14693",
+   "language": null,
+   "created": "2025-01-29",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/keras-team__keras-22316",
+   "language": null,
+   "created": "2026-03-01",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/jlowin__fastmcp-3235",
+   "language": null,
+   "created": "2026-02-20",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/milvus-io__pymilvus-3273",
+   "language": null,
+   "created": "2026-02-10",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/koxudaxi__datamodel-code-generator-2993",
+   "language": null,
+   "created": "2026-02-14",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/astropy__astropy-19438",
+   "language": null,
+   "created": "2026-03-16",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/DS4SD__docling-824",
+   "language": null,
+   "created": "2025-01-28",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tobymao__sqlglot-6409",
+   "language": null,
+   "created": "2025-11-25",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/asottile__dead-204",
+   "language": null,
+   "created": "2025-02-09",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/Point72__ccflow-24",
+   "language": null,
+   "created": "2025-01-30",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/ua-parser__uap-python-255",
+   "language": null,
+   "created": "2025-02-01",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/vndee__llm-sandbox-101",
+   "language": null,
+   "created": "2025-10-07",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/python-trio__trio-3334",
+   "language": null,
+   "created": "2025-09-21",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pypa__auditwheel-568",
+   "language": null,
+   "created": "2025-04-05",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/dask__dask-11803",
+   "language": null,
+   "created": "2025-03-04",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/stfc__PSyclone-2983",
+   "language": null,
+   "created": "2025-05-08",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/hiero-ledger__hiero-sdk-python-1914_interface",
+   "language": null,
+   "created": "2026-03-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/gidgethub__gidgethub-225",
+   "language": null,
+   "created": "2025-08-08",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tobymao__sqlglot-5037",
+   "language": null,
+   "created": "2025-05-02",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/mpmath__mpmath-992",
+   "language": null,
+   "created": "2025-08-14",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/deepset-ai__haystack-10029",
+   "language": null,
+   "created": "2025-11-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/GenericMappingTools__pygmt-4104",
+   "language": null,
+   "created": "2025-09-19",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pgmpy__pgmpy-2034",
+   "language": null,
+   "created": "2025-05-03",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/deepset-ai__haystack-9033",
+   "language": null,
+   "created": "2025-03-13",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/CS-SI__eodag-1717",
+   "language": null,
+   "created": "2025-07-01",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/yukinarit__pyserde-657",
+   "language": null,
+   "created": "2025-08-10",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/agentscope-ai__qwenpaw-3278",
+   "language": null,
+   "created": "2026-04-12",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/conan-io__conan-19604",
+   "language": null,
+   "created": "2026-02-12",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/modelcontextprotocol__python-sdk-1864",
+   "language": null,
+   "created": "2026-01-15",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/yt-project__unyt-560",
+   "language": null,
+   "created": "2025-02-07",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/google__flax-4580",
+   "language": null,
+   "created": "2025-02-27",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/BerriAI__litellm-16315",
+   "language": null,
+   "created": "2025-11-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/mwouts__jupytext-1366",
+   "language": null,
+   "created": "2025-03-14",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tobymao__sqlglot-4569",
+   "language": null,
+   "created": "2025-01-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/open-spaced-repetition__py-fsrs-127",
+   "language": null,
+   "created": "2025-08-04",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/lmstudio-ai__lmstudio-python-110",
+   "language": null,
+   "created": "2025-06-30",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/stan-dev__cmdstanpy-801",
+   "language": null,
+   "created": "2025-08-07",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/iterative__dvc-10711",
+   "language": null,
+   "created": "2025-03-26",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pypa__twine-1309",
+   "language": null,
+   "created": "2026-04-18",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/sympy__sympy-27685",
+   "language": null,
+   "created": "2025-03-04",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/geopandas__geopandas-3591",
+   "language": null,
+   "created": "2025-06-05",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/BrianPugh__cyclopts-633",
+   "language": null,
+   "created": "2025-10-24",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/collective__icalendar-880",
+   "language": null,
+   "created": "2025-07-16",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tox-dev__sphinx-autodoc-typehints-606",
+   "language": null,
+   "created": "2026-02-18",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/hdmf-dev__hdmf-1374",
+   "language": null,
+   "created": "2026-01-10",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/reframe-hpc__reframe-3553",
+   "language": null,
+   "created": "2025-09-17",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/BerriAI__litellm-17027",
+   "language": null,
+   "created": "2025-11-24",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/All-Hands-AI__OpenHands-11914",
+   "language": null,
+   "created": "2025-12-05",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tobymao__sqlglot-5253",
+   "language": null,
+   "created": "2025-06-20",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tobymao__sqlglot-4563",
+   "language": null,
+   "created": "2025-01-05",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/PennyLaneAI__pennylane-6939",
+   "language": null,
+   "created": "2025-02-08",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/mitmproxy__pdoc-806",
+   "language": null,
+   "created": "2025-05-04",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/astropy__astroquery-3168",
+   "language": null,
+   "created": "2025-01-07",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/agronholm__sqlacodegen-370",
+   "language": null,
+   "created": "2025-02-23",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/dask__dask-11727",
+   "language": null,
+   "created": "2025-02-07",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/bluesky__ophyd-async-1164",
+   "language": null,
+   "created": "2025-12-16",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tobymao__sqlglot-5256",
+   "language": null,
+   "created": "2025-06-20",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/scientific-python__docstub-123",
+   "language": null,
+   "created": "2026-01-15",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/aws__bedrock-agentcore-sdk-python-279_interface",
+   "language": null,
+   "created": "2026-02-24",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pyccel__pyccel-2512",
+   "language": null,
+   "created": "2025-11-20",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pymc-devs__pymc-7858",
+   "language": null,
+   "created": "2025-07-20",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/genericmappingtools__pygmt-4342",
+   "language": null,
+   "created": "2026-01-12",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/sympy__sympy-28738",
+   "language": null,
+   "created": "2025-12-10",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/Jc2k__aiohomekit-500",
+   "language": null,
+   "created": "2025-09-14",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/omni-us__jsonargparse-711",
+   "language": null,
+   "created": "2025-04-23",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/conan-io__conan-18005",
+   "language": null,
+   "created": "2025-03-24",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/facelessuser__pymdown-extensions-2651",
+   "language": null,
+   "created": "2025-04-28",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/Spenhouet__confluence-markdown-exporter-92",
+   "language": null,
+   "created": "2025-09-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/ImperialCollegeLondon__virtual_ecosystem-1232",
+   "language": null,
+   "created": "2025-12-17",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/python-scim__scim2-models-120",
+   "language": null,
+   "created": "2026-01-25",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pgmpy__pgmpy-2098",
+   "language": null,
+   "created": "2025-05-23",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/fox-it__dissect.cstruct-120",
+   "language": null,
+   "created": "2025-04-28",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/iris-hep__func_adl-184",
+   "language": null,
+   "created": "2025-03-21",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/astropy__astropy-17984",
+   "language": null,
+   "created": "2025-04-08",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/allenneuraldynamics__aind-data-schema-1677",
+   "language": null,
+   "created": "2026-01-06",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tobymao__sqlglot-5359",
+   "language": null,
+   "created": "2025-07-07",
+   "why": "random 420 of the rest"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/break-filter-js-from-html",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/compile-compcert",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/configure-git-webserver",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/constraints-scheduling",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/count-dataset-tokens",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/crack-7z-hash",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/db-wal-recovery",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/distribution-search",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/feal-differential-cryptanalysis",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/feal-linear-cryptanalysis",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/filter-js-from-html",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/financial-document-processor",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/fix-code-vulnerability",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/gcode-to-text",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/git-multibranch",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/largest-eigenval",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/llm-inference-batching-scheduler",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/log-summary-date-ranges",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/mailman",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/model-extraction-relu-logits",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/mteb-leaderboard",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/mteb-retrieve",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/multi-source-data-merger",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/nginx-request-logging",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/openssl-selfsigned-cert",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/password-recovery",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/protein-assembly",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/pytorch-model-cli",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/pytorch-model-recovery",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/qemu-alpine-ssh",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/qemu-startup",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/raman-fitting",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/rstan-to-pystan",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/sanitize-git-repo",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/sparql-university",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/sqlite-with-gcov",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/train-fasttext",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/tune-mjcf",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/video-processing",
+   "language": null,
+   "created": null,
+   "why": "the rest of the set"
+  }
+ ]
+}
