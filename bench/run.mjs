@@ -25,12 +25,17 @@
 // task holds). A session then starts in a copy of that project. It gets the shell commands that
 // the task names and no others, and no variable of the person's environment that names a key, a
 // token, a password or a cloud account.
+// An arm of an arms file with "agent": "codex" runs Codex in place of Claude Code (bench/codex.mjs
+// says how such a session is set up). It signs in with the sign-in of the person's Codex folder:
+// CODEX_HOME, or ~/.codex.
 import { spawn, spawnSync } from 'node:child_process'
 import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { homedir } from 'node:os'
 import { delimiter, join } from 'node:path'
 import { ARMS, TOOLS, addArms, armOf, settingsOf } from './arms.mjs'
+import { argsOf, codexHome, linkIntact, logOf, numbersOf, readEvents, renewedSignIn } from './codex.mjs'
 import { linkLogs } from './collect.mjs'
-import { ROOT, flags, oneTaskSet, outDir, paths, readJson, writeJson } from './lib.mjs'
+import { ROOT, agentOf, flags, oneTaskSet, outDir, paths, readJson, writeJson } from './lib.mjs'
 import { markStart, scoreOther, startOther } from './other.mjs'
 import { taskHash } from './record.mjs'
 import { score, startState } from './score.mjs'
@@ -38,6 +43,10 @@ import { OWN_SET, TASKS, taskOf, taskSet, useTasks } from './tasks.mjs'
 
 const f = flags()
 const out = outDir(f)
+/** The person's Codex folder, whose sign-in an arm that runs Codex uses. */
+const codexFrom = process.env.CODEX_HOME || join(homedir(), '.codex')
+/** Set when a Codex session renewed the sign-in in the benchmark's folder: no further Codex session starts. */
+let codexStopped
 const P = paths(out)
 if (typeof f['arms-file'] === 'string') addArms(f['arms-file'], out)
 if (typeof f['tasks-file'] === 'string') useTasks(f['tasks-file'])
@@ -74,6 +83,9 @@ function sessionEnv(arm, task) {
     for (const name of Object.keys(env)) if (SECRET.test(name) && !name.startsWith('ANTHROPIC_')) delete env[name]
     Object.assign(env, task.env ?? {})
   }
+  // Codex signs in with the file in its folder (bench/codex.mjs), so it gets no key of the person's
+  // at all: an API key would bill the API in place of the person's plan.
+  if (arm.agent === 'codex') for (const name of Object.keys(env)) if (SECRET.test(name) || name.startsWith('CODEX_')) delete env[name]
   // What an arm of an arms file adds: folders in front of PATH, and variables of its own.
   if (arm.path?.length) env.PATH = [...arm.path, env.PATH].join(delimiter)
   return { ...env, ...(arm.env ?? {}) }
@@ -90,9 +102,10 @@ function settingsFile(arm) {
   return file
 }
 
-function claude(args, { cwd, env, timeoutMs }) {
+/** Runs the agent's command line (claude or codex) to its end or to the time limit. */
+function agentRun(command, args, { cwd, env, timeoutMs }) {
   return new Promise((done) => {
-    const child = spawn('claude', args, { cwd, env, stdio: ['ignore', 'pipe', 'pipe'] })
+    const child = spawn(command, args, { cwd, env, stdio: ['ignore', 'pipe', 'pipe'] })
     let stdout = ''
     let stderr = ''
     let timedOut = false
@@ -120,6 +133,7 @@ const version = (command, args) => {
 }
 const setup = {
   claudeCode: version('claude', ['--version'])?.split(' ')[0],
+  ...(arms.some((a) => a.agent === 'codex') ? { codex: version('codex', ['--version'])?.split(' ').pop() } : {}),
   widalCode: readJson(join(ROOT, 'package.json')).version,
   node: process.version,
   platform: `${process.platform} ${process.arch}`,
@@ -148,6 +162,7 @@ async function runOne(arm, task, rep) {
   git(work, 'checkout', '-q', '-b', branch)
   // With Widal.Code on, the tool's own Claude Code folder gets the logs of this work folder before the session starts.
   if (arm.plugin) linkLogs(out, arm.id, arm.id, { early: true })
+  if (arm.agent === 'codex') return runCodex(arm, task, rep, { file, work, ticket, branch })
 
   const args = ['-p', task.prompt, '--output-format', 'json', '--setting-sources', 'project', '--settings', settingsFile(arm), '--strict-mcp-config', '--mcp-config', '{"mcpServers":{}}', '--max-budget-usd', String(budget)]
   // An effort level that the settings file cannot name (max) goes on the command line.
@@ -159,7 +174,7 @@ async function runOne(arm, task, rep) {
   const tools = task.other ? [...TOOLS.filter((tool) => !tool.startsWith('Bash(')), ...task.tools] : TOOLS
   args.push('--allowedTools', [...tools, ...(arm.tools ?? [])].join(','))
   const started = Date.now()
-  const r = await claude(args, { cwd: work, env: sessionEnv(arm, task), timeoutMs: minutes * 60_000 })
+  const r = await agentRun('claude', args, { cwd: work, env: sessionEnv(arm, task), timeoutMs: minutes * 60_000 })
   const ended = Date.now()
 
   let reported
@@ -170,16 +185,7 @@ async function runOne(arm, task, rep) {
   } catch {
     // The session ended without a result, for example at the time limit.
   }
-  const kept = P.kept(arm.id, task.id, rep)
-  let scored
-  if (task.other) {
-    // Another project is too large to keep whole: the changed files and a patch are kept, and the tests run in the work folder.
-    scored = scoreOther(task, work, kept)
-  } else {
-    rmSync(kept, { recursive: true, force: true })
-    cpSync(work, kept, { recursive: true, filter: (path) => !path.endsWith('/.git') })
-    scored = score(task.id, kept)
-  }
+  const scored = scoreWork(arm, task, rep, work)
   const record = {
     arm: arm.id, task: task.id, taskNumber: task.number, taskHash: taskHash(task), rep, ticket, branch, cwd: work, setup, settings: readJson(settingsFile(arm)),
     // The set of a task of a tasks file. Such a run is never exported.
@@ -201,8 +207,47 @@ async function runOne(arm, task, rep) {
   return record
 }
 
+/**
+ * What a session left, scored. Another project is too large to keep whole: the changed files and a
+ * patch are kept, and its tests run in the work folder. The sample project is kept whole and scored
+ * in the copy.
+ */
+function scoreWork(arm, task, rep, work) {
+  const kept = P.kept(arm.id, task.id, rep)
+  if (task.other) return scoreOther(task, work, kept)
+  rmSync(kept, { recursive: true, force: true })
+  cpSync(work, kept, { recursive: true, filter: (path) => !path.endsWith('/.git') })
+  return score(task.id, kept)
+}
+
+/** One run of a task through Codex (bench/codex.mjs). Its record has `codex` where a run of Claude Code has `claude`. */
+async function runCodex(arm, task, rep, { file, work, ticket, branch }) {
+  if (codexStopped) throw new Error(codexStopped)
+  const home = codexHome(out, arm, codexFrom)
+  const started = Date.now()
+  const r = await agentRun('codex', argsOf(task.prompt, work), { cwd: work, env: { ...sessionEnv(arm, task), CODEX_HOME: home }, timeoutMs: minutes * 60_000 })
+  const ended = Date.now()
+  const events = readEvents(r.stdout)
+  const numbers = numbersOf(events, logOf(home, events.thread), ended - started, r.timedOut)
+  const record = {
+    arm: arm.id, task: task.id, taskNumber: task.number, taskHash: taskHash(task), rep, ticket, branch, cwd: work, setup, settings: readJson(settingsFile(arm)),
+    ...(task.other ? { taskSet: taskSet() } : {}),
+    other: { name: arm.name, agent: 'codex', path: arm.path, env: arm.env && Object.keys(arm.env) },
+    started: new Date(started).toISOString(), wallMs: ended - started, exit: r.status, timedOut: r.timedOut,
+    codex: numbers,
+    stderr: events.ended ? undefined : r.stderr.slice(-400),
+    score: scoreWork(arm, task, rep, work),
+  }
+  writeJson(file, record)
+  if (!linkIntact(home, codexFrom)) {
+    codexStopped = renewedSignIn(home, codexFrom)
+    console.log(codexStopped)
+  }
+  return record
+}
+
 const line = (r) =>
-  `${r.arm.padEnd(13)} ${r.task.padEnd(3)} r${r.rep}  ${r.score.closed ? 'closed' : 'open  '}  ${String(r.score.passed).padStart(2)}/${String(r.score.total).padEnd(2)} checks  $${(r.claude?.cost ?? 0).toFixed(3).padStart(6)}  ${String(Math.round(r.wallMs / 1000)).padStart(4)}s  ${r.claude ? `${r.claude.turns} turns` : 'no result'}${r.timedOut ? '  (time limit)' : ''}`
+  `${r.arm.padEnd(13)} ${r.task.padEnd(3)} r${r.rep}  ${r.score.closed ? 'closed' : 'open  '}  ${String(r.score.passed).padStart(2)}/${String(r.score.total).padEnd(2)} checks  $${(agentOf(r)?.cost ?? 0).toFixed(3).padStart(6)}  ${String(Math.round(r.wallMs / 1000)).padStart(4)}s  ${agentOf(r) ? `${agentOf(r).turns} turns` : 'no result'}${r.timedOut ? '  (time limit)' : ''}`
 
 // Fails before any agent starts when the arm's settings are missing.
 for (const arm of arms) settingsFile(arm)

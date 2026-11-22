@@ -184,6 +184,41 @@ into your own home. Run one task first and check that the tool acted (its own co
 session's record), because an arm in which the tool did nothing reads like "no effect". The runs
 of such an arm are in the report, and never in the records that may be shared.
 
+## Run Codex on the same tasks
+
+An arm of an arms file with `"agent": "codex"` runs the tasks through Codex in place of Claude
+Code. Its `settings` name Codex's model and effort level:
+
+```json
+[{ "id": "codex", "number": 30, "name": "Codex, GPT-5.6-Sol, effort high", "agent": "codex",
+   "settings": { "model": "gpt-5.6-sol", "effortLevel": "high" } }]
+```
+
+Sign in to Codex first with `codex login`. A Codex session of the benchmark is set up like this
+(`bench/codex.mjs`):
+
+- It reads a Codex folder of its own inside the folder you give, in place of your own. Your
+  instructions file, rules, MCP servers, plugins and settings are not read, and its session logs
+  stay in that folder.
+- It uses your sign-in: your Codex folder's `auth.json` is linked into that folder, never copied.
+  Codex keeps the sign-in in that file only if you have not set it to use the system's keychain.
+- It runs with no person to approve anything, in Codex's sandbox: it can write in its work folder
+  and in the temp folders, and it has no network. It has no web search, because the Claude Code
+  sessions have none.
+- Codex has no list of allowed commands as Claude Code has. A rules file forbids the type check,
+  builds, installs and the git commands that reach a remote instead. A command that starts with
+  a variable, such as `NODE_OPTIONS=... tsc`, gets past those rules.
+- Codex reports tokens and no cost. The cost of a session is what Widal.Code computes from the
+  session's log, call by call, at list prices. The report checks that Widal.Code counted the same
+  tokens as Codex's own count.
+- Codex has no budget limit like `--budget`: only the time limit ends a long session.
+
+Codex renews its sign-in a few minutes before the access token expires, and it saves the new one
+by writing a new file in place of the old. If that happens during a session of the benchmark, the
+new sign-in lands in the benchmark's folder and yours keeps the old one. The runner then stops the
+Codex arm and says how to put the new file in place, or sign in again. To avoid that in a long
+run, use Codex yourself shortly before you start, so that its sign-in is fresh.
+
 ## Run issues of another project
 
 `--tasks-file <file>` runs the tasks of a JSON file in place of the benchmark's own. Such a task is
@@ -291,6 +326,8 @@ checks its cost and ticket.
   you give. It sees only the benchmark's sessions. Your own Widal.Code setup, your settings and
   your board are neither read nor changed.
 - Claude Code writes the logs of the sessions to its own folder, as for any session.
+- An arm that runs Codex uses a Codex folder of its own inside the folder you give, with a link to
+  your sign-in (see "Run Codex on the same tasks").
 - With a tasks file, each session runs in a copy of the other project's folder, and the project's
   test commands run there. The project's own instructions for agents (`CLAUDE.md`, `AGENTS.md`)
   are read, because they are part of the work. Its tests run with the network that your computer
