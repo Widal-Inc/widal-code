@@ -4,8 +4,19 @@
       "id": "baseline",
       "name": "Fable 5.2, effort xhigh, no tool",
       "effort": "xhigh",
-      "settings": { "model": "claude-fable-5-2", "autoMemoryEnabled": false, "env": { "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1", "DISABLE_AUTOUPDATER": "1" } },
-      "budget": 10
+      "settings": {
+        "model": "claude-fable-5-2",
+        "autoMemoryEnabled": false,
+        "env": {
+          "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+          "DISABLE_AUTOUPDATER": "1",
+          "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS": "1"
+        }
+      },
+      "budget": 10,
+      "rootInstall": [
+        "for h in github.com api.github.com raw.githubusercontent.com codeload.github.com objects.githubusercontent.com gist.github.com uploads.github.com; do echo \"0.0.0.0 $h\" >> /etc/hosts; done"
+      ]
     },
     {
       "id": "widal-on",
@@ -15,11 +26,26 @@
         "model": "claude-fable-5-2",
         "autoMemoryEnabled": false,
         "bashOutputMaxChars": 10000,
-        "env": { "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1", "DISABLE_AUTOUPDATER": "1", "CLAUDE_CODE_SUBAGENT_MODEL": "claude-sonnet-5-5" }
+        "env": {
+          "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+          "DISABLE_AUTOUPDATER": "1",
+          "CLAUDE_CODE_SUBAGENT_MODEL": "claude-sonnet-5-5",
+          "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS": "1"
+        }
       },
-      "uploads": [{ "from": "${setups}/../..", "to": "/opt/widal-code" }],
-      "pluginDirs": ["/opt/widal-code"],
-      "budget": 10
+      "uploads": [
+        {
+          "from": "${setups}/../..",
+          "to": "/opt/widal-code"
+        }
+      ],
+      "pluginDirs": [
+        "/opt/widal-code"
+      ],
+      "budget": 10,
+      "rootInstall": [
+        "for h in github.com api.github.com raw.githubusercontent.com codeload.github.com objects.githubusercontent.com gist.github.com uploads.github.com; do echo \"0.0.0.0 $h\" >> /etc/hosts; done"
+      ]
     }
   ]
 }

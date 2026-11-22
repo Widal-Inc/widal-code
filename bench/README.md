@@ -277,6 +277,15 @@ solved, the cost per task and per solved task, and the time, each with a 95% int
 test on the cost. A trial that ended on an error of the harness before the agent spent anything
 counts in no number and is listed apart.
 
+Both example setups block GitHub inside the container (`rootInstall`), because some task sets
+allow the internet and a session could otherwise fetch the real fix. Give every setup of a run the
+same block. They also set `CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS=1`: an API organization with
+HIPAA settings refuses Claude Code's context management with an error 400, and the setting must
+then be the same in every setup so that the comparison stays fair.
+
+Harbor starts each task with `docker compose`. On a Linux machine whose Docker has no Compose
+plugin (Amazon Linux, for example), install the plugin first.
+
 Claude Code signs in inside the container with `ANTHROPIC_API_KEY`, or with a token of a
 subscription from `claude setup-token` in `CLAUDE_CODE_OAUTH_TOKEN`. A run starts real sessions and
 costs what they cost. Most task images are built for Intel processors, so on a Mac with Apple
