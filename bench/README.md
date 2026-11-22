@@ -196,7 +196,9 @@ an issue of another project, for example a finished ticket of your own codebase:
 
 A task is closed when every test in its `expect` list passes and no test that passed at the start
 fails now. Test files of the start that the session changed are put back before the tests run, so
-a session cannot pass by changing a test.
+a session cannot pass by changing a test. The checks of a task, and so its quality, are the
+expected tests that fail at the start (the `failing` list). Many tests of a real fix pass before
+the fix already, and they earn nothing: they count as tests that must still pass.
 
 ```
 node bench/run.mjs --out <new folder> --tasks-file <file> --arms fable-xhigh --round 1 --paired
@@ -211,6 +213,7 @@ node bench/report.mjs --out <new folder> --tasks-file <file>
     "start": "${dir}/start/p1", "folder": "shop",
     "tools": ["Bash(npm test:*)", "Bash(git diff:*)", "Bash(ls:*)", "Bash(cat:*)", "Bash(grep:*)"],
     "hidden": { "files": "${dir}/hidden/p1", "expect": "${dir}/hidden/p1.expect.json",
+                "failing": "${dir}/hidden/p1.failing.json",
                 "command": ["npx", "vitest", "run", "test/count.test.ts", "--reporter=json", "--outputFile=${report}"] },
     "still": { "passing": "${dir}/start/p1.passing.json", "tests": "\\.test\\.ts$",
                "command": ["npx", "vitest", "related", "${changed}", "--run", "--reporter=json", "--outputFile=${report}"] }
@@ -219,8 +222,9 @@ node bench/report.mjs --out <new folder> --tasks-file <file>
 
 `${dir}` is the folder of the file. The two commands write their report in the JSON form of Jest
 and Vitest to `${report}`. `${changed}` stands for the files the session changed, so the second
-command runs only the tests that those files reach. `expect` and `passing` are lists of tests as
-"file > name": the hidden tests that pass on the real fix, and the tests that pass at the start.
+command runs only the tests that those files reach. `expect`, `failing` and `passing` are lists
+of tests as "file > name": the hidden tests that pass on the real fix, the ones of them that fail
+at the start, and the tests of the project that pass at the start.
 `useTasks` in `tasks.mjs` describes every field, and `passingNow` in `other.mjs` makes such a list.
 
 Before you use a finished ticket as a task, check three things:

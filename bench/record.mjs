@@ -65,6 +65,7 @@ export function taskHash(task) {
     // A task of a tasks file: the state it starts from by its name, and the tests that score it.
     add('version', task.version ?? '')
     add('expect', readFileSync(task.hidden.expect))
+    if (task.hidden.failing) add('failing', readFileSync(task.hidden.failing))
     add('passing', readFileSync(task.still.passing))
     for (const file of filesOf(task.hidden.files)) add(file, readFileSync(join(task.hidden.files, file)))
     const value = hash.digest('hex').slice(0, 16)

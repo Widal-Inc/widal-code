@@ -10,6 +10,11 @@
 // the start fails now. The hidden test files come into the work folder only when the session has
 // ended. Test files of the start that the session changed are put back first, so a session cannot
 // pass by changing a test.
+//
+// The checks of a task are the expected tests that fail at the start (the task's "failing" list):
+// the tests that the fix has to make pass. The other expected tests pass at the start already, so
+// they count as tests that must still pass. A task without that list counts every expected test
+// as a check.
 import { spawnSync } from 'node:child_process'
 import { constants, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -147,12 +152,22 @@ export function scoreOther(task, work, kept) {
     // The hidden files do not stay: the folder is next to the folders in which other sessions work.
     for (const file of hidden) rmSync(join(work, file), { force: true })
   }
-  const checks = expect.map((name) => (ran ? { name, ok: ran.tests.get(name) === true } : { name, ok: false, why: 'the hidden tests did not finish' }))
+  // The checks: the expected tests that fail at the start. Without that list, every expected test.
+  const failing = task.hidden.failing ? new Set(JSON.parse(readFileSync(task.hidden.failing, 'utf8'))) : undefined
+  const isCheck = (name) => !failing || failing.has(name)
+  const checks = expect.filter(isCheck).map((name) => (ran ? { name, ok: ran.tests.get(name) === true } : { name, ok: false, why: 'the hidden tests did not finish' }))
 
   const passing = new Set(JSON.parse(readFileSync(task.still.passing, 'utf8')))
   const hiddenPaths = new Set(hidden.map((file) => relative(join(work, task.still.cwd ?? ''), join(work, file))))
   const still = { ran: 0, failed: [] }
   let stillFinished = true
+  // An expected test that passed at the start already: when it fails now, the session broke it.
+  const held = expect.filter((name) => !isCheck(name))
+  if (held.length && !ran) stillFinished = false
+  for (const name of ran ? held : []) {
+    still.ran += 1
+    if (ran.tests.get(name) !== true) still.failed.push(name)
+  }
   if (reach.length) {
     if (!again) stillFinished = false
     else {

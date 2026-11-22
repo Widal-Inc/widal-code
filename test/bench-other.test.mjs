@@ -55,6 +55,8 @@ writeFileSync(out, JSON.stringify({ testResults }))
   })
   writeFileSync(join(dir, 'expect.json'), JSON.stringify(['test/count.test.mjs > counts each item as often as its count', 'test/count.test.mjs > an empty list is 0']))
   writeFileSync(join(dir, 'passing.json'), JSON.stringify(['test/total.test.mjs > adds the prices', 'test/label.test.mjs > shows two digits']))
+  // The one expected test that fails at the start.
+  writeFileSync(join(dir, 'failing.json'), JSON.stringify(['test/count.test.mjs > counts each item as often as its count']))
   const task = {
     id: 'p1', number: 1, slug: 'count', kind: 'bug fix', minutes: 20, prompt: 'The total ignores the count of an item.', version: 'abc123',
     start: '${dir}/start', folder: 'shop', tools: ['Bash(node run-tests.mjs:*)'],
@@ -91,6 +93,7 @@ test('a tasks file takes the place of the own tasks, with its folders filled in,
     [{ folder: 'lane2' }, /needs a "folder"/],
     [{ secret: 'x' }, /has the field "secret"/],
     [{ still: { command: ['node', 'run-tests.mjs', '${report}'], passing: '${dir}/passing.json', tests: 'x' } }, /needs "\$\{changed\}"/],
+    [{ hidden: { files: '${dir}/hidden', command: ['node', 'run-tests.mjs', '--out', '${report}', 'test/count.test.mjs'], expect: '${dir}/expect.json', failing: '${dir}/passing.json' } }, /all of them from the "expect" file/],
   ]) {
     write(change)
     assert.throws(() => useTasks(file), message)
@@ -157,6 +160,30 @@ test('a fix that breaks a test of the start is open, also when the session chang
   const own = scoreOther(task, work(dir, 'own', { 'test/count.test.mjs': "export const tests = { 'counts each item as often as its count': () => {}, 'an empty list is 0': () => {} }\n" }))
   assert.equal(own.passed, 1)
   assert.equal(own.closed, false)
+})
+
+test('with a list of the tests that fail at the start, only those are checks, and the other expected tests must still pass', () => {
+  const { dir, file, write } = project()
+  write({ hidden: { files: '${dir}/hidden', command: ['node', 'run-tests.mjs', '--out', '${report}', 'test/count.test.mjs'], expect: '${dir}/expect.json', failing: '${dir}/failing.json' } })
+  const [task] = useTasks(file)
+  assert.equal(task.checks, 1)
+
+  const untouched = scoreOther(task, work(dir, 'none', {}))
+  assert.equal(untouched.total, 1)
+  assert.equal(untouched.quality, 0, 'the test that passes at the start already earns nothing')
+  assert.equal(untouched.closed, false)
+
+  const right = scoreOther(task, work(dir, 'right', RIGHT))
+  assert.equal(right.passed, 1)
+  assert.equal(right.closed, true)
+  assert.equal(right.still.ran, 3, 'two tests of the start and the expected test that passed already')
+
+  // The fix is in, and the empty list no longer gives 0: the session broke a test that passed at the start.
+  const broke = scoreOther(task, work(dir, 'broke', { 'src/total.mjs': 'export const total = (items) => (items.length ? items.reduce((sum, item) => sum + item.price * item.count, 0) : -1)\n' }))
+  assert.equal(broke.passed, 1)
+  assert.equal(broke.testsPass, false)
+  assert.equal(broke.closed, false)
+  assert.deepEqual(broke.still.failed, ['test/count.test.mjs > an empty list is 0'])
 })
 
 test('the tests that pass now are the list that a task\'s files hold', () => {

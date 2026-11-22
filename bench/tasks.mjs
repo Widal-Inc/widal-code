@@ -296,7 +296,10 @@ const FILE_KEYS = ['id', 'number', 'slug', 'kind', 'minutes', 'prompt', 'promptF
  * - `hidden`: the hidden checks. `files` is a folder of test files that are put over the work when
  *   the session has ended. `command` runs them and writes a report in the JSON form of Jest and
  *   Vitest to the file "${report}". `expect` is a file with the list of tests that must pass.
- *   `cwd` is the folder inside the project that the command runs in.
+ *   `failing` (optional) is a file with the tests of that list that fail at the start: they are
+ *   the task's checks, and the other expected tests count as tests that must still pass. Without
+ *   it every expected test is a check. `cwd` is the folder inside the project that the command
+ *   runs in.
  * - `still`: the tests that passed at the start. `command` runs the tests that belong to the
  *   files in "${changed}" (the files the session changed) and writes the same kind of report.
  *   `passing` is a file with the list of tests that passed at the start. `tests` is a pattern for
@@ -359,8 +362,15 @@ export function useTasks(file) {
       throw wrong('needs "still" with "tests": a pattern for the paths of test files')
     }
     if (typeof task.still.tests !== 'string') throw wrong('needs "still" with "tests": a pattern for the paths of test files')
-    task.checks = JSON.parse(readFileSync(task.hidden.expect, 'utf8')).length
-    if (!(task.checks > 0)) throw wrong('needs at least one test in the "expect" file of "hidden"')
+    const expect = JSON.parse(readFileSync(task.hidden.expect, 'utf8'))
+    if (!texts(expect)) throw wrong('needs at least one test in the "expect" file of "hidden"')
+    task.checks = expect.length
+    if (task.hidden.failing !== undefined) {
+      if (typeof task.hidden.failing !== 'string' || !existsSync(task.hidden.failing)) throw wrong('needs a "failing" file that is there in "hidden"')
+      const failing = JSON.parse(readFileSync(task.hidden.failing, 'utf8'))
+      if (!texts(failing) || !failing.every((name) => expect.includes(name))) throw wrong('needs a "failing" file in "hidden" with at least one test, all of them from the "expect" file')
+      task.checks = failing.length
+    }
     list.push({ ...task, folder: task.folder ?? data.set, other: true })
   }
   set = data.set
