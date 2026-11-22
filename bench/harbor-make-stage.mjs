@@ -20,6 +20,7 @@
 //   --model, --provider, --agent   for every setup of the stage (one provider per stage)
 //   --cap, --concurrency, --block-size, --seed
 //   --budget        the most one session may spend, in dollars, for the copies this stage writes
+//   --effort        the effort level of those copies (low, medium, high, xhigh, max)
 //   --settings      a JSON object merged into the Claude Code settings of those copies, for example {"effortLevel": "xhigh"}
 //   --env           a JSON object of variables for the agent, for example {"OPENAI_API_KEY": "${env:OPENAI_API_KEY}"}
 //   --command       the command that starts Harbor for this provider (comma), default by provider
@@ -62,7 +63,7 @@ export function setupOf(entry, { model, provider, agent }) {
  * Makes sure every setup id of the stage has an entry in the file of setups: a run 2 copies its arm's
  * entry, and "id=spec" copies the entry "spec". Returns the ids it added.
  */
-export function addCopies(file, setups, { budget = null, settings = null } = {}) {
+export function addCopies(file, setups, { budget = null, settings = null, effort = null } = {}) {
   const doc = JSON.parse(readFileSync(file, 'utf8'))
   const byId = new Map(doc.setups.map((s) => [s.id, s]))
   const added = []
@@ -72,6 +73,7 @@ export function addCopies(file, setups, { budget = null, settings = null } = {})
     if (!from) throw new Error(`The file of setups has no setup "${s.spec ?? s.arm}" to copy for "${s.id}".`)
     const copy = { ...structuredClone(from), id: s.id, name: `${from.name}${s.rep > 1 ? ` (run ${s.rep})` : ''}` }
     if (budget !== null) copy.budget = budget
+    if (effort !== null) copy.effort = effort
     if (settings) copy.settings = { ...(copy.settings ?? {}), ...settings, env: { ...(copy.settings?.env ?? {}), ...(settings.env ?? {}) } }
     doc.setups.push(copy)
     byId.set(s.id, copy)
@@ -107,7 +109,7 @@ function main() {
   const setups = f.setups.split(',').map((e) => setupOf(e, { model: f.model, provider: f.provider, agent: f.agent }))
   const setupsFile = f['setups-file'] ?? join(base, 'setups', 'setups-v1.json')
   if (existsSync(setupsFile)) {
-    const added = addCopies(setupsFile, setups, { budget: f.budget ? Number(f.budget) : null, settings: f.settings ? JSON.parse(f.settings) : null })
+    const added = addCopies(setupsFile, setups, { budget: f.budget ? Number(f.budget) : null, settings: f.settings ? JSON.parse(f.settings) : null, effort: typeof f.effort === 'string' ? f.effort : null })
     if (added.length) console.log(`added to ${setupsFile}: ${added.join(', ')}`)
   }
   const commands = {

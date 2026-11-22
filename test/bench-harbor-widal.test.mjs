@@ -47,3 +47,16 @@ test('the new setup has the settings after the changes and Widal.Code\'s plugin'
   const plain = setupOf({ id: 'baseline', settings: {} }, 'widal-on', {}, '/opt/widal-code')
   assert.equal(plain.effort, undefined, 'no effort level when Widal.Code set none')
 })
+
+test('attribution setups: a change alone has no hooks, the hooks alone have no change', async () => {
+  const { changeOnly, hooksOnly } = await import('../bench/harbor-widal.mjs')
+  const spec = { id: 'baseline', name: 'B', budget: 4, effort: 'xhigh', settings: { env: { A: '1' } }, uploads: [{ from: '/x', to: '/y' }], pluginDirs: ['/y'] }
+  const one = changeOnly(spec, 'w-only-1', { env: { A: '1' }, effortLevel: 'high' }, 'effort alone')
+  assert.equal(one.effort, 'high')
+  assert.deepEqual(one.pluginDirs, ['/y'], 'the setup keeps the tools of --from, and gets no plugin of its own')
+  const keep = changeOnly(spec, 'w-only-2', { env: { A: '1', B: '2' } }, 'env alone')
+  assert.equal(keep.effort, 'xhigh')
+  const hooks = hooksOnly(spec, 'w-hooks-only', spec.settings, '/opt/widal-code')
+  assert.deepEqual(hooks.pluginDirs, ['/y', '/opt/widal-code'])
+  assert.deepEqual(hooks.settings, spec.settings)
+})
