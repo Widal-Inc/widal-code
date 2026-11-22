@@ -42,7 +42,8 @@ import shlex
 from pathlib import Path
 from typing import Any
 
-from harbor.agents.installed.claude_code import ClaudeCode
+from harbor.agents.installed.claude_code import ClaudeCode, ClaudeCodeOptions
+from pydantic import Field
 
 FIELDS = {
     "id",
@@ -120,10 +121,20 @@ def options_of(spec: dict[str, Any]) -> dict[str, Any]:
     return options
 
 
+class SetupAgentOptions(ClaudeCodeOptions):
+    """Harbor checks every agent option against this schema before it starts a trial."""
+
+    setups: str | None = Field(default=None, description="The file of setups.")
+    setup: str | None = Field(default=None, description="The id of the setup in that file.")
+
+
 class SetupAgent(ClaudeCode):
     """Harbor's Claude Code agent with one setup of the benchmark on top."""
 
-    def __init__(self, logs_dir: Path, *args: Any, setups: str | None = None, setup: str | None = None, **kwargs: Any):
+    options_model = SetupAgentOptions
+
+    def __init__(self, logs_dir: Path, *args: Any, **kwargs: Any):
+        setups, setup = kwargs.get("setups"), kwargs.get("setup")
         if not setups or not setup:
             raise ValueError("SetupAgent needs --ak setups=<file of setups> and --ak setup=<id>.")
         self._spec = load_setup(setups, setup)
