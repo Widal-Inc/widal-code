@@ -96,4 +96,60 @@ All setups of a stage use the same provider.
 
 ## Changes after 22 Nov 2026
 
-None yet.
+### Change 1, 22 Nov 2026, during the pilot and before any comparison of it was seen
+
+Why: a review of this plan against the published standards for agent benchmarks (Zhu et al. 2025,
+Kapoor et al. 2024, Miller 2024, Bjarnason et al. 2026; the review is in Widal's company repository,
+`research/2026-11-22-benchmark-review.md`) found five gaps, and Nils asked for only the newest models.
+While the pilot ran, only its spend and health were looked at, as the stop rules say. These changes
+replace the parts of the plan above that they name; everything else stays.
+
+1. **The 40 pilot tasks count in no comparison.** Widal.Code's setup is made from the baseline's pilot
+   sessions, so every main, quality, attribution and model stage leaves the pilot's tasks out
+   (`bench/harbor-make-stage.mjs --exclude-from`). The pilot still measures the noise between two runs.
+2. **Every task runs twice per setup** in the main and quality stages and in the model stages for
+   Haiku 5.5 and Opus 5.5. Fable 5.2 runs once, for cost. Runs are paired by task and run number, and
+   every interval resamples the tasks and then the runs inside each task (`clusteredRatio`,
+   `clusteredSolvedDifference` in `bench/stats.mjs`). The sign test uses each task's mean.
+3. **Question 2 gets enough tasks.** A quality stage on Sonnet 5.5 adds the 644 tasks of
+   `bench/harbor/v1-tasks-extra.json` (seed 20261123: 185 more of SWE-bench Pro, 420 more of the
+   SWE-rebench leaderboard, the 39 other Terminal-Bench 2.1 tasks), after the same oracle check, with
+   the baseline and Widal.Code only. Question 2 is answered on the main and quality stages together.
+   The margin stays 3 points. If fewer tasks pass the oracle or the budget stops the stage early, the
+   report states the margin the tasks reached (the half-width of the interval) and answers question 2
+   only against that margin.
+4. **One primary measure per question, and a correction for several comparisons.** Question 1: the
+   ratio of total cost, Widal.Code against the baseline, main stage. Question 2: the paired difference
+   in the share solved, main and quality stages. Question 5: the ratio of total cost of each other tool
+   against the baseline, with the sign test's chance corrected by Holm's method over the ranked tools.
+   Every other number is exploratory and is labelled so.
+5. **Headroom is reported, not ranked.** This API organization refuses its tool search, so it runs with
+   `HEADROOM_TOOL_SEARCH=0`, without one of its savings. It is in a table of its own with no rank and
+   no Holm chance (`--unranked headroom`).
+
+**Models: only the newest.** All Claude stages run on Claude Haiku 5.5, Sonnet 5.5, Opus 5.5 and Fable
+5.2, and the OpenAI stage on GPT-6.2 Astra and GPT-6.2 Sol. No older model is used anywhere. All
+Claude models run with their 1M context window, which is their default.
+
+| Stage | Model | Setups | Tasks | Runs |
+| --- | --- | --- | --- | --- |
+| Pilot (running) | Sonnet 5.5 | baseline twice, Widal.Code | 40 | 1 |
+| Main | Sonnet 5.5 | baseline, Widal.Code, caveman, RTK; Headroom unranked | all that passed the oracle, minus the pilot's | 2 |
+| Quality | Sonnet 5.5 | baseline, Widal.Code | the extra tasks that pass the oracle | 2 |
+| Attribution | Sonnet 5.5 | each change Widal.Code proposed, alone | 100 of the main tasks | 2 |
+| Haiku 5.5 | Haiku 5.5 | baseline; Widal.Code made from Haiku's own pilot sessions | 150 of the main tasks | 2 |
+| Opus 5.5 | Opus 5.5 | baseline; Widal.Code made from Opus's own pilot sessions | 100 of the main tasks | 2 |
+| Fable 5.2 | Fable 5.2 | baseline at effort xhigh; effort high alone; Widal.Code made from Fable's own pilot sessions | 80 of the main tasks | 1 |
+| OpenAI | GPT-6.2 Astra and Sol, in Codex | each model alone (no Widal.Code setup for Codex) | 100 of the main tasks | 2 |
+
+Each model stage first runs its own baseline on the 40 pilot tasks, once, and makes Widal.Code's setup
+from those sessions, as a person on that model would; those pilot runs count in no comparison. The
+OpenAI stage starts only when an OpenAI API key is stored for the runner, with a cap of its own ($500).
+The Bedrock cap stays: Claude 5 models on Bedrock run only once AWS lifts this account's quota of 0
+tokens per minute for them (requested on 22 Nov 2026), as a second run of the model stages on the same
+tasks. The stages run in the order of the table, and the API cap stops the later ones first.
+
+**Cost of a trial that reports none.** Harbor's Codex agent leaves the cost empty for a model its price
+list does not know. Such a trial is priced from its tokens at Widal.Code's list prices (`costOf` in
+`bench/harbor.mjs`, `costSource: "tokens"`), with input that is not read from the cache priced as
+uncached input.

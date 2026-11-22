@@ -39,6 +39,9 @@ const BUILT_IN = {
   // OpenAI, from its API pricing page, read on 2026-11-12. From GPT-5.6 on, input written to the
   // cache costs 1.25 times the input price (the 30 minute cache): that is `w5` here. Above 272,000
   // input tokens, input costs twice as much and output one and a half times.
+  // GPT-6.2, from OpenAI's announcement "Introducing GPT-6.2 Astra and Sol", read on 2026-11-22.
+  'gpt-6.2-astra': openai(8, 0.4, 40),
+  'gpt-6.2-sol': openai(2, 0.1, 10),
   'gpt-6-astra': openai(10, 1, 50),
   'gpt-6.1-sol': openai(2, 0.1, 10),
   'gpt-6.1-terra': openai(1, 0.05, 5),

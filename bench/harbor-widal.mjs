@@ -14,6 +14,10 @@
 // 5. writes <into>.proposals.json next to the file of setups: every proposal with its predicted
 //    saving, and what was applied. The pre-registration commits this file before the main stage.
 //
+// With --each, it also writes the setups of the attribution stage: "<into>-only-<n>" with the n-th applied
+// change alone (applied by "widal apply" to the settings of --from, without the hooks), and
+// "<into>-hooks-only" with the hooks and no change. They are listed in <into>.proposals.json.
+//
 // Nobody adds or removes a proposal by hand.
 import { spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, symlinkSync, writeFileSync } from 'node:fs'
@@ -67,6 +71,20 @@ export function setupOf(spec, into, after, plugin) {
   return entry
 }
 
+/** The setup of one change alone: the settings after that change, without Widal.Code's hooks. */
+export function changeOnly(spec, id, settings, what) {
+  const { effort: _, ...rest } = spec
+  const entry = { ...rest, id, name: `${what}, on top of "${spec.id}", without hooks`, settings: { ...settings } }
+  if (settings.effortLevel) entry.effort = settings.effortLevel
+  else if (spec.effort) entry.effort = spec.effort
+  return entry
+}
+
+/** The setup of Widal.Code's hooks alone: the settings of --from unchanged, with the plugin. */
+export function hooksOnly(spec, id, settings, plugin) {
+  return { ...spec, id, name: `Widal.Code's hooks alone, on top of "${spec.id}"`, settings: { ...settings }, uploads: [...(spec.uploads ?? []), { from: ROOT, to: plugin }], pluginDirs: [...(spec.pluginDirs ?? []), plugin] }
+}
+
 function widal(env, args) {
   const r = spawnSync(process.execPath, [WIDAL, ...args], { env, encoding: 'utf8', timeout: 600_000 })
   return { status: r.status, out: (r.stdout ?? '').trim(), err: (r.stderr ?? '').trim() }
@@ -75,8 +93,12 @@ function widal(env, args) {
 function main() {
   const f = {}
   const argv = process.argv.slice(2)
-  for (let i = 0; i < argv.length; i++) if (argv[i].startsWith('--')) f[argv[i].slice(2)] = argv[++i]
-  for (const key of ['jobs', 'setups', 'from', 'into']) if (!f[key]) throw new Error('usage: node bench/harbor-widal.mjs --jobs <folder> --setups <file> --from <setup> --into <setup> [--plugin /opt/widal-code]')
+  for (let i = 0; i < argv.length; i++) {
+    if (!argv[i].startsWith('--')) continue
+    const name = argv[i].slice(2)
+    f[name] = argv[i + 1] && !argv[i + 1].startsWith('--') ? argv[++i] : true
+  }
+  for (const key of ['jobs', 'setups', 'from', 'into']) if (typeof f[key] !== 'string') throw new Error('usage: node bench/harbor-widal.mjs --jobs <folder> --setups <file> --from <setup> --into <setup> [--plugin /opt/widal-code] [--each]')
   const plugin = f.plugin ?? '/opt/widal-code'
   const file = resolve(f.setups)
   const data = JSON.parse(readFileSync(file, 'utf8'))
@@ -108,8 +130,21 @@ function main() {
   const after = JSON.parse(readFileSync(settingsFile, 'utf8'))
   const entry = setupOf(spec, f.into, after, plugin)
   data.setups.push(entry)
+  const attribution = []
+  if (f.each) {
+    applied.filter((a) => a.status === 0).forEach((a, i) => {
+      writeFileSync(settingsFile, `${JSON.stringify(before, null, 2)}\n`)
+      const r = widal(env, ['apply', a.action, ...a.args])
+      const alone = JSON.parse(readFileSync(settingsFile, 'utf8'))
+      const id = `${f.into}-only-${i + 1}`
+      data.setups.push(changeOnly(spec, id, alone, `${a.action} alone`))
+      attribution.push({ id, action: a.action, args: a.args, status: r.status })
+    })
+    data.setups.push(hooksOnly(spec, `${f.into}-hooks-only`, before, plugin))
+    attribution.push({ id: `${f.into}-hooks-only`, action: 'hooks', args: [], status: 0 })
+  }
   writeFileSync(file, `${JSON.stringify(data, null, 1)}\n`)
-  const state = { at: new Date().toISOString(), from: f.from, into: f.into, sessions: folders.length, total: advise.total ?? null, proposals: advise.proposals ?? [], applied, settingsBefore: before, settingsAfter: after }
+  const state = { at: new Date().toISOString(), from: f.from, into: f.into, sessions: folders.length, total: advise.total ?? null, proposals: advise.proposals ?? [], applied, attribution, settingsBefore: before, settingsAfter: after }
   writeFileSync(join(dirname(file), `${f.into}.proposals.json`), `${JSON.stringify(state, null, 2)}\n`)
   writeFileSync(join(view, 'advise.txt'), `${adviseText.out}\n`)
   console.log(`"widal advise" read ${folders.length} sessions: ${state.proposals.length} proposals, ${applied.filter((a) => a.status === 0).length} applied. The setup "${f.into}" is in ${file}.`)

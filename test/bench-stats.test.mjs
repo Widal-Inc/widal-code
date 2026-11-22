@@ -95,3 +95,59 @@ test('the difference in the share solved, paired by task, with an interval', () 
   assert.deepEqual(solvedDifference([{ a: true, b: true }, { a: false, b: false }]), { difference: 0, low: 0, high: 0, tasks: 2 })
   assert.equal(solvedDifference([]), null)
 })
+
+test('two-level resampling: one run per task gives the plain ratio of totals', async () => {
+  const { clusteredRatio } = await import('../bench/stats.mjs')
+  const pairs = [{ a: 1, b: 2 }, { a: 2, b: 4 }, { a: 3, b: 5 }]
+  const r = clusteredRatio(pairs.map((p) => [p]))
+  near(r.ratio, 6 / 11)
+  assert.equal(r.tasks, 3)
+  assert.equal(r.runs, 3)
+  assert.ok(r.low <= r.ratio && r.ratio <= r.high)
+})
+
+test('two-level resampling: noisy runs inside a task widen the interval', async () => {
+  const { clusteredRatio } = await import('../bench/stats.mjs')
+  const steady = Array.from({ length: 30 }, () => [{ a: 1, b: 2 }, { a: 1, b: 2 }])
+  const noisy = Array.from({ length: 30 }, (_, i) => [{ a: 0.2 + (i % 3) * 0.4, b: 2 }, { a: 1.8 - (i % 3) * 0.4, b: 2 }])
+  const s = clusteredRatio(steady)
+  const n = clusteredRatio(noisy)
+  near(s.ratio, 0.5)
+  near(n.ratio, 0.5)
+  assert.ok(n.high - n.low > s.high - s.low)
+})
+
+test('the solved difference averages each task over its runs', async () => {
+  const { clusteredSolvedDifference } = await import('../bench/stats.mjs')
+  const groups = [
+    [{ a: true, b: true }, { a: false, b: true }],
+    [{ a: true, b: false }, { a: true, b: false }],
+    [{ a: false, b: false }],
+  ]
+  const d = clusteredSolvedDifference(groups)
+  near(d.difference, (-0.5 + 1 + 0) / 3)
+  assert.equal(d.tasks, 3)
+  assert.equal(d.runs, 5)
+})
+
+test('Holm keeps the order and never lowers a chance', async () => {
+  const { holm } = await import('../bench/stats.mjs')
+  const out = holm([0.01, 0.04, null, 0.03])
+  near(out[0], 0.03)
+  near(out[3], 0.06)
+  near(out[1], 0.06)
+  assert.equal(out[2], null)
+})
+
+test('repeat noise: the share solved in one run only, and the cost spread', async () => {
+  const { repeatNoise } = await import('../bench/stats.mjs')
+  const n = repeatNoise([
+    { task: 'x', rep: 1, closed: true, cost: 1 },
+    { task: 'x', rep: 2, closed: false, cost: 2 },
+    { task: 'y', rep: 1, closed: true, cost: 1 },
+    { task: 'y', rep: 2, closed: true, cost: 1 },
+    { task: 'z', rep: 1, closed: true, cost: 1 },
+  ])
+  assert.equal(n.tasks, 2)
+  near(n.discordance, 0.5)
+})
