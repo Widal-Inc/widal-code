@@ -1,0 +1,2113 @@
+{
+ "note": "The 301 public tasks of version 1, picked on 22 Nov 2026 with a fixed seed from the downloaded Harbor task sets. Tasks whose reference solution fails Harbor oracle check are dropped before the pilot, and the report lists them.",
+ "seed": 20261122,
+ "tasks": [
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/ArcadeData__arcadedb-4281",
+   "language": "java",
+   "created": "2026-05-22",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/ArcadeData__arcadedb-4411",
+   "language": "java",
+   "created": "2026-05-29",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/ArcadeData__arcadedb-4455",
+   "language": "java",
+   "created": "2026-06-01",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/Gentleman-Programming__gentle-ai-595",
+   "language": "go",
+   "created": "2026-05-20",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/HKUDS__nanobot-4048",
+   "language": "python",
+   "created": "2026-05-29",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/HKUDS__nanobot-4129",
+   "language": "python",
+   "created": "2026-06-01",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/HKUDS__nanobot-4274",
+   "language": "python",
+   "created": "2026-06-10",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/Martian-Engineering__lossless-claw-814",
+   "language": "typescript",
+   "created": "2026-06-04",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/PerryTS__perry-3982",
+   "language": "rust",
+   "created": "2026-06-01",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/Soju06__codex-lb-744",
+   "language": "python",
+   "created": "2026-05-21",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/agno-agi__agno-8148",
+   "language": "python",
+   "created": "2026-05-28",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/apache__dubbo-go-3357",
+   "language": "go",
+   "created": "2026-05-30",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/apache__hugegraph-3037",
+   "language": "java",
+   "created": "2026-05-24",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/apache__pulsar-25793",
+   "language": "java",
+   "created": "2026-05-16",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/apache__pulsar-25865",
+   "language": "java",
+   "created": "2026-05-24",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/apache__pulsar-25953",
+   "language": "java",
+   "created": "2026-06-06",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/astral-sh__ruff-25414",
+   "language": "rust",
+   "created": "2026-05-27",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/astral-sh__ruff-25567",
+   "language": "rust",
+   "created": "2026-06-03",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/better-auth__better-auth-10070",
+   "language": "typescript",
+   "created": "2026-06-15",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/better-auth__better-auth-9756",
+   "language": "typescript",
+   "created": "2026-05-26",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/cloudflare__vinext-1371",
+   "language": "typescript",
+   "created": "2026-05-20",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/cloudflare__vinext-1574",
+   "language": "typescript",
+   "created": "2026-05-22",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/cloudflare__vinext-1837",
+   "language": "typescript",
+   "created": "2026-06-08",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/cloudnative-pg__cloudnative-pg-10747",
+   "language": "go",
+   "created": "2026-05-20",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/danny-avila__LibreChat-13166",
+   "language": "typescript",
+   "created": "2026-05-18",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/docker__docker-agent-2992",
+   "language": "go",
+   "created": "2026-06-03",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/facebook__lexical-8676",
+   "language": "typescript",
+   "created": "2026-06-11",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/fallow-rs__fallow-762",
+   "language": "rust",
+   "created": "2026-05-29",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/fallow-rs__fallow-821",
+   "language": "rust",
+   "created": "2026-05-31",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/fallow-rs__fallow-824",
+   "language": "rust",
+   "created": "2026-05-31",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/fallow-rs__fallow-913",
+   "language": "rust",
+   "created": "2026-06-03",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/fathah__hermes-desktop-249",
+   "language": "typescript",
+   "created": "2026-05-18",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/fathah__hermes-desktop-268",
+   "language": "typescript",
+   "created": "2026-05-19",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/floci-io__floci-1021",
+   "language": "java",
+   "created": "2026-05-24",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/floci-io__floci-1032",
+   "language": "java",
+   "created": "2026-05-25",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/floci-io__floci-1142",
+   "language": "java",
+   "created": "2026-06-02",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/floci-io__floci-1209",
+   "language": "java",
+   "created": "2026-06-06",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/floci-io__floci-1235",
+   "language": "java",
+   "created": "2026-06-08",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/floci-io__floci-1325",
+   "language": "java",
+   "created": "2026-06-13",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/gleam-lang__gleam-5797",
+   "language": "rust",
+   "created": "2026-06-03",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/gleam-lang__gleam-5798",
+   "language": "rust",
+   "created": "2026-06-03",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/gotd__td-1759",
+   "language": "go",
+   "created": "2026-06-11",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/harbor-framework__harbor-1764",
+   "language": "python",
+   "created": "2026-05-30",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/helidon-io__helidon-11979",
+   "language": "java",
+   "created": "2026-05-18",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/intellectronica__ruler-556",
+   "language": "typescript",
+   "created": "2026-06-05",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/ivov__lisette-491",
+   "language": "rust",
+   "created": "2026-05-25",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/ivov__lisette-627",
+   "language": "rust",
+   "created": "2026-06-06",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/ivov__lisette-657",
+   "language": "rust",
+   "created": "2026-06-08",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/kenn-io__agentsview-602",
+   "language": "go",
+   "created": "2026-06-07",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/kestra-io__kestra-16067",
+   "language": "java",
+   "created": "2026-05-17",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/kestra-io__kestra-16119",
+   "language": "java",
+   "created": "2026-05-19",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/kestra-io__kestra-16450",
+   "language": "java",
+   "created": "2026-06-01",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/kubernetes-sigs__kueue-11559",
+   "language": "go",
+   "created": "2026-05-23",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/kubernetes-sigs__kueue-11619",
+   "language": "go",
+   "created": "2026-05-25",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/langchain-ai__deepagents-3866",
+   "language": "python",
+   "created": "2026-06-11",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/langchain4j__langchain4j-5315",
+   "language": "java",
+   "created": "2026-05-27",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/langchain4j__langchain4j-5328",
+   "language": "java",
+   "created": "2026-05-29",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/langchain4j__langchain4j-5367",
+   "language": "java",
+   "created": "2026-06-04",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/livekit__agents-5944",
+   "language": "python",
+   "created": "2026-06-02",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/ludo-technologies__pyscn-500",
+   "language": "go",
+   "created": "2026-05-31",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/ludo-technologies__pyscn-548",
+   "language": "go",
+   "created": "2026-06-12",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/marimo-team__marimo-9626",
+   "language": "python",
+   "created": "2026-05-20",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/marimo-team__marimo-9754",
+   "language": "python",
+   "created": "2026-06-02",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/marimo-team__marimo-9766",
+   "language": "python",
+   "created": "2026-06-03",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/matrixorigin__matrixone-24632",
+   "language": "go",
+   "created": "2026-05-27",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/microsoft__apm-1553",
+   "language": "python",
+   "created": "2026-05-29",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/microsoft__typescript-go-4062",
+   "language": "go",
+   "created": "2026-05-27",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/microsoft__typescript-go-4194",
+   "language": "go",
+   "created": "2026-06-04",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/microsoft__waza-247",
+   "language": "go",
+   "created": "2026-05-20",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/mikro-orm__mikro-orm-7799",
+   "language": "typescript",
+   "created": "2026-05-29",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/mozilla-ai__any-llm-1121",
+   "language": "python",
+   "created": "2026-06-11",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/mui__base-ui-4849",
+   "language": "typescript",
+   "created": "2026-05-19",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/mui__base-ui-4903",
+   "language": "typescript",
+   "created": "2026-05-25",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/mvanhorn__cli-printing-press-1920",
+   "language": "go",
+   "created": "2026-05-23",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/mvanhorn__cli-printing-press-2002",
+   "language": "go",
+   "created": "2026-05-23",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/mvanhorn__cli-printing-press-2086",
+   "language": "go",
+   "created": "2026-05-24",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/nearai__ironclaw-3694",
+   "language": "rust",
+   "created": "2026-05-15",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/nearai__ironclaw-3735",
+   "language": "rust",
+   "created": "2026-05-17",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/nesquena__hermes-webui-3069",
+   "language": "python",
+   "created": "2026-05-28",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/open-jarvis__OpenJarvis-465",
+   "language": "python",
+   "created": "2026-06-01",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/openrewrite__rewrite-7784",
+   "language": "java",
+   "created": "2026-05-26",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/oxc-project__oxc-22623",
+   "language": "rust",
+   "created": "2026-05-20",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/promptfoo__promptfoo-9313",
+   "language": "typescript",
+   "created": "2026-05-20",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/pydantic__pydantic-ai-5580",
+   "language": "python",
+   "created": "2026-05-22",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/pydantic__pydantic-ai-5842",
+   "language": "python",
+   "created": "2026-06-09",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/raullenchai__Rapid-MLX-426",
+   "language": "python",
+   "created": "2026-05-21",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/react-hook-form__react-hook-form-13464",
+   "language": "typescript",
+   "created": "2026-05-22",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/rest-sh__restish-337",
+   "language": "go",
+   "created": "2026-05-28",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/rust-lang__rust-analyzer-22397",
+   "language": "rust",
+   "created": "2026-05-18",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/sipeed__picoclaw-2928",
+   "language": "go",
+   "created": "2026-05-22",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/stablyai__orca-1934",
+   "language": "typescript",
+   "created": "2026-05-15",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/stablyai__orca-4331",
+   "language": "typescript",
+   "created": "2026-05-31",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/stablyai__orca-5176",
+   "language": "typescript",
+   "created": "2026-06-11",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/tailscale__tailscale-19847",
+   "language": "go",
+   "created": "2026-05-22",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/tashfeenahmed__freellmapi-289",
+   "language": "typescript",
+   "created": "2026-06-11",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/teng-lin__notebooklm-py-826",
+   "language": "python",
+   "created": "2026-05-18",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/tursodatabase__turso-7117",
+   "language": "rust",
+   "created": "2026-05-16",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/ubugeeei-prod__vize-1265",
+   "language": "rust",
+   "created": "2026-06-09",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/ubugeeei-prod__vize-1281",
+   "language": "rust",
+   "created": "2026-06-09",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/ubugeeei-prod__vize-1508",
+   "language": "rust",
+   "created": "2026-06-12",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/ubugeeei-prod__vize-769",
+   "language": "rust",
+   "created": "2026-05-30",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/ubugeeei-prod__vize-774",
+   "language": "rust",
+   "created": "2026-05-30",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/ueberdosis__tiptap-7887",
+   "language": "typescript",
+   "created": "2026-05-29",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/ueberdosis__tiptap-7896",
+   "language": "typescript",
+   "created": "2026-05-30",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/verl-project__verl-6506",
+   "language": "python",
+   "created": "2026-05-27",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/vuejs__core-14877",
+   "language": "typescript",
+   "created": "2026-05-23",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/vuejs__core-14897",
+   "language": "typescript",
+   "created": "2026-05-31",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/withcoral__coral-1143",
+   "language": "rust",
+   "created": "2026-06-03",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/withcoral__coral-1179",
+   "language": "rust",
+   "created": "2026-06-04",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/withcoral__coral-1186",
+   "language": "rust",
+   "created": "2026-06-04",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/woodpecker-ci__woodpecker-6623",
+   "language": "go",
+   "created": "2026-05-22",
+   "why": "all tasks of the newest snapshot"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/agronholm__anyio-1134",
+   "language": null,
+   "created": "2026-05-06",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/raullenchai__rapid-mlx-228",
+   "language": null,
+   "created": "2026-05-06",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/conan-io__conan-19750",
+   "language": null,
+   "created": "2026-03-13",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pyinfra-dev__pyinfra-1679_interface",
+   "language": null,
+   "created": "2026-04-20",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pgmpy__pgmpy-3137",
+   "language": null,
+   "created": "2026-03-22",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/keras-team__keras-22330",
+   "language": null,
+   "created": "2026-03-03",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/vprusso__toqito-1538",
+   "language": null,
+   "created": "2026-04-22",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/sqlfluff__sqlfluff-7617",
+   "language": null,
+   "created": "2026-03-16",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/nesquena__hermes-webui-2056",
+   "language": null,
+   "created": "2026-05-11",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/sqlfluff__sqlfluff-7622",
+   "language": null,
+   "created": "2026-03-16",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/aallan__vera-662_interface",
+   "language": null,
+   "created": "2026-05-12",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/python-wheel-build__fromager-1124",
+   "language": null,
+   "created": "2026-05-07",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/containers__ramalama-2487",
+   "language": null,
+   "created": "2026-03-05",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pypsa__pypsa-1653",
+   "language": null,
+   "created": "2026-04-13",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/schemathesis__schemathesis-3778",
+   "language": null,
+   "created": "2026-04-21",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/delgan__loguru-1451",
+   "language": null,
+   "created": "2026-03-25",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/alibaba__opensandbox-426",
+   "language": null,
+   "created": "2026-03-11",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/spack__spack-52244",
+   "language": null,
+   "created": "2026-04-13",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/koxudaxi__datamodel-code-generator-3070",
+   "language": null,
+   "created": "2026-04-04",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/scikit-learn__scikit-learn-33565",
+   "language": null,
+   "created": "2026-03-17",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/hkuds__openharness-217",
+   "language": null,
+   "created": "2026-04-30",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pyinfra-dev__pyinfra-1630",
+   "language": null,
+   "created": "2026-03-24",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/koxudaxi__datamodel-code-generator-3071",
+   "language": null,
+   "created": "2026-04-04",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/stanfordnlp__dspy-9478_interface",
+   "language": null,
+   "created": "2026-03-20",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/deltares__hydrolib-core-1049_interface",
+   "language": null,
+   "created": "2026-04-13",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/raullenchai__rapid-mlx-289",
+   "language": null,
+   "created": "2026-05-08",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/agronholm__anyio-1121",
+   "language": null,
+   "created": "2026-04-21",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/dagster-io__dagster-33605",
+   "language": null,
+   "created": "2026-03-15",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pandas-dev__pandas-64796",
+   "language": null,
+   "created": "2026-03-24",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/harumiweb__exstruct-113",
+   "language": null,
+   "created": "2026-03-21",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/sunpy__sunpy-8548_interface",
+   "language": null,
+   "created": "2026-03-22",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/sqlfluff__sqlfluff-7615",
+   "language": null,
+   "created": "2026-03-15",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/schemathesis__schemathesis-4087",
+   "language": null,
+   "created": "2026-05-12",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/copier-org__copier-2646",
+   "language": null,
+   "created": "2026-04-30",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/reframe-hpc__reframe-3660_interface",
+   "language": null,
+   "created": "2026-04-28",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pandas-dev__pandas-64816",
+   "language": null,
+   "created": "2026-03-24",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pdm-project__pdm-3759",
+   "language": null,
+   "created": "2026-04-01",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/python-wheel-build__fromager-1106",
+   "language": null,
+   "created": "2026-05-04",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/macbre__sql-metadata-625_interface",
+   "language": null,
+   "created": "2026-05-08",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/line__line-bot-sdk-python-981_interface",
+   "language": null,
+   "created": "2026-04-01",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/raullenchai__rapid-mlx-227",
+   "language": null,
+   "created": "2026-05-06",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/marshmallow-code__marshmallow-2925_interface",
+   "language": null,
+   "created": "2026-03-25",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/astronomy-commons__lsdb-1349",
+   "language": null,
+   "created": "2026-04-30",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pandas-dev__pandas-64797",
+   "language": null,
+   "created": "2026-03-24",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/zarr-developers__virtualizarr-979",
+   "language": null,
+   "created": "2026-04-24",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/geopython__pygeoapi-2338",
+   "language": null,
+   "created": "2026-05-11",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/conan-io__conan-19735_interface",
+   "language": null,
+   "created": "2026-03-10",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/oemof__tespy-921",
+   "language": null,
+   "created": "2026-03-26",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pennylaneai__pennylane-9298",
+   "language": null,
+   "created": "2026-04-14",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/astronomy-commons__hats-648",
+   "language": null,
+   "created": "2026-03-06",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tox-dev__tox-3846",
+   "language": null,
+   "created": "2026-03-03",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/celestoai__smolvm-172",
+   "language": null,
+   "created": "2026-04-18",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tox-dev__tox-3931",
+   "language": null,
+   "created": "2026-05-01",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/genericmappingtools__pygmt-4463",
+   "language": null,
+   "created": "2026-03-21",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/meltano__meltano-9929",
+   "language": null,
+   "created": "2026-04-04",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/azure-samples__azure-search-openai-demo-3025",
+   "language": null,
+   "created": "2026-04-07",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/keras-team__keras-22642",
+   "language": null,
+   "created": "2026-04-07",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/graphistry__pygraphistry-1277",
+   "language": null,
+   "created": "2026-05-04",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/nesquena__hermes-webui-1818",
+   "language": null,
+   "created": "2026-05-07",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/mempalace__mempalace-1004",
+   "language": null,
+   "created": "2026-04-19",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tox-dev__tox-3904",
+   "language": null,
+   "created": "2026-03-26",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/youssofal__mtplx-21",
+   "language": null,
+   "created": "2026-05-08",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pallets__click-3239",
+   "language": null,
+   "created": "2026-03-02",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tobymao__sqlglot-7479",
+   "language": null,
+   "created": "2026-04-09",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/sigma67__ytmusicapi-909_interface",
+   "language": null,
+   "created": "2026-04-24",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/holoviz__param-1117",
+   "language": null,
+   "created": "2026-03-25",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/olofk__fusesoc-776_interface",
+   "language": null,
+   "created": "2026-05-07",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/ucfopen__canvasapi-716",
+   "language": null,
+   "created": "2026-04-01",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pallets-eco__wtforms-892_interface",
+   "language": null,
+   "created": "2026-05-03",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/apache__iceberg-python-3295",
+   "language": null,
+   "created": "2026-04-29",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/alibaba__opensandbox-816",
+   "language": null,
+   "created": "2026-04-29",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pyinfra-dev__pyinfra-1665",
+   "language": null,
+   "created": "2026-04-14",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/getmoto__moto-9903",
+   "language": null,
+   "created": "2026-03-24",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/hiero-ledger__hiero-sdk-python-2007_interface",
+   "language": null,
+   "created": "2026-03-20",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/huggingface__huggingface_hub-4056",
+   "language": null,
+   "created": "2026-04-06",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pypa__build-1027",
+   "language": null,
+   "created": "2026-04-11",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/schemathesis__schemathesis-3933",
+   "language": null,
+   "created": "2026-05-04",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/microsoft__qcodes-8039",
+   "language": null,
+   "created": "2026-04-13",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/unit8co__darts-3065",
+   "language": null,
+   "created": "2026-04-11",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/cpp-linter__cpp-linter-hooks-206_interface",
+   "language": null,
+   "created": "2026-04-06",
+   "why": "random 80 of the tasks created from March 2026 on"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-d6d2251929c84c3aa883bad7db0f19cc9ff0339e-v30a923fb5c164d6cd18280c02422f75e611e8fb2",
+   "language": "python",
+   "created": null,
+   "why": "15 python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-431442c92887a3aece3f8aa771dd029738a80eb1-v76304ecdb3a5954fcf13feb710e8c40fcf24b73c",
+   "language": "python",
+   "created": null,
+   "why": "15 python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-fcfa069a06ade76d91bac38127f3235c13d78eb1-v5fc38aaf22415ab0b70567368332beee7955b367",
+   "language": "python",
+   "created": null,
+   "why": "15 python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-3b823d908e8a5d17674f8c26d337d3114b7493b1-v0f01c69f1e2528b935359cfe578530722bca2c59",
+   "language": "python",
+   "created": null,
+   "why": "15 python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-e1e502986a3b003899a8347ac8a7ff7b08cbfc39-v08d8e8889ec945ab821fb156c04c7d2e2810debb",
+   "language": "python",
+   "created": null,
+   "why": "15 python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-bf045f7ec7c27709ea3ef61cf41a24e8fdd2e7da-v059c6fdc75567943479b23ebca7c07b5e9a7f34c",
+   "language": "python",
+   "created": null,
+   "why": "15 python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-cd473dfb2fdbc97acf3293c134b21cbbcfa89ec3-vba6da65a0f3baefda7a058ebbd0a8dcafb8512f5",
+   "language": "python",
+   "created": null,
+   "why": "15 python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-a48fd6ba9482c527602bc081491d9e8ae6e8226c-vfa6ff903cb27f336e17654595dd900fa943dcd91",
+   "language": "python",
+   "created": null,
+   "why": "15 python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-e70f5b03187bdd40e8bf70f5f3ead840f52d1f42-v02ad04386d5238fe2d1a1be450df257370de4b6a",
+   "language": "python",
+   "created": null,
+   "why": "15 python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-c616e54a6e23fa5616a1d56d243f69576164ef9b-v1055803c3a812189a1133297f7f5468579283f86",
+   "language": "python",
+   "created": null,
+   "why": "15 python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-7bf3238533070f2d24bafbb26eedf675d51941f6-v08d8e8889ec945ab821fb156c04c7d2e2810debb",
+   "language": "python",
+   "created": null,
+   "why": "15 python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-e57b6e0eeeb656eb2c84d6547d5a0a7333ecee85-v2ef375ac784985212b1805e1d0431dc8f1b3c171",
+   "language": "python",
+   "created": null,
+   "why": "15 python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-ed6581e4db2f1bec5a772213c3e186081adc162d-v0f01c69f1e2528b935359cfe578530722bca2c59",
+   "language": "python",
+   "created": null,
+   "why": "15 python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-798a582540019363d14b2090755cc7b89a350788-v430f20c722405e462d9ef44dee7d34c41e76fe7a",
+   "language": "python",
+   "created": null,
+   "why": "15 python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-deeb15d6f009b3ca0c3bd503a7cef07462bd16b4-v363c8a7e5ccdf6968fc7ab84a2053ac78036691d",
+   "language": "python",
+   "created": null,
+   "why": "15 python tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_navidrome__navidrome-6bd4c0f6bfa653e9b8b27cfdc2955762d371d6e9",
+   "language": "go",
+   "created": null,
+   "why": "15 go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_future-architect__vuls-e4728e388120b311c4ed469e4f942e0347a2689b-v264a82e2f4818e30f5a25e4da53b27ba119f62b5",
+   "language": "go",
+   "created": null,
+   "why": "15 go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_flipt-io__flipt-a0cbc0cb65ae601270bdbe3f5313e2dfd49c80e4",
+   "language": "go",
+   "created": null,
+   "why": "15 go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_gravitational__teleport-645afa051b65d137654fd0d2d878a700152b305a-vee9b09fb20c43af7e520f57e9239bbcf46b7113d",
+   "language": "go",
+   "created": null,
+   "why": "15 go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_navidrome__navidrome-6b3b4d83ffcf273b01985709c8bc5df12bbb8286",
+   "language": "go",
+   "created": null,
+   "why": "15 go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_future-architect__vuls-c11ba27509f733d7d280bdf661cbbe2e7a99df4c",
+   "language": "go",
+   "created": null,
+   "why": "15 go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_flipt-io__flipt-ea9a2663b176da329b3f574da2ce2a664fc5b4a1",
+   "language": "go",
+   "created": null,
+   "why": "15 go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_gravitational__teleport-82185f232ae8974258397e121b3bc2ed0c3729ed-v626ec2a48416b10a88641359a169d99e935ff037",
+   "language": "go",
+   "created": null,
+   "why": "15 go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_navidrome__navidrome-0130c6dc13438b48cf0fdfab08a89e357b5517c9",
+   "language": "go",
+   "created": null,
+   "why": "15 go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_future-architect__vuls-e1fab805afcfc92a2a615371d0ec1e667503c254-v264a82e2f4818e30f5a25e4da53b27ba119f62b5",
+   "language": "go",
+   "created": null,
+   "why": "15 go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_flipt-io__flipt-cd2f3b0a9d4d8b8a6d3d56afab65851ecdc408e8",
+   "language": "go",
+   "created": null,
+   "why": "15 go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_gravitational__teleport-dd3977957a67bedaf604ad6ca255ba8c7b6704e9",
+   "language": "go",
+   "created": null,
+   "why": "15 go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_navidrome__navidrome-de90152a7173039677ac808f5bfb1e644d761336",
+   "language": "go",
+   "created": null,
+   "why": "15 go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_future-architect__vuls-fe8d252c51114e922e6836055ef86a15f79ad042",
+   "language": "go",
+   "created": null,
+   "why": "15 go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_flipt-io__flipt-b6cef5cdc0daff3ee99e5974ed60a1dc6b4b0d67",
+   "language": "go",
+   "created": null,
+   "why": "15 go tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-1917e37f5d9941a3459ce4b0177e201e2d94a622",
+   "language": "js",
+   "created": null,
+   "why": "15 js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-fe14847bb9bb07cab1b9c6c54335ff22ca5e516a-vnan",
+   "language": "js",
+   "created": null,
+   "why": "15 js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-00c70ce7b0541cfc94afe567921d7668cdc8f4ac-vnan",
+   "language": "js",
+   "created": null,
+   "why": "15 js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-f161c10cf7d31abf82e8d64d7a99c9fac5acfa18",
+   "language": "js",
+   "created": null,
+   "why": "15 js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-9a31cd0fa849da810b4fac6c6c015145e850b282-vnan",
+   "language": "js",
+   "created": null,
+   "why": "15 js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-be43cd25974681c9743d424238b7536c357dc8d3-vf2cf3cbd463b7ad942381f1c6d077626485a1e9e",
+   "language": "js",
+   "created": null,
+   "why": "15 js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-d3e513044d299d04e509bf8c0f4e73d812030246",
+   "language": "js",
+   "created": null,
+   "why": "15 js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-53a9b6447bd7e6110ee4a63e2ec0322c250f08d1-vnan",
+   "language": "js",
+   "created": null,
+   "why": "15 js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-0e07f3c9bace416cbab078a30eae972868c0a8a3-vf2cf3cbd463b7ad942381f1c6d077626485a1e9e",
+   "language": "js",
+   "created": null,
+   "why": "15 js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-01b519cd49e6a24d9a05d2eb97f54e420740072e",
+   "language": "js",
+   "created": null,
+   "why": "15 js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-772df3021201d9c73835a626df8dcb6334ad9a3e-vnan",
+   "language": "js",
+   "created": null,
+   "why": "15 js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-bd80d36e0dcf78cd4360791a82966078b3a07712-v4fbcfae8b15e4ce5d132c408bca69ebb9cf146ed",
+   "language": "js",
+   "created": null,
+   "why": "15 js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-815695401137dac2975400fc610149a16db8214b",
+   "language": "js",
+   "created": null,
+   "why": "15 js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-aec454dd6feeb93000380523cbb0b3681c0275fd-vnan",
+   "language": "js",
+   "created": null,
+   "why": "15 js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-cfc237c2b79d8c731bbfc6cadf977ed530bfd57a-v0495b863a912fbff5749c67e860612b91825407c",
+   "language": "js",
+   "created": null,
+   "why": "15 js tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-de49d486feef842101506adf040a0f00ded59519-v10a26bfb45a064b93f4fc044a0254925037b88f1",
+   "language": "ts",
+   "created": null,
+   "why": "15 ts tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-1e516e989b3c0221f4af6b297d9c0e4c43e4adc3-vbc0d9ba8f0071fbe982809910959a6ff8884dbbf",
+   "language": "ts",
+   "created": null,
+   "why": "15 ts tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-8513a9e8114a8b42e64f4348335e0f23efa054c4-vee878bb72091875e912c52fc32bc60ec3760227b",
+   "language": "ts",
+   "created": null,
+   "why": "15 ts tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-51818218c6ae33de00cbea3a4d30daac8c34142e-vc4e41fd0029957297843cb9dec4a25c7c756f029",
+   "language": "ts",
+   "created": null,
+   "why": "15 ts tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-4b4e45949096bb288f2b522f657610e480efa3e8-vee878bb72091875e912c52fc32bc60ec3760227b",
+   "language": "ts",
+   "created": null,
+   "why": "15 ts tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-fb32e5f9d9fc152a00144d56dd0af01760a2d4dc-vc4e41fd0029957297843cb9dec4a25c7c756f029",
+   "language": "ts",
+   "created": null,
+   "why": "15 ts tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-b4934a0f3c34d9d7649e944b183137e8fad3e859-vbc0d9ba8f0071fbe982809910959a6ff8884dbbf",
+   "language": "ts",
+   "created": null,
+   "why": "15 ts tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-da4edb7375c10f47f4ed3860a591c5e6557f7b5c-vbc0d9ba8f0071fbe982809910959a6ff8884dbbf",
+   "language": "ts",
+   "created": null,
+   "why": "15 ts tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-219bc8f05d7b980e038bc1524cb021bf56397a1b-vee878bb72091875e912c52fc32bc60ec3760227b",
+   "language": "ts",
+   "created": null,
+   "why": "15 ts tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-fbdb72a2bd39b05131ff905780d9d4a2a074de26-vbc0d9ba8f0071fbe982809910959a6ff8884dbbf",
+   "language": "ts",
+   "created": null,
+   "why": "15 ts tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-fe240cbf7f0fdd6744ef7bef8cb61676bcdbb621-vc4e41fd0029957297843cb9dec4a25c7c756f029",
+   "language": "ts",
+   "created": null,
+   "why": "15 ts tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-f3ffe17af6e8ab007e8d461355057ad237846d9d-vbc0d9ba8f0071fbe982809910959a6ff8884dbbf",
+   "language": "ts",
+   "created": null,
+   "why": "15 ts tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-12a6cbaa4f8b43c2f85caca0787ab55501539955-vc4e41fd0029957297843cb9dec4a25c7c756f029",
+   "language": "ts",
+   "created": null,
+   "why": "15 ts tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-f373ac3808deefce8183dad8d16729839cc330c1-v2939aa9f4356f0dc9f523ee5ce19d09e08ab979b",
+   "language": "ts",
+   "created": null,
+   "why": "15 ts tasks, one repository after another"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-befce4b146002b9abc86aa95f4d57581771815ce-vee878bb72091875e912c52fc32bc60ec3760227b",
+   "language": "ts",
+   "created": null,
+   "why": "15 ts tasks, one repository after another"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/build-cython-ext",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/build-pmars",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/build-pov-ray",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/cancel-async-tasks",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/circuit-fibsqrt",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/cobol-modernization",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/code-from-image",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/custom-memory-heap-crash",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/fix-git",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/fix-ocaml-gc",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/git-leak-recovery",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/gpt2-codegolf",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/headless-terminal",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/kv-store-grpc",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/make-doom-for-mips",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/make-mips-interpreter",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/merge-diff-arc-agi-task",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/overfull-hbox",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/path-tracing",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/path-tracing-reverse",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/polyglot-c-py",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/polyglot-rust-c",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/prove-plus-comm",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/pypi-server",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/regex-chess",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/schemelike-metacircular-eval",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/sqlite-db-truncate",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/torch-pipeline-parallelism",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/torch-tensor-parallelism",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/winning-avg-corewars",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/write-compressor",
+   "language": null,
+   "created": null,
+   "why": "software engineering or debugging"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/bn-fit-modify",
+   "language": null,
+   "created": null,
+   "why": "random other category"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/query-optimize",
+   "language": null,
+   "created": null,
+   "why": "random other category"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/modernize-scientific-stack",
+   "language": null,
+   "created": null,
+   "why": "random other category"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/caffe-cifar-10",
+   "language": null,
+   "created": null,
+   "why": "random other category"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/extract-moves-from-video",
+   "language": null,
+   "created": null,
+   "why": "random other category"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/large-scale-text-editing",
+   "language": null,
+   "created": null,
+   "why": "random other category"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/regex-log",
+   "language": null,
+   "created": null,
+   "why": "random other category"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/hf-model-inference",
+   "language": null,
+   "created": null,
+   "why": "random other category"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/extract-elf",
+   "language": null,
+   "created": null,
+   "why": "random other category"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/sam-cell-seg",
+   "language": null,
+   "created": null,
+   "why": "random other category"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/portfolio-optimization",
+   "language": null,
+   "created": null,
+   "why": "random other category"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/dna-insert",
+   "language": null,
+   "created": null,
+   "why": "random other category"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/mcmc-sampling-stan",
+   "language": null,
+   "created": null,
+   "why": "random other category"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/adaptive-rejection-sampler",
+   "language": null,
+   "created": null,
+   "why": "random other category"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/chess-best-move",
+   "language": null,
+   "created": null,
+   "why": "random other category"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/reshard-c4-data",
+   "language": null,
+   "created": null,
+   "why": "random other category"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/dna-assembly",
+   "language": null,
+   "created": null,
+   "why": "random other category"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/install-windows-3.11",
+   "language": null,
+   "created": null,
+   "why": "random other category"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/vulnerable-secret",
+   "language": null,
+   "created": null,
+   "why": "random other category"
+  }
+ ]
+}

@@ -1,7 +1,7 @@
 // The statistics of the benchmark report (bench/stats.mjs): intervals, noise and sample sizes.
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { closedShare, deviation, noise, ratioOfTotals, seeded, tasksNeeded, typicalRatio } from '../bench/stats.mjs'
+import { closedShare, deviation, noise, ratioOfTotals, seeded, solvedDifference, tasksNeeded, typicalRatio } from '../bench/stats.mjs'
 
 const near = (actual, expected, within = 1e-3) => assert.ok(Math.abs(actual - expected) <= within, `${actual} is not near ${expected}`)
 
@@ -80,4 +80,18 @@ test('the tasks a difference needs grow as the difference shrinks', () => {
   assert.equal(tasksNeeded(0.26, 0.1), 48)
   assert.equal(tasksNeeded(0.35, 0.3), 8)
   assert.ok(tasksNeeded(0.35, 0.05) > tasksNeeded(0.35, 0.1))
+})
+
+test('the difference in the share solved, paired by task, with an interval', () => {
+  const pairs = [
+    { a: true, b: true },
+    { a: false, b: true },
+    { a: true, b: false },
+    { a: false, b: true },
+  ]
+  const d = solvedDifference(pairs)
+  near(d.difference, -0.25)
+  assert.ok(d.low <= d.difference && d.difference <= d.high)
+  assert.deepEqual(solvedDifference([{ a: true, b: true }, { a: false, b: false }]), { difference: 0, low: 0, high: 0, tasks: 2 })
+  assert.equal(solvedDifference([]), null)
 })

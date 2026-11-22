@@ -88,6 +88,7 @@ test('import and report: each arm against the baseline, with intervals', () => {
 
   const text = markdown(r)
   assert.match(text, /\| cheaper \| 6 \| 5 = 83%/)
+  assert.match(text, /-16\.7 \(/)
   assert.match(text, /-50% \(-50% to -50%\)/)
   assert.match(text, /## set-b/)
   assert.match(text, /EnvironmentStartError/)
