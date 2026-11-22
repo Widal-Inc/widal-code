@@ -5,3 +5,4 @@ dist/
 /tsconfig.json
 # A cache that a plugin of the person's own agent can leave in any folder.
 .impeccable/
+__pycache__/
