@@ -12,6 +12,7 @@ import { ARMS, BASELINE, EFFORTS, addArms, armOf, effortOf } from './arms.mjs'
 import { tokensAgree } from './codex.mjs'
 import { collect } from './collect.mjs'
 import { ROOT, agentOf, flags, oneTaskSet, outDir, paths, readJson, runsOf, writeJson } from './lib.mjs'
+import { closedShare, noise, ratioOfTotals, tasksNeeded, typicalRatio } from './stats.mjs'
 import { OWN_SET, TASKS, taskOf, taskSet, useTasks } from './tasks.mjs'
 
 const f = flags()
@@ -179,6 +180,12 @@ function signTest(pairs, value) {
   return { less, n, chance: Math.min(1, (2 * tail) / 2 ** n) }
 }
 const chanceText = (t) => (t.chance === null ? 'n/a' : t.chance < 0.001 ? 'under 0.1%' : `${(100 * t.chance).toFixed(t.chance < 0.1 ? 1 : 0)}%`)
+/** A ratio as a difference: 0.41 is -59%, 1.14 is +14%. */
+const asChange = (ratio) => `${ratio < 1 ? '-' : '+'}${pct(Math.abs(ratio - 1))}`
+/** A ratio with its 95% interval, as differences: "-59% (-66% to -51%)". */
+const intervalText = (x) => (x ? `${asChange(x.ratio)} (${asChange(x.low)} to ${asChange(x.high)})` : 'n/a')
+/** The ratio of totals of two arms over pairs of runs, with its 95% interval. */
+const totalsOf = (pairs, value) => ratioOfTotals(pairs.map((p) => ({ a: value(p.a), b: value(p.b) })))
 /** An arm that differs from the other arms of its model in the effort level only. */
 const plainEffort = (a) => !a.arm.from && !a.arm.only && !a.arm.other && Object.keys(a.arm.settings).every((key) => key === 'model' || key === 'effortLevel')
 /** The runs of an arm in a paired round. */
@@ -206,7 +213,7 @@ for (const rep of pairedRounds) {
   const figures = rows.map(({ a, pairs }) => {
     const mine = pairs.map((p) => p.a)
     const theirs = pairs.map((p) => p.b)
-    return { arm: a.arm.id, name: a.arm.name, tasks: pairs.length, closed: mine.filter((r) => r.score.closed).length, baselineClosed: theirs.filter((r) => r.score.closed).length, cost: sum(mine, costOf), baselineCost: sum(theirs, costOf), costSign: signTest(pairs, costOf), seconds: sum(mine, seconds), baselineSeconds: sum(theirs, seconds), medianSeconds: median(mine.map(seconds)), baselineMedianSeconds: median(theirs.map(seconds)), timeSign: signTest(pairs, seconds) }
+    return { arm: a.arm.id, name: a.arm.name, tasks: pairs.length, closed: mine.filter((r) => r.score.closed).length, baselineClosed: theirs.filter((r) => r.score.closed).length, cost: sum(mine, costOf), baselineCost: sum(theirs, costOf), costSign: signTest(pairs, costOf), costInterval: totalsOf(pairs, costOf), seconds: sum(mine, seconds), baselineSeconds: sum(theirs, seconds), medianSeconds: median(mine.map(seconds)), baselineMedianSeconds: median(theirs.map(seconds)), timeSign: signTest(pairs, seconds), timeInterval: totalsOf(pairs, seconds) }
   })
   paired.push({ round: rep, reference: ref.arm.id, arms: figures })
   // The words for the arm that the others are set against.
@@ -214,9 +221,48 @@ for (const rep of pairedRounds) {
   const short = ref === base ? 'baseline' : 'effort xhigh'
   say(`## Round ${rep}: every arm started each task at the same moment`)
   say(`The arms of this round ran side by side on each task, so they ran under the same load. Each arm is set against ${ref === base ? `the baseline (${ref.arm.name})` : `the arm "${ref.arm.name}"`} of the same round, on the tasks that both ran.`)
-  say(table(['arm', `tasks closed (${short})`, 'cost', `cost ${it}`, 'difference', `tasks that cost less than ${it}`, 'chance of such a split without a real difference'], figures.map((x) => [x.name, `${x.closed} of ${x.tasks} (${x.baselineClosed})`, money(x.cost), money(x.baselineCost), change(x.baselineCost, x.cost), `${x.costSign.less} of ${x.costSign.n}`, chanceText(x.costSign)])))
-  say(table(['arm', 'time for the tasks', `time ${it}`, 'difference', `median time (${short})`, `tasks that took less time than ${it}`, 'chance of such a split without a real difference'], figures.map((x) => [x.name, `${Math.round(x.seconds)}s`, `${Math.round(x.baselineSeconds)}s`, change(x.baselineSeconds, x.seconds), `${Math.round(x.medianSeconds)}s (${Math.round(x.baselineMedianSeconds)}s)`, `${x.timeSign.less} of ${x.timeSign.n}`, chanceText(x.timeSign)])))
-  say('The last column is a sign test: how likely it is to see the tasks split at least this one-sidedly when the arm makes no difference. Under 5% is the usual line for a real difference. It says nothing about how large the difference is.')
+  say(table(['arm', `tasks closed (${short})`, 'cost', `cost ${it}`, 'difference (95% interval)', `tasks that cost less than ${it}`, 'chance of such a split without a real difference'], figures.map((x) => [x.name, `${x.closed} of ${x.tasks} (${x.baselineClosed})`, money(x.cost), money(x.baselineCost), intervalText(x.costInterval), `${x.costSign.less} of ${x.costSign.n}`, chanceText(x.costSign)])))
+  say(table(['arm', 'time for the tasks', `time ${it}`, 'difference (95% interval)', `median time (${short})`, `tasks that took less time than ${it}`, 'chance of such a split without a real difference'], figures.map((x) => [x.name, `${Math.round(x.seconds)}s`, `${Math.round(x.baselineSeconds)}s`, intervalText(x.timeInterval), `${Math.round(x.medianSeconds)}s (${Math.round(x.baselineMedianSeconds)}s)`, `${x.timeSign.less} of ${x.timeSign.n}`, chanceText(x.timeSign)])))
+  say('The 95% interval comes from resampling the tasks: draw 13 tasks with replacement many times and work out the difference again. The last column is a sign test: how likely it is to see the tasks split at least this one-sidedly when the arm makes no difference. Under 5% is the usual line for a real difference.')
+}
+
+// 3b2. Every run of an arm against the baseline of the same round, all rounds together. Cost
+// counts every round. Time counts only the rounds in which both ran side by side.
+const pooled = []
+if (base) {
+  for (const a of whole.filter((x) => x !== base)) {
+    const reps = [...new Set(a.runs.map((r) => r.rep))].sort()
+    const pairs = reps.flatMap((rep) => pairsOf(a, rep))
+    if (!pairs.length) continue
+    const timed = pairs.filter((p) => p.a.setup?.paired && p.b.setup?.paired)
+    const closed = pairs.filter((p) => p.a.score.closed).length
+    pooled.push({
+      arm: a.arm.id, name: a.arm.name, rounds: [...new Set(pairs.map((p) => p.a.rep))], runs: pairs.length,
+      closed, closedShare: closedShare(closed, pairs.length), baselineClosed: pairs.filter((p) => p.b.score.closed).length,
+      cost: totalsOf(pairs, costOf), typicalCost: typicalRatio(pairs.map((p) => ({ a: costOf(p.a), b: costOf(p.b) }))), costSign: signTest(pairs, costOf),
+      timedRuns: timed.length, time: timed.length ? totalsOf(timed, seconds) : null, timeSign: timed.length ? signTest(timed, seconds) : null,
+    })
+  }
+}
+const several = pooled.filter((x) => x.rounds.length > 1)
+if (several.length) {
+  say('## Every round together: each arm against the baseline')
+  say('Only the arms that ran in more than one round. Each run is set against the baseline of its own round, on the same task. The time counts only the rounds in which both ran side by side.')
+  const share = (s) => `${pct(s.share)} (${pct(s.low)} to ${pct(s.high)})`
+  say(table(['arm', 'rounds', 'runs', 'tasks closed (95% interval)', 'cost against the baseline (95% interval)', 'runs that cost less', 'chance', 'time against the baseline (95% interval)', 'runs that took less time'], several.map((x) => [x.name, x.rounds.join(', '), String(x.runs), share(x.closedShare), intervalText(x.cost), `${x.costSign.less} of ${x.costSign.n}`, chanceText(x.costSign), x.time ? intervalText(x.time) : 'n/a', x.timeSign ? `${x.timeSign.less} of ${x.timeSign.n}` : 'n/a'])))
+}
+
+// 3b3. The noise: how much the baseline differs from itself between rounds, and how many tasks a
+// difference of a given size needs before it stands out from that noise.
+const baseNoise = base ? noise(base.runs.map((r) => ({ task: r.task, value: costOf(r) }))) : { pairs: 0, spread: null }
+const armSpreads = pooled.map((x) => x.typicalCost?.spread).filter((x) => x > 0)
+const armSpread = armSpreads.length ? armSpreads.reduce((m, x) => m + x, 0) / armSpreads.length : null
+const SIZES = [0.3, 0.2, 0.1, 0.05]
+const sizes = { noise: baseNoise, armSpread, needed: SIZES.map((d) => ({ difference: d, fromNoise: baseNoise.spread ? tasksNeeded(baseNoise.spread, d) : null, fromArms: armSpread ? tasksNeeded(armSpread, d) : null })) }
+if (baseNoise.spread) {
+  say('## Noise, and the number of tasks a difference needs')
+  say(`The baseline ran some tasks more than once. Between two of its runs, the cost of one task differs with a standard deviation of ${baseNoise.spread.toFixed(2)} on the log scale (${baseNoise.pairs} pairs of runs). Across the arms, the log of an arm's cost over the baseline's on one task has a standard deviation of ${armSpread ? armSpread.toFixed(2) : 'n/a'} on average. The table gives the tasks a paired comparison needs to tell a true cost difference from that noise, with 80% power at the 5% level. This task set has ${TASKS.length} tasks.`)
+  say(table(['true cost difference', 'tasks needed (noise of the baseline)', 'tasks needed (spread of the arms)'], sizes.needed.map((x) => [pct(x.difference), String(x.fromNoise ?? 'n/a'), String(x.fromArms ?? 'n/a')])))
 }
 
 // 3c. The effort levels of each model, each next to the same model at effort xhigh.
@@ -514,6 +560,8 @@ writeJson(join(out, 'results.json'), {
   arms: arms.map((a) => ({ id: a.arm.id, name: a.arm.name, first: stats(first(a)), all: stats(a.runs), signs: a.view?.signs, runs: a.runs.map((r) => ({ task: r.task, rep: r.rep, closed: r.score.closed, passed: r.score.passed, total: r.score.total, testsPass: r.score.testsPass, cost: costOf(r), seconds: r.wallMs / 1000, turns: r.claude?.turns, refused: r.claude?.denials?.length ?? 0 })) })),
   picks: picks.map((p) => ({ task: p.task.id, arm: p.best?.a.arm.id, cost: p.best ? costOf(p.best.r) : null, baseline: p.baseline ? costOf(p.baseline) : null })),
   paired,
+  pooled,
+  sizes,
   efforts,
   alone: single.map((x) => ({ arm: x.arm, task: x.task, round: x.round, closed: x.run.score.closed, cost: costOf(x.run), seconds: seconds(x.run), baselineCost: x.baseline ? costOf(x.baseline) : null, baselineSeconds: x.baseline ? seconds(x.baseline) : null, allCost: x.all ? costOf(x.all) : null })),
   trust: checked,
