@@ -184,6 +184,62 @@ into your own home. Run one task first and check that the tool acted (its own co
 session's record), because an arm in which the tool did nothing reads like "no effect". The runs
 of such an arm are in the report, and never in the records that may be shared.
 
+## Run issues of another project
+
+`--tasks-file <file>` runs the tasks of a JSON file in place of the benchmark's own. Such a task is
+an issue of another project, for example a finished ticket of your own codebase:
+
+- the session starts in a copy of a folder that holds the project as it was before the fix;
+- the task text is the ticket;
+- the hidden checks are test files of the project, for example the tests of the real fix. They
+  come into the work folder only when the session has ended.
+
+A task is closed when every test in its `expect` list passes and no test that passed at the start
+fails now. Test files of the start that the session changed are put back before the tests run, so
+a session cannot pass by changing a test.
+
+```
+node bench/run.mjs --out <new folder> --tasks-file <file> --arms fable-xhigh --round 1 --paired
+node bench/report.mjs --out <new folder> --tasks-file <file>
+```
+
+```json
+{ "set": "shop-issues",
+  "tasks": [{
+    "id": "p1", "number": 1, "slug": "count", "kind": "bug fix", "minutes": 20,
+    "promptFile": "${dir}/texts/p1.md", "version": "the commit before the fix",
+    "start": "${dir}/start/p1", "folder": "shop",
+    "tools": ["Bash(npm test:*)", "Bash(git diff:*)", "Bash(ls:*)", "Bash(cat:*)", "Bash(grep:*)"],
+    "hidden": { "files": "${dir}/hidden/p1", "expect": "${dir}/hidden/p1.expect.json",
+                "command": ["npx", "vitest", "run", "test/count.test.ts", "--reporter=json", "--outputFile=${report}"] },
+    "still": { "passing": "${dir}/start/p1.passing.json", "tests": "\\.test\\.ts$",
+               "command": ["npx", "vitest", "related", "${changed}", "--run", "--reporter=json", "--outputFile=${report}"] }
+  }] }
+```
+
+`${dir}` is the folder of the file. The two commands write their report in the JSON form of Jest
+and Vitest to `${report}`. `${changed}` stands for the files the session changed, so the second
+command runs only the tests that those files reach. `expect` and `passing` are lists of tests as
+"file > name": the hidden tests that pass on the real fix, and the tests that pass at the start.
+`useTasks` in `tasks.mjs` describes every field, and `passingNow` in `other.mjs` makes such a list.
+
+Before you use a finished ticket as a task, check three things:
+
+- **The hidden tests are fair.** They must use only files and names that the code had before the
+  fix, and they must not check the wording of the code. Otherwise a correct fix that picked
+  another name fails.
+- **The task proves itself.** Score a copy of the start: it must be open. Score a copy with the
+  real fix: it must be closed (`node bench/other.mjs --tasks-file <file> <task id> <work folder>`).
+- **The start folder holds nothing a session must not see.** Make it from the commit before the
+  fix without the git history, with the packages installed, without a `.env` file, and without
+  the project's own Claude Code settings, hooks and MCP file.
+
+A session in another project gets the shell commands that the task names in `tools`, and no other
+shell command. It gets no variable of your environment whose name says key, token, secret,
+password or credential, and none that starts with `AWS_`. Use a new folder for `--out`: one
+folder holds the runs of one set of tasks. The runs of a tasks file are in the report, and never
+in the records that may be shared.
+
 ## Keep and share the records
 
 ```
@@ -230,13 +286,20 @@ checks its cost and ticket.
   you give. It sees only the benchmark's sessions. Your own Widal.Code setup, your settings and
   your board are neither read nor changed.
 - Claude Code writes the logs of the sessions to its own folder, as for any session.
+- With a tasks file, each session runs in a copy of the other project's folder, and the project's
+  test commands run there. The project's own instructions for agents (`CLAUDE.md`, `AGENTS.md`)
+  are read, because they are part of the work. Its tests run with the network that your computer
+  has, so use a project whose unit tests need no live system.
 - A session may read files outside its own folder, and the folder of the benchmark holds what
   earlier runs left. The report therefore says how many of the lines that two runs of one task
   added are the same. A high share between different arms would be a sign of copying.
 
 ## Limits
 
-- One small project in one language. The results say little about a large codebase.
+- One small project in one language. The results say little about a large codebase. A tasks file
+  with issues of your own codebase is the way to measure there.
+- A finished ticket scores a session against the tests of one real fix. A good fix that made
+  another choice than the real one can fail them, so read the open tasks before you count them.
 - The tasks say exactly what is wanted. In the first full run every arm closed every task, also
   the three hard ones. So this set shows what a setup costs for the same outcome, and whether a
   change breaks something. It does not yet show where a cheaper model stops being good enough.

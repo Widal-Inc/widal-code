@@ -4,6 +4,9 @@
 // would need for the task by hand: an estimate, used only to put a value on a closed task.
 // `checks` is how many hidden checks the task has (bench/checks/<id>.mjs). `variant` names a
 // folder in bench/variants whose files are put over the project before the task starts.
+import { existsSync, readFileSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
+
 const DONE = 'Work in this repository. The tests run with "npm test". Stop when the work is done.'
 
 export const TASKS = [
@@ -264,4 +267,104 @@ export const taskOf = (id) => {
   const task = TASKS.find((t) => t.id === id)
   if (!task) throw new RangeError(`no task "${id}"`)
   return task
+}
+
+/** The name of the benchmark's own set of tasks. The tasks of a tasks file are another set. */
+export const OWN_SET = 'ledger'
+let set = OWN_SET
+/** The set of tasks in use: the benchmark's own, or the set of the tasks file. */
+export const taskSet = () => set
+
+const FILE_KEYS = ['id', 'number', 'slug', 'kind', 'minutes', 'prompt', 'promptFile', 'version', 'start', 'folder', 'tools', 'env', 'hidden', 'still']
+
+/**
+ * Puts the tasks of a tasks file in the place of the benchmark's own tasks (--tasks-file). Such a
+ * task is an issue of another project: the session starts in a copy of a folder of that project,
+ * and the project's own test files score what it left (bench/other.mjs).
+ *
+ * The file holds `set` (a name for the set of tasks) and `tasks`. A task has `id`, `number` (1 to
+ * 99), `slug`, `kind`, `minutes` and the fields below. "${dir}" in a text stands for the folder of
+ * the file.
+ * - `prompt`, or `promptFile` with the path of a text file: the whole message the agent gets.
+ * - `start`: the folder the session starts in. It is copied whole, so it holds the project as it
+ *   was before the fix, with its packages installed, and nothing a session must not see.
+ * - `version`: a text that names the state of `start`, for example a commit.
+ * - `folder`: the name of the work folder, for example the project's name.
+ * - `tools`: the shell commands a session may run, as "Bash(...)" rules. They take the place of
+ *   the benchmark's own shell rules, which fit the sample project only.
+ * - `env`: variables for the session and for the test commands.
+ * - `hidden`: the hidden checks. `files` is a folder of test files that are put over the work when
+ *   the session has ended. `command` runs them and writes a report in the JSON form of Jest and
+ *   Vitest to the file "${report}". `expect` is a file with the list of tests that must pass.
+ *   `cwd` is the folder inside the project that the command runs in.
+ * - `still`: the tests that passed at the start. `command` runs the tests that belong to the
+ *   files in "${changed}" (the files the session changed) and writes the same kind of report.
+ *   `passing` is a file with the list of tests that passed at the start. `tests` is a pattern for
+ *   the paths of test files: a test file of the start that the session changed is put back first.
+ *
+ * The runs of such tasks are never part of the records that may be shared (bench/export.mjs).
+ * @returns {object[]} The tasks.
+ */
+export function useTasks(file) {
+  let data
+  try {
+    data = JSON.parse(readFileSync(file, 'utf8'))
+  } catch (e) {
+    throw new Error(`The tasks file ${file} cannot be read as JSON: ${e.message}`)
+  }
+  const dir = dirname(resolve(file))
+  const fill = (value) => {
+    if (typeof value === 'string') return value.replaceAll('${dir}', dir)
+    if (Array.isArray(value)) return value.map(fill)
+    if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([key, v]) => [key, fill(v)]))
+    return value
+  }
+  if (!data || typeof data !== 'object' || !/^[a-z0-9][a-z0-9-]{0,39}$/.test(data.set ?? '') || data.set === OWN_SET) throw new Error(`The tasks file ${file} needs a "set": a name of lower case letters, digits and dashes that is not "${OWN_SET}".`)
+  if (!Array.isArray(data.tasks) || !data.tasks.length) throw new Error(`The tasks file ${file} needs a list of "tasks".`)
+  const list = []
+  const texts = (value) => Array.isArray(value) && value.length > 0 && value.every((x) => typeof x === 'string')
+  for (const given of data.tasks) {
+    const task = fill(given)
+    const wrong = (what) => new Error(`The tasks file ${file}: the task ${JSON.stringify(given?.id)} ${what}.`)
+    if (!task || typeof task !== 'object' || !/^[a-z][a-z0-9]{0,7}$/.test(task.id ?? '')) throw wrong('needs an "id" of a lower case letter and up to 7 more letters or digits')
+    const unknown = Object.keys(task).find((key) => !FILE_KEYS.includes(key))
+    if (unknown) throw wrong(`has the field "${unknown}", which is not one of: ${FILE_KEYS.join(', ')}`)
+    if (list.some((t) => t.id === task.id)) throw wrong('has the id of another task')
+    if (!Number.isInteger(task.number) || task.number < 1 || task.number > 99 || list.some((t) => t.number === task.number)) throw wrong('needs a "number" from 1 to 99 that no other task has')
+    if (!/^[a-z0-9][a-z0-9-]{0,39}$/.test(task.slug ?? '')) throw wrong('needs a "slug" of lower case letters, digits and dashes')
+    if (typeof task.kind !== 'string' || !task.kind.trim()) throw wrong('needs a "kind"')
+    if (!(task.minutes > 0)) throw wrong('needs "minutes": how long the task takes by hand')
+    if (task.promptFile !== undefined) {
+      if (task.prompt !== undefined || typeof task.promptFile !== 'string' || !existsSync(task.promptFile)) throw wrong('needs either a "prompt" or a "promptFile" that is there')
+      task.prompt = readFileSync(task.promptFile, 'utf8').trim()
+    }
+    if (typeof task.prompt !== 'string' || !task.prompt.trim()) throw wrong('needs a "prompt" or a "promptFile"')
+    if (typeof task.start !== 'string' || !existsSync(task.start)) throw wrong('needs a "start" folder that is there')
+    if (task.version !== undefined && typeof task.version !== 'string') throw wrong('needs a text as "version"')
+    if (task.folder !== undefined && (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,39}$/.test(task.folder) || /^lane\w+$/.test(task.folder))) throw wrong('needs a "folder" of letters, digits, dots and dashes that does not start with "lane"')
+    if (!texts(task.tools) || !task.tools.every((rule) => /^Bash\(.+\)$/.test(rule))) throw wrong('needs "tools": a list of "Bash(...)" rules')
+    if (task.env !== undefined && !(task.env && typeof task.env === 'object' && Object.values(task.env).every((x) => typeof x === 'string'))) throw wrong('needs texts as the values of "env"')
+    for (const part of ['hidden', 'still']) {
+      const p = task[part]
+      if (!p || typeof p !== 'object' || !texts(p.command) || !p.command.some((x) => x.includes('${report}'))) throw wrong(`needs "${part}" with a "command" that writes its report to "\${report}"`)
+      if (p.cwd !== undefined && (typeof p.cwd !== 'string' || p.cwd.startsWith('/') || p.cwd.split('/').includes('..'))) throw wrong(`needs a "cwd" inside the project in "${part}"`)
+    }
+    if (typeof task.hidden.files !== 'string' || !existsSync(task.hidden.files)) throw wrong('needs "hidden" with a "files" folder that is there')
+    if (typeof task.hidden.expect !== 'string' || !existsSync(task.hidden.expect)) throw wrong('needs "hidden" with an "expect" file that is there')
+    if (typeof task.still.passing !== 'string' || !existsSync(task.still.passing)) throw wrong('needs "still" with a "passing" file that is there')
+    if (!task.still.command.includes('${changed}')) throw wrong('needs "${changed}" as one part of the "command" in "still"')
+    try {
+      new RegExp(task.still.tests)
+    } catch {
+      throw wrong('needs "still" with "tests": a pattern for the paths of test files')
+    }
+    if (typeof task.still.tests !== 'string') throw wrong('needs "still" with "tests": a pattern for the paths of test files')
+    task.checks = JSON.parse(readFileSync(task.hidden.expect, 'utf8')).length
+    if (!(task.checks > 0)) throw wrong('needs at least one test in the "expect" file of "hidden"')
+    list.push({ ...task, folder: task.folder ?? data.set, other: true })
+  }
+  set = data.set
+  // In place, so that every file that took the list before this call has the new tasks.
+  TASKS.splice(0, TASKS.length, ...list)
+  return list
 }
