@@ -2,7 +2,7 @@
 // as records of the benchmark, and a report with 95% intervals.
 //
 //   node bench/harbor.mjs import --jobs <Harbor's jobs folder> --out <folder> [--arm <id>] [--rep 1]
-//   node bench/harbor.mjs report --out <folder> [--baseline baseline]
+//   node bench/harbor.mjs report --out <folder> [--baseline baseline] [--stage <name>]
 //
 // "import" reads every trial of Harbor's jobs folder (each one is a folder with a result.json) and
 // writes one record per trial to <folder>/harbor/<arm>/<task>-r<rep>.json. The arm is the setup
@@ -51,7 +51,7 @@ export const taskFile = (task) => task.replace(/[^A-Za-z0-9._-]+/g, '_').slice(0
  * The record of one trial of Harbor.
  * @param {object} r The trial's result.json.
  */
-export function recordOf(r, { arm, rep = 1 } = {}) {
+export function recordOf(r, { arm, rep = 1, extra = {} } = {}) {
   const agent = r.agent_result ?? {}
   const rewards = r.verifier_result?.rewards ?? null
   const reward = rewards ? (rewards.reward ?? Object.values(rewards)[0] ?? null) : null
@@ -76,14 +76,15 @@ export function recordOf(r, { arm, rep = 1 } = {}) {
     tokens: { input: agent.n_input_tokens ?? null, cache: agent.n_cache_tokens ?? null, output: agent.n_output_tokens ?? null },
     error: r.exception_info?.exception_type ?? null,
     harnessError,
+    ...extra,
   }
 }
 
 /** Reads every trial of a jobs folder and writes its record. Returns the records. */
-export function importJobs(jobs, out, { arm, rep = 1 } = {}) {
+export function importJobs(jobs, out, { arm, rep = 1, extra = {} } = {}) {
   const records = []
   for (const folder of trialFolders(jobs)) {
-    const record = recordOf(JSON.parse(readFileSync(join(folder, 'result.json'), 'utf8')), { arm, rep })
+    const record = recordOf(JSON.parse(readFileSync(join(folder, 'result.json'), 'utf8')), { arm, rep, extra })
     const dir = join(out, 'harbor', record.arm)
     mkdirSync(dir, { recursive: true })
     writeFileSync(join(dir, `${taskFile(record.task)}-r${rep}.json`), `${JSON.stringify(record, null, 2)}\n`)
@@ -113,8 +114,8 @@ const money = (x) => `$${x.toFixed(2)}`
 const table = (head, rows) => [`| ${head.join(' | ')} |`, `| ${head.map(() => '---').join(' | ')} |`, ...rows.map((row) => `| ${row.join(' | ')} |`)].join('\n')
 
 /** The report: each arm against the baseline, overall and per task set. */
-export function report(records, { baseline = 'baseline' } = {}) {
-  const usable = records.filter((r) => !r.harnessError)
+export function report(records, { baseline = 'baseline', stage } = {}) {
+  const usable = records.filter((r) => !r.harnessError && (!stage || r.stage === stage))
   const key = (r) => `${r.task}\u0000${r.rep}`
   const base = new Map(usable.filter((r) => r.arm === baseline).map((r) => [key(r), r]))
   const arms = [...new Set(usable.map((r) => r.arm))].sort((a, b) => (a === baseline ? -1 : b === baseline ? 1 : a.localeCompare(b)))
@@ -194,7 +195,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     const records = importJobs(f.jobs, f.out, { arm: typeof f.arm === 'string' ? f.arm : undefined, rep: Number(f.rep ?? 1) })
     console.log(`${records.length} trials read, ${records.filter((r) => r.harnessError).length} of them ended on an error of the harness.`)
   } else if (command === 'report' && typeof f.out === 'string') {
-    const result = report(readRecords(f.out), { baseline: typeof f.baseline === 'string' ? f.baseline : 'baseline' })
+    const result = report(readRecords(f.out), { baseline: typeof f.baseline === 'string' ? f.baseline : 'baseline', stage: typeof f.stage === 'string' ? f.stage : undefined })
     writeFileSync(join(f.out, 'harbor-results.json'), `${JSON.stringify(result, null, 2)}\n`)
     console.log(markdown(result))
   } else {

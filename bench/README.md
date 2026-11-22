@@ -292,6 +292,17 @@ costs what they cost. Most task images are built for Intel processors, so on a M
 silicon they run under emulation and slowly, and a few hundred images need much disk. A cloud
 machine, or one of Harbor's cloud sandboxes (`--env`), suits a full run better.
 
+`bench/harbor-stage.mjs` runs a whole stage: every setup on every task, in blocks shuffled with a
+fixed seed, so that a stop at any point leaves complete pairs. After each block it reads the results,
+adds up the spend per provider and per stage from the cost that Claude Code reports, and writes
+`status-<stage>.md` and `ledger.json`. It stops at 90% of the stage's cap or of a provider's cap,
+when more than 10% of a block's trials fail in the harness, or when a setup solves 20 points fewer
+tasks than the reference setup after two blocks. The status file shows spend and errors, never the
+solved tasks or the cost per setup, so that nobody reads the result before the stage ends. All setups
+of a stage use one provider. Run it again after a stop and it skips what is done
+(`node bench/harbor-stage.mjs --config <stage.json>`, and `--plan` to see the blocks first; the
+comment at the top of the file describes the stage file).
+
 In version 0.1 Widal.Code proposed its changes from the baseline's own sessions. For a new task
 set, run the baseline first, point `widal advise` at the sessions Harbor kept for it (in each
 trial's `agent/sessions` folder), and put what it proposes into the setup.
