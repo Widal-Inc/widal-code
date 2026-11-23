@@ -240,3 +240,31 @@ next to the Claude baselines and not ranked. They run only when an OpenAI API ke
 - A trial's tokens are the sum of many calls. Priced as one call, the sum crossed OpenAI's long-prompt
   limit (272,000 tokens), and the trial was priced at twice the input price. Sums are now priced at the
   standard price.
+
+## Correction, 23 Nov 2026: a larger runner, and a longer limit for the agent's setup
+
+Neither change below alters a setup, a task, a measure or a stop rule. The code that the stages run stays
+pinned to commit 9f58453, the commit the main stage started on, because the setup "widal-on" uploads that
+checkout into every container.
+
+**A larger runner.** The main stage ran slowly on a machine with 16 processors. When a test process
+crashed in a container, the host wrote and compressed a core dump, and these used about 7 of the 16
+processors. Core dumps were turned off on the host (`kernel.core_pattern` set to `|/bin/false`). A
+crashing process ends the same way with or without a core dump, in every setup. The chain was stopped at
+01:06 UTC and the runner was moved to an m7i.8xlarge (32 processors, 123 GB of memory), the largest the
+account's limit allows. The 16 trials that the stop cut off ($1.64) are set aside and count in no result.
+The 55 that had finished are kept. On the larger machine the main stage runs three trials at a time per
+setup again. It started again at 01:08 UTC.
+
+**A longer limit for the agent's setup.** The main stage stopped itself after 8 of its 10 blocks at
+12:11 UTC, because 54 of the last block's 250 trials ended on an error of the harness. Five tasks
+(fix-ocaml-gc, path-tracing, regex-log, langchain4j-5328 and langchain4j-5367) failed in all ten setups
+at the agent's setup, which had a limit of 12 minutes. Harbor installs Node.js and npm before it installs
+Claude Code, which is 667 packages on these tasks' plain Ubuntu 24.04 images, and all ten setups did that
+at the same moment. Alone, the same install takes under 2 minutes on the runner, and 15 downloads of the
+packages at once took 10 seconds, so the unpacking of the packages in ten containers at once is the slow
+part. The setup runs before the agent and spends nothing, so its limit was raised to 30 minutes (Harbor's
+`--agent-setup-timeout-multiplier` 5) for this and every later stage. The quality stage had started at
+12:11 UTC. It was stopped at 12:19 UTC: its 47 finished trials are kept, and the 12 it cut off ($0) are
+set aside. The main stage started again at 12:20 UTC. It runs again only the trials that ended on an
+error of the harness, then its last two blocks, and the quality stage follows it.
