@@ -296,3 +296,27 @@ that starts from now on. The cap of each stage stays as it was. The chain's late
 edit of `bench/harbor-make-stage.mjs` in the runner's checkout at 9f58453, because the chain's script
 cannot be edited while it runs. The main stage's file was made earlier and keeps $1,500, which it does not
 come near (it ends near $430).
+
+## Correction, 23 Nov 2026: a faster disk, and more trials at a time in the quality stage
+
+Neither change below alters a setup, a task, a measure, a cap or a stop rule.
+
+**A faster disk.** When the quality stage started at 17:54 UTC, the runner spent most of its time waiting
+for its disk (a load of 116, with 69% of the processors' time waiting on input and output). The runner's
+disk was raised to 16,000 operations per second and 1,000 MB/s at 18:01 UTC, while the stage ran.
+
+**Eight trials at a time per setup in the quality stage.** Nils asked for the quality stage to end sooner.
+At 22:00 UTC it had finished 6 of its 26 blocks in about 4 hours and spent $69.32 of its $400 cap, and the
+runner's processors were 80% idle. The chain was stopped at 22:01 UTC, two minutes after block 7 started.
+The 653 trials that had finished are kept, and the 19 that the stop cut off ($0.86) are set aside and count
+in no result. The stage file was left as it was except for the number of trials at a time, which went from 5
+to 8 per setup, so the stage runs 32 trials at a time and the OpenAI stages beside it run 8. The main stage
+ran 30 at a time beside the same 8. The chain started again at 22:02 UTC with a script that begins at the
+quality stage, so the main stage does not run again. As after the main stage's restart, the quality stage
+first runs again the trials of blocks 1 to 6 that ended on an error of the harness (none of them spent
+anything), then goes on from block 7.
+
+The four setups of a block run at the same time with the same number of trials at a time, so the trials
+that are compared ran under the same load. Cost and tasks solved are measured per trial. Time is the one
+measure that the load changes, which is one more reason why the time comparisons count for less than cost
+and tasks solved.
