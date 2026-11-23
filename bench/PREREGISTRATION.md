@@ -292,4 +292,7 @@ and the stages started again at 17:11 UTC.
 **A higher cap for the Anthropic API key.** The caps of the Anthropic stages add up to $1,960, more than
 the key's cap of $1,500 over all stages (with a stop at 90%, $1,350), so the last stages would have been
 cut off. With Nils's approval the cap of the API key is raised to $2,100 (a stop at $1,890) for every stage
-that starts from now on. The cap of each stage stays as it was.
+that starts from now on. The cap of each stage stays as it was. The chain's later stages get the new cap from a local
+edit of `bench/harbor-make-stage.mjs` in the runner's checkout at 9f58453, because the chain's script
+cannot be edited while it runs. The main stage's file was made earlier and keeps $1,500, which it does not
+come near (it ends near $430).
