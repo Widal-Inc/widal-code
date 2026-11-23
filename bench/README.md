@@ -279,7 +279,9 @@ counts in no number and is listed apart.
 
 Both example setups block GitHub inside the container (`rootInstall`), because some task sets
 allow the internet and a session could otherwise fetch the real fix. Give every setup of a run the
-same block. They also set `CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS=1`: an API organization with
+same block. The setup agent saves the task's `/etc/hosts` before these steps and puts it back when the
+session ends, because the verifier runs next in the same container and some verifiers download their tools
+from GitHub. They also set `CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS=1`: an API organization with
 HIPAA settings refuses Claude Code's context management with an error 400, and the setting must
 then be the same in every setup so that the comparison stays fair.
 
