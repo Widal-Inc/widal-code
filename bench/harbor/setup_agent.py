@@ -31,6 +31,8 @@ Fields of a setup, all optional except "id":
 - "pluginDirs": folders in the container that Claude Code loads as plugins.
 - "rootInstall" and "agentInstall": shell commands run once before the session.
 - "budget": the most the session may spend, in dollars.
+- "fastMode": true runs the session in fast mode (Claude Code's --fast-mode on), which the Claude API
+  offers on Claude Opus 5.5 and Claude Fable 5.2 at twice the standard price.
 
 "${setups}" in a text stands for the folder of the file of setups.
 """
@@ -58,6 +60,7 @@ FIELDS = {
     "rootInstall",
     "agentInstall",
     "budget",
+    "fastMode",
 }
 EFFORTS = {"low", "medium", "high", "xhigh", "max"}
 DEFAULT_TOOLS = ["Bash", "Read", "Edit", "Write", "Glob", "Grep", "Task", "TodoWrite"]
@@ -86,6 +89,8 @@ def load_setup(setups: str | Path, setup: str) -> dict[str, Any]:
             raise ValueError(f"The setup {setup!r} needs a list of texts as {key!r}.")
     if "env" in spec and not (isinstance(spec["env"], dict) and all(isinstance(v, str) for v in spec["env"].values())):
         raise ValueError(f"The setup {setup!r} needs texts as the values of \"env\".")
+    if "fastMode" in spec and not isinstance(spec["fastMode"], bool):
+        raise ValueError(f"The setup {setup!r} needs true or false as \"fastMode\".")
     if "settings" in spec and not isinstance(spec["settings"], dict):
         raise ValueError(f"The setup {setup!r} needs an object as \"settings\".")
     for item in spec.get("uploads", []):
@@ -155,4 +160,5 @@ class SetupAgent(ClaudeCode):
     def build_cli_flags(self) -> str:
         flags = super().build_cli_flags()
         plugins = " ".join(f"--plugin-dir {shlex.quote(folder)}" for folder in self._spec.get("pluginDirs", []))
-        return " ".join(part for part in (flags, plugins) if part)
+        fast = "--fast-mode on" if self._spec.get("fastMode") else ""
+        return " ".join(part for part in (flags, plugins, fast) if part)

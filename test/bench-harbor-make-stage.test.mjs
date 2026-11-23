@@ -49,3 +49,18 @@ test('copies can get their own budget and settings', () => {
   assert.equal(copy.settings.effortLevel, 'xhigh')
   assert.deepEqual(copy.settings.env, { A: '1', B: '2' })
 })
+
+test('a copy can run in fast mode, and a copy for Codex keeps only what Codex reads', () => {
+  const file = join(mkdtempSync(join(tmpdir(), 'widal-make-stage-')), 'setups.json')
+  const block = ['echo 0.0.0.0 github.com >> /etc/hosts']
+  writeFileSync(file, JSON.stringify({ setups: [{ id: 'baseline', name: 'B', budget: 4, settings: { env: { A: '1' } }, rootInstall: block }] }))
+  addCopies(file, [setupOf('opus-fast=baseline', { model: 'm', provider: 'api' })], { fast: true, budget: 8 })
+  addCopies(file, [setupOf('openai-sol=baseline', { model: 'openai/gpt-6.2-sol', provider: 'openai', agent: 'codex' })], { budget: 8, fast: true })
+  const doc = JSON.parse(readFileSync(file, 'utf8')).setups
+  const fast = doc.find((s) => s.id === 'opus-fast')
+  assert.equal(fast.fastMode, true)
+  assert.equal(fast.budget, 8)
+  const codex = doc.find((s) => s.id === 'openai-sol')
+  assert.deepEqual(codex.rootInstall, block)
+  for (const key of ['settings', 'budget', 'fastMode']) assert.ok(!(key in codex), key)
+})

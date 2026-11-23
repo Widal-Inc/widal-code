@@ -142,6 +142,21 @@ test('a trial with tokens but no reported cost is priced from its tokens', async
   assert.equal(c.costSource, 'tokens')
   assert.ok(Math.abs(c.cost - 0.2) < 1e-9, String(c.cost))
   assert.deepEqual(costOf({ n_input_tokens: 5, n_output_tokens: 5 }, 'no-such-model'), { cost: null, costSource: null })
+  // The tokens of a whole trial are many calls: 5 million input tokens at $2 a million is $10, not the
+  // price of one long prompt.
+  const sum = costOf({ n_input_tokens: 5_000_000, n_cache_tokens: 4_000_000, n_output_tokens: 100_000 }, 'openai/gpt-6.2-sol')
+  assert.ok(Math.abs(sum.cost - (2 + 0.4 + 1)) < 1e-9, String(sum.cost))
+})
+
+test("a Codex trial that ended on an error after it spent tokens is the agent's miss, not the harness's", () => {
+  const r = recordOf({
+    task_name: 't1', trial_name: 't1__a', config: { agent: { model_name: 'openai/gpt-6.2-sol', kwargs: { setup: 'openai-sol' } } },
+    agent_result: { cost_usd: null, n_input_tokens: 200_000, n_cache_tokens: 100_000, n_output_tokens: 5_000 },
+    exception_info: { exception_type: 'AgentTimeoutError' },
+  })
+  assert.equal(r.costSource, 'tokens')
+  assert.equal(r.harnessError, null)
+  assert.equal(r.error, 'AgentTimeoutError')
 })
 
 test('import files a trial only under its own setup, and keeps a finished trial over a failed rerun', () => {

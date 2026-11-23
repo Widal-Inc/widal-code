@@ -21,9 +21,11 @@
 //   --cap, --concurrency, --block-size, --seed
 //   --budget        the most one session may spend, in dollars, for the copies this stage writes
 //   --effort        the effort level of those copies (low, medium, high, xhigh, max)
+//   --fast          those copies run in fast mode (Claude Opus 5.5 and Claude Fable 5.2, at twice the price)
 //   --settings      a JSON object merged into the Claude Code settings of those copies, for example {"effortLevel": "xhigh"}
 //   --env           a JSON object of variables for the agent, for example {"OPENAI_API_KEY": "${env:OPENAI_API_KEY}"}
 //   --command       the command that starts Harbor for this provider (comma), default by provider
+//   --codex         the version of Codex to install for setups with --agent codex
 //   --base          the folder of records, jobs and setups on the runner (default /opt/bench)
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -31,6 +33,9 @@ import { fileURLToPath } from 'node:url'
 import { shuffled } from './harbor-stage.mjs'
 
 const SEED = 20261122
+
+/** The fields of a setup that only Claude Code reads (bench/harbor/codex_setup_agent.py refuses them). */
+const CLAUDE_ONLY = ['settings', 'allowedTools', 'appendSystemPrompt', 'pluginDirs', 'budget', 'fastMode']
 
 /** The tasks of the task lists that passed the oracle and are in no excluded stage. */
 export function pickTasks({ lists, passed = null, excluded = [], perSet = null, sample = null, seed = SEED }) {
@@ -61,20 +66,29 @@ export function setupOf(entry, { model, provider, agent }) {
 
 /**
  * Makes sure every setup id of the stage has an entry in the file of setups: a run 2 copies its arm's
- * entry, and "id=spec" copies the entry "spec". Returns the ids it added.
+ * entry, and "id=spec" copies the entry "spec". A copy for Codex keeps only what Codex reads. Returns the
+ * ids it added.
  */
-export function addCopies(file, setups, { budget = null, settings = null, effort = null } = {}) {
+export function addCopies(file, setups, { budget = null, settings = null, effort = null, fast = false } = {}) {
   const doc = JSON.parse(readFileSync(file, 'utf8'))
   const byId = new Map(doc.setups.map((s) => [s.id, s]))
   const added = []
   for (const s of setups) {
-    if (s.agent || byId.has(s.id)) continue
+    if ((s.agent && s.agent !== 'codex') || byId.has(s.id)) continue
     const from = byId.get(s.spec ?? s.arm)
     if (!from) throw new Error(`The file of setups has no setup "${s.spec ?? s.arm}" to copy for "${s.id}".`)
     const copy = { ...structuredClone(from), id: s.id, name: `${from.name}${s.rep > 1 ? ` (run ${s.rep})` : ''}` }
-    if (budget !== null) copy.budget = budget
     if (effort !== null) copy.effort = effort
-    if (settings) copy.settings = { ...(copy.settings ?? {}), ...settings, env: { ...(copy.settings?.env ?? {}), ...(settings.env ?? {}) } }
+    if (s.agent === 'codex') {
+      // Codex reads only the commands, uploads, variables and effort of a setup: the block of GitHub
+      // comes with the commands, and a field that only Claude Code reads is left out.
+      for (const key of CLAUDE_ONLY) delete copy[key]
+      copy.name = `${copy.name}, run by Codex`
+    } else {
+      if (budget !== null) copy.budget = budget
+      if (fast) copy.fastMode = true
+      if (settings) copy.settings = { ...(copy.settings ?? {}), ...settings, env: { ...(copy.settings?.env ?? {}), ...(settings.env ?? {}) } }
+    }
     doc.setups.push(copy)
     byId.set(s.id, copy)
     added.push(s.id)
@@ -109,7 +123,7 @@ function main() {
   const setups = f.setups.split(',').map((e) => setupOf(e, { model: f.model, provider: f.provider, agent: f.agent }))
   const setupsFile = f['setups-file'] ?? join(base, 'setups', 'setups-v1.json')
   if (existsSync(setupsFile)) {
-    const added = addCopies(setupsFile, setups, { budget: f.budget ? Number(f.budget) : null, settings: f.settings ? JSON.parse(f.settings) : null, effort: typeof f.effort === 'string' ? f.effort : null })
+    const added = addCopies(setupsFile, setups, { budget: f.budget ? Number(f.budget) : null, settings: f.settings ? JSON.parse(f.settings) : null, effort: typeof f.effort === 'string' ? f.effort : null, fast: f.fast === true })
     if (added.length) console.log(`added to ${setupsFile}: ${added.join(', ')}`)
   }
   const commands = {
@@ -123,6 +137,7 @@ function main() {
     jobs: join(base, 'jobs'),
     setupsFile,
     claudeCode: f['claude-code'] ?? '2.1.330',
+    ...(f.codex ? { codex: f.codex } : {}),
     commands: { [f.provider]: f.command ? f.command.split(',') : commands[f.provider] },
     env: f.env ? { [f.provider]: JSON.parse(f.env) } : {},
     setups: setups.map(({ spec, ...s }) => s),
