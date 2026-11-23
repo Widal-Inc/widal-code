@@ -268,3 +268,28 @@ part. The setup runs before the agent and spends nothing, so its limit was raise
 12:11 UTC. It was stopped at 12:19 UTC: its 47 finished trials are kept, and the 12 it cut off ($0) are
 set aside. The main stage started again at 12:20 UTC. It runs again only the trials that ended on an
 error of the harness, then its last two blocks, and the quality stage follows it.
+
+## Change 3, 23 Nov 2026, before any result of a finished stage was seen
+
+None of the changes below alters a setup, a task, a measure or a stop rule of a stage.
+
+**The OpenAI stages run beside the chain, paid from another balance.** The stages "openai-sol" and
+"openai-astra" (change 2) were to run after every other stage, on OpenAI credits that were applied for.
+Nils gave an API key of the Vane organization on 23 Nov 2026, which has a balance of about $2,500, so
+the two stages started at 17:01 UTC beside the main stage instead. Their caps stay as in change 2: $400
+per model and $900 for OpenAI in all. To leave the chain untouched, they use their own checkout of the code
+(at origin/main), their own file of setups and their own folder of records, and run two trials at a time
+per setup. Their tasks are the 100 tasks of the Opus stage, picked with the same seed. The report sets
+them next to the Opus stage when both are done.
+
+**Two failed starts, at no cost.** The first start failed at once, because both stages wrote the file of
+setups at the same moment and left it unreadable. The stage files are now made one after the other. The
+second start failed before Codex ran: Harbor's Codex install loads nvm from `$HOME/.nvm`, but nvm's
+installer puts it in `$XDG_CONFIG_HOME/nvm` when that is set, as in some task images (widal-code PR 21
+links the two). Neither start spent anything. Their jobs and records are set aside and count in no result,
+and the stages started again at 17:11 UTC.
+
+**A higher cap for the Anthropic API key.** The caps of the Anthropic stages add up to $1,960, more than
+the key's cap of $1,500 over all stages (with a stop at 90%, $1,350), so the last stages would have been
+cut off. With Nils's approval the cap of the API key is raised to $2,100 (a stop at $1,890) for every stage
+that starts from now on. The cap of each stage stays as it was.
