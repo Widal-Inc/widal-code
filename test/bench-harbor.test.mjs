@@ -5,7 +5,7 @@ import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
-import { importJobs, markdown, readRecords, recordOf, report, taskFile } from '../bench/harbor.mjs'
+import { importJobs, markdown, markVerifier, readRecords, recordOf, report, taskFile, verifierBlocked } from '../bench/harbor.mjs'
 import { signTest } from '../bench/stats.mjs'
 
 const dir = mkdtempSync(join(tmpdir(), 'widal-code-bench-harbor-test-'))
@@ -176,4 +176,48 @@ test('import files a trial only under its own setup, and keeps a finished trial 
   const written = importJobs(again, out, { arm: 'baseline', rep: 1, setup: 'baseline' })
   assert.equal(written.length, 0)
   assert.equal(readRecords(out).find((r) => r.rep === 1).cost, 2, 'the finished trial stays')
+})
+
+test('a verifier that could not reach GitHub marks the record, at import and afterwards', () => {
+  assert.equal(verifierBlocked('downloading uv 0.9.5\ncurl: (7) Failed to connect to github.com port 443 after 0 ms'), true)
+  assert.equal(verifierBlocked('curl: (7) Failed to connect to raw.githubusercontent.com port 443'), true)
+  assert.equal(verifierBlocked('1 passed'), false)
+  const jobs = join(dir, 'jobs-verifier')
+  const out = join(dir, 'out-verifier')
+  const r = result({ task: 'tb/t1', setup: 'baseline', reward: 0 })
+  writeTrial(jobs, r)
+  const folder = join(jobs, 'job-1', r.trial_name)
+  importJobs(jobs, out)
+  assert.equal(readRecords(out)[0].verifierBlocked, false)
+  mkdirSync(join(folder, 'verifier'), { recursive: true })
+  writeFileSync(join(folder, 'verifier', 'test-stdout.txt'), 'curl: (7) Failed to connect to github.com port 443 after 0 ms')
+  assert.deepEqual(markVerifier(jobs, out), { seen: 1, marked: 1 })
+  assert.equal(readRecords(out)[0].verifierBlocked, true)
+  importJobs(jobs, out)
+  assert.equal(readRecords(out)[0].verifierBlocked, true, 'import reads the verifier log too')
+})
+
+test('a task whose verifier could not reach GitHub counts in cost but in no solved number', () => {
+  const rec = (task, arm, rep, cost, closed, verifierBlocked = false) => ({ task, arm, rep, cost, closed, seconds: 10, stage: 'main', taskSet: 's', harnessError: null, verifierBlocked })
+  const records = []
+  for (let i = 0; i < 10; i++) for (const rep of [1, 2]) records.push(rec(`t${i}`, 'baseline', rep, 2, true), rec(`t${i}`, 'tool', rep, 1, i !== 0))
+  // The blocked task: one trial of one arm is marked, and the task leaves every arm's solved numbers.
+  for (const rep of [1, 2]) records.push(rec('tb', 'baseline', rep, 2, false, rep === 1), rec('tb', 'tool', rep, 1, false))
+  const r = report(records)
+  const tool = r.arms.find((x) => x.arm === 'tool')
+  const base = r.arms.find((x) => x.arm === 'baseline')
+  assert.deepEqual(r.unscored, ['tb'])
+  assert.equal(tool.tasks, 11, 'the task still counts in cost')
+  assert.equal(tool.scoredRuns, 20)
+  assert.equal(tool.solved, 18)
+  assert.equal(base.solved, 20)
+  assert.equal(base.solvedShare.share, 1)
+  assert.equal(tool.solvedOnlyBaseline, 2)
+  assert.ok(Math.abs(tool.costRatio.ratio - 0.5) < 1e-9)
+  assert.equal(r.noise.tasks, 10)
+  assert.equal(r.noise.costTasks, 11)
+  const text = markdown(r)
+  assert.match(text, /1 tasks count in cost and time but in no solved number/)
+  assert.match(text, /## Tasks whose tests could not reach GitHub/)
+  assert.match(text, /- tb/)
 })

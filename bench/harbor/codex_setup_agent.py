@@ -75,6 +75,15 @@ GITHUB_UNBLOCK = (
 )
 GITHUB_REBLOCK = f"if [ -f {HOSTS_SAVED} ]; then cat {HOSTS_SAVED} > /etc/hosts && rm -f {HOSTS_SAVED}; fi"
 
+# The setups block GitHub (a rootInstall step) for the session only. /etc/hosts as it was before that
+# block is saved, and put back after the session, before Harbor's verifier runs in the same container:
+# some verifiers download their tools from GitHub (Terminal-Bench's tests/test.sh installs uv from it).
+# The image's own block (SWE-bench Pro) stays, as in the oracle check. The file is written in place,
+# because Docker mounts it into the container and `sed -i` cannot replace it.
+HOSTS_BEFORE_SETUP = "/var/tmp/.hosts-before-setup"
+SAVE_HOSTS = f"cp /etc/hosts {HOSTS_BEFORE_SETUP}"
+RESTORE_HOSTS = f"if [ -f {HOSTS_BEFORE_SETUP} ]; then cat {HOSTS_BEFORE_SETUP} > /etc/hosts && rm -f {HOSTS_BEFORE_SETUP}; fi"
+
 
 class CodexSetupAgent(Codex):
     """Harbor's Codex agent with one setup of the benchmark on top."""
@@ -101,9 +110,24 @@ class CodexSetupAgent(Codex):
             await super().install(environment)
         finally:
             await self.exec_as_root(environment, command=GITHUB_REBLOCK)
+        await self.exec_as_root(environment, command=SAVE_HOSTS)
         for item in self._spec.get("uploads", []):
             await environment.upload_dir(item["from"], item["to"])
         for command in self._spec.get("rootInstall", []):
             await self.exec_as_root(environment, command=command)
         for command in self._spec.get("agentInstall", []):
             await self.exec_as_agent(environment, command=command)
+
+    async def run(self, instruction: str, environment, context) -> None:
+        """Runs the session, then puts back /etc/hosts as it was before the setup's block of GitHub.
+
+        This runs also when the session fails or runs out of time, and a failure here never becomes the
+        trial's error.
+        """
+        try:
+            await super().run(instruction=instruction, environment=environment, context=context)
+        finally:
+            try:
+                await self.exec_as_root(environment, command=RESTORE_HOSTS, timeout_sec=60)
+            except Exception as error:  # the verifier then reports the failed download, as before
+                print(f"Could not put back /etc/hosts: {error}")
