@@ -120,17 +120,24 @@ test('a value ${env:NAME} is read from the environment and masked in logs', asyn
   delete process.env.BENCH_TEST_SECRET
 })
 
-test('a setup with another Harbor agent gets no setup of setup_agent.py', async () => {
+test('Codex runs its setup with codex_setup_agent.py, and another Harbor agent gets no setup', async () => {
   const { commandsOf, stageOf } = await import('../bench/harbor-stage.mjs')
   const stage = stageOf({
     name: 'x', out: '/tmp/widal-bench-none', jobs: '/tmp/j', setupsFile: '/s.json', claudeCode: '2.1.330', cap: 10,
     commands: { openai: ['/run.sh', '/harbor.sh'] },
-    setups: [{ id: 'codex', model: 'openai/gpt-6-astra', provider: 'openai', agent: 'codex' }],
+    setups: [
+      { id: 'openai-sol', model: 'openai/gpt-6.2-sol', provider: 'openai', agent: 'codex' },
+      { id: 'aider', model: 'openai/gpt-6.2-sol', provider: 'openai', agent: 'aider' },
+    ],
     tasks: [{ dataset: 'd', task: 'd/t1' }],
   })
   const [c] = commandsOf(stage, stage.setups[0], stage.tasks, 1)
-  assert.equal(c.args[c.args.indexOf('-a') + 1], 'codex')
-  assert.ok(!c.args.includes('--ak'))
+  assert.equal(c.args[c.args.indexOf('-a') + 1], 'bench.harbor.codex_setup_agent:CodexSetupAgent')
+  assert.ok(c.args.includes('setup=openai-sol'))
+  assert.ok(c.args.includes('setups=/s.json'))
+  const [other] = commandsOf(stage, stage.setups[1], stage.tasks, 1)
+  assert.equal(other.args[other.args.indexOf('-a') + 1], 'aider')
+  assert.ok(!other.args.includes('--ak'))
 })
 
 test('each setup, also a second run of an arm, gets a job folder of its own', () => {

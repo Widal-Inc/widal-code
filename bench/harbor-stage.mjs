@@ -28,7 +28,9 @@
 //   setupsFile    the file of setups for bench/harbor/setup_agent.py
 //   claudeCode    the version of Claude Code to install
 //   setups        [{"id", "model", "provider", "arm" (default: id), "rep" (default: 1), "agent"}]. "agent" is
-//                 another Harbor agent (for example "codex"); it then gets no setup of setup_agent.py.
+//                 another Harbor agent. "codex" runs the setup "id" of the file of setups with
+//                 bench/harbor/codex_setup_agent.py; any other agent gets no setup.
+//   codex         the version of Codex to install (default: Harbor's)
 //   reference     the setup the safety rule compares with (default: the first)
 //   tasks         [{"dataset", "task"}]
 //   blockSize     tasks per block (default 25)
@@ -182,15 +184,25 @@ function done(stage, setup, task) {
   return !JSON.parse(readFileSync(file, 'utf8')).harnessError
 }
 
+/**
+ * Harbor's agent options for one setup. Claude Code runs the setup with bench/harbor/setup_agent.py,
+ * Codex ("agent": "codex") with bench/harbor/codex_setup_agent.py, both from the file of setups. Any
+ * other agent runs as Harbor ships it, with no setup.
+ */
+export function agentOf(stage, setup) {
+  const of = ['--ak', `setups=${stage.setupsFile}`, '--ak', `setup=${setup.id}`]
+  if (!setup.agent) return ['-a', 'bench.harbor.setup_agent:SetupAgent', ...of, '--ak', `version=${stage.claudeCode}`]
+  if (setup.agent === 'codex') return ['-a', 'bench.harbor.codex_setup_agent:CodexSetupAgent', ...of, ...(stage.codex ? ['--ak', `version=${stage.codex}`] : [])]
+  return ['-a', setup.agent]
+}
+
 /** The Harbor commands of one setup for one block: one per task set. */
 export function commandsOf(stage, setup, block, n) {
   const byDataset = new Map()
   for (const t of block) if (!done(stage, setup, t)) byDataset.set(t.dataset, [...(byDataset.get(t.dataset) ?? []), t])
   return [...byDataset.entries()].map(([dataset, list]) => {
     const env = Object.entries(stage.env[setup.provider] ?? {}).flatMap(([k, v]) => ['--ae', `${k}=${expand(v)}`])
-    const agent = setup.agent
-      ? ['-a', setup.agent]
-      : ['-a', 'bench.harbor.setup_agent:SetupAgent', '--ak', `setups=${stage.setupsFile}`, '--ak', `setup=${setup.id}`, '--ak', `version=${stage.claudeCode}`]
+    const agent = agentOf(stage, setup)
     // One folder per setup, not per arm: two runs of one arm that start a task set in the same second
     // would otherwise get the same job folder from Harbor, and one would overwrite the other's trials.
     const folder = join(stage.jobs, stage.name, setup.id, `block-${n}`)
@@ -275,7 +287,7 @@ async function main() {
         for (const c of commandsOf(stage, setup, block, n + 1)) {
           mkdirSync(c.folder, { recursive: true })
           await runCommand(c, join(c.folder, 'harbor.log'))
-          importJobs(c.folder, stage.out, { arm: setup.arm, rep: setup.rep, setup: setup.agent ? null : setup.id, extra: { stage: stage.name, provider: setup.provider, setup: setup.id } })
+          importJobs(c.folder, stage.out, { arm: setup.arm, rep: setup.rep, setup: setup.agent && setup.agent !== 'codex' ? null : setup.id, extra: { stage: stage.name, provider: setup.provider, setup: setup.id } })
         }
       }),
     )

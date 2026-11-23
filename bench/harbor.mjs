@@ -57,8 +57,11 @@ export function recordOf(r, { arm, rep = 1, extra = {} } = {}) {
   const rewards = r.verifier_result?.rewards ?? null
   const reward = rewards ? (rewards.reward ?? Object.values(rewards)[0] ?? null) : null
   const setup = r.config?.agent?.kwargs?.setup
-  // An error before the agent ran, or one of the harness, is not the agent's miss.
-  const harnessError = r.exception_info && !(agent.cost_usd > 0) ? r.exception_info.exception_type : null
+  const model = r.agent_info?.model_info?.name ?? r.config?.agent?.model_name ?? null
+  const spend = costOf(agent, model)
+  // An error before the agent ran, or one of the harness, is not the agent's miss. A trial that spent
+  // money ran the agent, also when the cost comes from its tokens (Codex reports none).
+  const harnessError = r.exception_info && !(spend.cost > 0) ? r.exception_info.exception_type : null
   return {
     v: 1,
     source: 'harbor',
@@ -67,13 +70,13 @@ export function recordOf(r, { arm, rep = 1, extra = {} } = {}) {
     arm: arm ?? setup ?? r.agent_info?.name ?? 'agent',
     rep,
     trial: r.trial_name,
-    model: r.agent_info?.model_info?.name ?? r.config?.agent?.model_name ?? null,
+    model,
     agentVersion: r.agent_info?.version ?? null,
     started: r.started_at ?? null,
     seconds: seconds(r.agent_execution),
     reward,
     closed: reward !== null && reward >= 1,
-    ...costOf(agent, r.agent_info?.model_info?.name ?? r.config?.agent?.model_name ?? null),
+    ...spend,
     tokens: { input: agent.n_input_tokens ?? null, cache: agent.n_cache_tokens ?? null, output: agent.n_output_tokens ?? null },
     error: r.exception_info?.exception_type ?? null,
     harnessError,
@@ -85,7 +88,8 @@ export function recordOf(r, { arm, rep = 1, extra = {} } = {}) {
  * The cost of a trial: what the agent reported, or, when it reported none but counted its tokens (Harbor's
  * Codex agent leaves the cost empty for a model its price list does not know), the cost worked out from
  * the tokens at Widal.Code's list prices. Input that is not read from the cache is priced as uncached
- * input, because Harbor does not count cache writes apart; `costSource` says which one it is.
+ * input, because Harbor does not count cache writes apart, and at the price of prompts under the
+ * long-prompt limit, because the sizes of single calls are not known; `costSource` says which one it is.
  */
 export function costOf(agent, model) {
   if (typeof agent.cost_usd === 'number') return { cost: agent.cost_usd, costSource: 'reported' }
@@ -93,7 +97,9 @@ export function costOf(agent, model) {
   const cache = agent.n_cache_tokens ?? 0
   const output = agent.n_output_tokens
   if (typeof input !== 'number' || typeof output !== 'number' || !model) return { cost: null, costSource: null }
-  const c = callCost({ m: model.replace(/^[a-z-]+\//, ''), in: Math.max(0, input - cache), w5: 0, w1: 0, cr: cache, out: output })
+  // The tokens are the sum of the trial's calls, so the price of long prompts (which depends on each
+  // call's prompt) is not applied: `sum` says so.
+  const c = callCost({ m: model.replace(/^[a-z-]+\//, ''), in: Math.max(0, input - cache), w5: 0, w1: 0, cr: cache, out: output, sum: true })
   return c.known ? { cost: c.total, costSource: 'tokens' } : { cost: null, costSource: null }
 }
 

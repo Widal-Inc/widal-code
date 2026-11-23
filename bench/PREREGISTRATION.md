@@ -196,3 +196,47 @@ the setup that ran it and never replaces a finished trial with a failed one, bui
 locked across Harbor's processes, and Harbor gets twice its usual time to set up the agent. The main
 stage runs two trials at a time per setup instead of three.
 
+
+## Correction, 23 Nov 2026: Docker ran out of network addresses
+
+The second start of the main stage, at 23:42 UTC on 22 Nov, failed in the harness too. Each trial runs in
+a Docker network of its own, and Docker's default address pools hold about 30 networks. The networks left
+by the stopped first start, the 20 trials of the main stage and the oracle check of the extra tasks took
+them all, and 175 trials could not start their container. None of them reached the agent or spent money.
+The stage was stopped at 00:00 UTC on 23 Nov. Its 175 records were removed (all were errors of the harness,
+with no cost), its job folders were set aside, and Docker was given an address pool of 256 networks
+(`default-address-pools` 10.210.0.0/16 in /24 networks). The stage started again at 00:03 UTC from the
+first block. The plan did not change.
+
+## Change 2, 23 Nov 2026, before any result of the main stage was seen
+
+Two stages are added after the stages of change 1. They run on the same 100 tasks as the Opus 5.5 stage
+(the same sample, picked with the same seed), so that each arm can be set against that stage's baseline.
+
+| Stage | Model | Setups | Tasks | Runs | Cap |
+| --- | --- | --- | --- | --- | --- |
+| Opus 5.5, fast mode | Opus 5.5 | the Opus baseline with fast mode on (Claude Code's `--fast-mode on`) | the Opus stage's 100 | 1 | $150 |
+| OpenAI | GPT-6.2 Sol, then GPT-6.2 Astra, in Codex | each model alone | the Opus stage's 100 | Sol 2, Astra 1 | $220 each |
+
+**Fast mode.** The Claude API runs Claude Opus 5.5 faster in fast mode, at twice the price ($8 and $40 per
+million input and output tokens). The question is what it buys in time per task, and whether it changes
+how many tasks are solved. The report gives the cost ratio and the time ratio to the Opus baseline, from
+the trials' own reported cost and time. A session's budget is doubled to $16, so that the budget stops no
+more sessions than in the baseline. A test request on 22 Nov 2026 with the benchmark's API key came back
+with `"speed": "fast"`.
+
+**Codex under the same rules.** `bench/harbor/codex_setup_agent.py` runs a setup of the file of setups in
+Codex. It runs the setup's commands, so GitHub is blocked in the container and the block is checked into
+`network-check.txt`, as for Claude Code. It turns web search off, as Claude Code's setups have no web tool,
+and it refuses a field that only Claude Code reads. Codex has no limit on the spend of one session, so only
+the stage's cap limits it. The OpenAI setups are copies of the baseline with only what Codex reads. Neither
+model has a Widal.Code setup, because Widal.Code reads only Claude Code's sessions, so they are reported
+next to the Claude baselines and not ranked. They run only when an OpenAI API key is stored for the runner.
+
+**Two fixes for trials that report no cost**, which are Codex's trials:
+- A trial that ended on an error is an error of the harness only when it spent nothing. This used the
+  cost the agent reported, so every Codex trial that ended on an error (a time limit, for example) would
+  have been counted as an error of the harness and run again. It now uses the cost priced from tokens.
+- A trial's tokens are the sum of many calls. Priced as one call, the sum crossed OpenAI's long-prompt
+  limit (272,000 tokens), and the trial was priced at twice the input price. Sums are now priced at the
+  standard price.

@@ -91,7 +91,9 @@ export function rates(call) {
   let p = priceOf(call.m)
   if (!p) return undefined
   const prompt = call.in + call.w5 + call.w1 + call.cr
-  if (p.long && prompt > p.longOver) p = p.long
+  // `sum` marks tokens added up over many calls: the size of one prompt is then unknown, and the
+  // standard price is used.
+  if (p.long && prompt > p.longOver && !call.sum) p = p.long
   // Fast mode is twice the standard price on the models that have it. That it also doubles the
   // cache prices is an assumption.
   const x = (call.sp === 'fast' ? 2 : 1) / 1e6
