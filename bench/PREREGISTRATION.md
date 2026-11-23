@@ -320,3 +320,23 @@ The four setups of a block run at the same time with the same number of trials a
 that are compared ran under the same load. Cost and tasks solved are measured per trial. Time is the one
 measure that the load changes, which is one more reason why the time comparisons count for less than cost
 and tasks solved.
+
+## Correction, 23 Nov 2026: the task sets of a block run at the same time
+
+This change alters no setup, task, measure, cap or stop rule either.
+
+Eight trials at a time did not make the quality stage much faster, because the runner ran a setup's task
+sets one after the other. A block of 25 tasks holds two or three task sets (swe-rebench, SWE-bench Pro and
+Terminal-Bench), and each task set waited for its slowest task before the next one started, so at 22:46 UTC
+only 9 trial containers ran on the 32 processors. With the option `taskSetsTogether` of
+`bench/harbor-stage.mjs`, the task sets of a setup run at the same time, each with at most the stage's trials
+at a time and at most half its tasks at once, so that a block waits for its slowest task once. In the quality
+stage that is at most 52 trials at once at the start of a block. The chain was stopped at 22:53 UTC, when
+block 8 started and before any of its trials had run, so no trial was cut off, and it started again at once.
+The runner's checkout stays at 9f58453, so the runner uses a copy of the new block loop outside the checkout
+that imports everything else from `bench/harbor-stage.mjs` at 9f58453.
+
+The quality stage from block 8 and the Haiku, Opus and Fable stages run their task sets at the same time. The
+attribution stage has about ten setups, so it keeps running its task sets one after the other, which keeps
+the number of trials at once near what the main stage ran. As before, all setups of a block run at the same
+time under the same load.

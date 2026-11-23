@@ -5,7 +5,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
-import { blocksOf, commandsOf, ledgerOf, shuffled, stageOf, statusOf, stopRule } from '../bench/harbor-stage.mjs'
+import { blocksOf, commandsOf, ledgerOf, perSet, shuffled, stageOf, statusOf, stopRule, togetherOf } from '../bench/harbor-stage.mjs'
 
 const dir = mkdtempSync(join(tmpdir(), 'widal-code-bench-stage-test-'))
 const tasks = Array.from({ length: 7 }, (_, i) => ({ dataset: i < 4 ? 'org/set-a' : 'org/set-b', task: `org/task-${i}` }))
@@ -108,6 +108,22 @@ test('the Harbor commands of a block, one per task set, without the tasks alread
   writeFileSync(join(s.out, 'harbor', 'baseline', 'org_task-0-r1.json'), JSON.stringify(record({})))
   const [again] = commandsOf(s, s.setups[0], block, 1)
   assert.deepEqual(again.tasks, ['org/task-1'], 'a finished task is not run again')
+})
+
+test('task sets that run together each get their trials at a time, a log and a start of their own', () => {
+  assert.equal(perSet(20, 8), 8)
+  assert.equal(perSet(12, 8), 6)
+  assert.equal(perSet(3, 8), 2)
+  assert.equal(perSet(1, 8), 1)
+  const s = stageOf({ ...base, concurrency: 8, taskSetsTogether: true })
+  const commands = commandsOf(s, s.setups[1], tasks, 1)
+  const [a, b] = togetherOf(commands, s.concurrency)
+  assert.equal(a.args[a.args.indexOf('-n') + 1], '2')
+  assert.equal(b.args[b.args.indexOf('-n') + 1], '2')
+  assert.equal(commands[0].args[commands[0].args.indexOf('-n') + 1], '8', 'the commands made for one after the other are left as they are')
+  assert.equal(a.folder, b.folder)
+  assert.notEqual(a.log, b.log)
+  assert.deepEqual([a.delay, b.delay], [0, 2500])
 })
 
 test('a value ${env:NAME} is read from the environment and masked in logs', async () => {

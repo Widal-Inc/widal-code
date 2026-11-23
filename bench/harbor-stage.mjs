@@ -36,6 +36,10 @@
 //   blockSize     tasks per block (default 25)
 //   seed          the seed of the shuffle
 //   concurrency   trials at a time per setup (default 2)
+//   taskSetsTogether   true: within a setup, the task sets of a block (one Harbor command each) run at the
+//                 same time instead of one after the other, each with at most `concurrency` trials at a time
+//                 and at most half its tasks at once, so that a block waits for its slowest task once and not
+//                 once per task set (default false)
 //   setupTimeoutMultiplier   Harbor's --agent-setup-timeout-multiplier (default 2): installing Claude Code
 //                 in many containers at once can take longer than Harbor's 360 seconds, and the setup
 //                 ends before the agent starts, so a longer limit changes no measure
@@ -220,6 +224,23 @@ export function commandsOf(stage, setup, block, n) {
   })
 }
 
+/** The trials at a time of one task set that runs beside the others: at most `concurrency`, at most half its tasks. */
+export const perSet = (tasks, concurrency) => Math.max(1, Math.min(concurrency, Math.ceil(tasks / 2)))
+
+/**
+ * The commands of one setup and block, made to run at the same time: each gets its trials at a time, its own
+ * log, and a start 2.5 seconds after the one before, because Harbor names a job folder by the second it
+ * starts and the task sets of a setup share the block's folder.
+ */
+export function togetherOf(commands, concurrency) {
+  return commands.map((c, i) => {
+    const args = [...c.args]
+    args[args.indexOf('-n') + 1] = String(perSet(c.tasks.length, concurrency))
+    const dataset = args[args.indexOf('-d') + 1].split('/').pop()
+    return { ...c, args, log: join(c.folder, `harbor-${dataset}.log`), delay: i * 2500 }
+  })
+}
+
 /** A value of the stage's env: "${env:NAME}" is read from the runner's environment, and remembered for masking. */
 const secrets = new Set()
 export function expand(value) {
@@ -269,7 +290,10 @@ async function main() {
   if (f.plan) {
     blocks.forEach((block, n) => {
       console.log(`block ${n + 1}: ${block.length} tasks`)
-      for (const setup of stage.setups) for (const c of commandsOf(stage, setup, block, n + 1)) console.log(`  ${setup.id}: ${c.tasks.length} tasks of ${c.args[c.args.indexOf('-d') + 1]}`)
+      for (const setup of stage.setups) {
+        const commands = commandsOf(stage, setup, block, n + 1)
+        for (const c of stage.taskSetsTogether ? togetherOf(commands, stage.concurrency) : commands) console.log(`  ${setup.id}: ${c.tasks.length} tasks of ${c.args[c.args.indexOf('-d') + 1]}, ${c.args[c.args.indexOf('-n') + 1]} at a time`)
+      }
     })
     return
   }
@@ -284,11 +308,26 @@ async function main() {
     // Every setup runs the block at the same time, each with its own trials at a time.
     await Promise.all(
       stage.setups.map(async (setup) => {
-        for (const c of commandsOf(stage, setup, block, n + 1)) {
-          mkdirSync(c.folder, { recursive: true })
-          await runCommand(c, join(c.folder, 'harbor.log'))
-          importJobs(c.folder, stage.out, { arm: setup.arm, rep: setup.rep, setup: setup.agent && setup.agent !== 'codex' ? null : setup.id, extra: { stage: stage.name, provider: setup.provider, setup: setup.id } })
+        const into = () => ({ arm: setup.arm, rep: setup.rep, setup: setup.agent && setup.agent !== 'codex' ? null : setup.id, extra: { stage: stage.name, provider: setup.provider, setup: setup.id } })
+        if (!stage.taskSetsTogether) {
+          for (const c of commandsOf(stage, setup, block, n + 1)) {
+            mkdirSync(c.folder, { recursive: true })
+            await runCommand(c, join(c.folder, 'harbor.log'))
+            importJobs(c.folder, stage.out, into())
+          }
+          return
         }
+        const commands = togetherOf(commandsOf(stage, setup, block, n + 1), stage.concurrency)
+        if (!commands.length) return
+        await Promise.all(
+          commands.map(async (c) => {
+            await new Promise((resolve) => setTimeout(resolve, c.delay))
+            mkdirSync(c.folder, { recursive: true })
+            await runCommand(c, c.log)
+          }),
+        )
+        // Read once all task sets of the setup have ended, so that no trial that still runs is read.
+        importJobs(commands[0].folder, stage.out, into())
       }),
     )
     blocksDone = n + 1
