@@ -58,6 +58,12 @@ class CodexSetupAgentOptions(CodexOptions):
     setup: str | None = Field(default=None, description="The id of the setup in that file.")
 
 
+NVM_LINK = (
+    'if [ -n "${XDG_CONFIG_HOME:-}" ] && [ ! -e "$HOME/.nvm" ]; then'
+    ' mkdir -p "$XDG_CONFIG_HOME/nvm" && ln -s "$XDG_CONFIG_HOME/nvm" "$HOME/.nvm"; fi'
+)
+
+
 class CodexSetupAgent(Codex):
     """Harbor's Codex agent with one setup of the benchmark on top."""
 
@@ -74,6 +80,10 @@ class CodexSetupAgent(Codex):
         self._resolved_env_vars.update(self._spec.get("env", {}))
 
     async def install(self, environment) -> None:
+        # Harbor's Codex install loads nvm from $HOME/.nvm, but nvm's installer puts it in
+        # $XDG_CONFIG_HOME/nvm when that is set, as in some task images: the install then fails before
+        # the agent starts. A link from $HOME/.nvm to that folder makes both agree.
+        await self.exec_as_agent(environment, command=NVM_LINK)
         await super().install(environment)
         for item in self._spec.get("uploads", []):
             await environment.upload_dir(item["from"], item["to"])
