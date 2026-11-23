@@ -16,7 +16,7 @@
 //
 // "mark-verifier" sets `verifierBlocked` on the records of the trials of a jobs folder, from each trial's
 // verifier/test-stdout.txt, for records written before import did it (correction of 24 Nov 2026).
-import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { cost as callCost } from '../src/prices.mjs'
@@ -173,7 +173,10 @@ export function markVerifier(jobs, out) {
     const blocked = verifierBlocked(verifierLog(folder))
     if (blocked) marked++
     if (record.verifierBlocked === blocked) continue
-    writeFileSync(file, `${JSON.stringify({ ...record, verifierBlocked: blocked }, null, 2)}\n`)
+    // Written to a temporary file and renamed over the record, so that a stage reading the records at the
+    // same time never reads half a file.
+    writeFileSync(`${file}.tmp`, `${JSON.stringify({ ...record, verifierBlocked: blocked }, null, 2)}\n`)
+    renameSync(`${file}.tmp`, file)
   }
   return { seen, marked }
 }
