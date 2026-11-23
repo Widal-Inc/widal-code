@@ -216,7 +216,7 @@ Two stages are added after the stages of change 1. They run on the same 100 task
 | Stage | Model | Setups | Tasks | Runs | Cap |
 | --- | --- | --- | --- | --- | --- |
 | Opus 5.5, fast mode | Opus 5.5 | the Opus baseline with fast mode on (Claude Code's `--fast-mode on`) | the Opus stage's 100 | 1 | $150 |
-| OpenAI | GPT-6.2 Sol, then GPT-6.2 Astra, in Codex | each model alone | the Opus stage's 100 | Sol 2, Astra 1 | $220 each |
+| OpenAI | GPT-6.2 Sol, then GPT-6.2 Astra, in Codex | each model alone | the Opus stage's 100 | 2 each | $400 each, $900 for OpenAI in all |
 
 **Fast mode.** The Claude API runs Claude Opus 5.5 faster in fast mode, at twice the price ($8 and $40 per
 million input and output tokens). The question is what it buys in time per task, and whether it changes
@@ -231,7 +231,7 @@ Codex. It runs the setup's commands, so GitHub is blocked in the container and t
 and it refuses a field that only Claude Code reads. Codex has no limit on the spend of one session, so only
 the stage's cap limits it. The OpenAI setups are copies of the baseline with only what Codex reads. Neither
 model has a Widal.Code setup, because Widal.Code reads only Claude Code's sessions, so they are reported
-next to the Claude baselines and not ranked. They run only when an OpenAI API key is stored for the runner.
+next to the Claude baselines and not ranked. They run only when an OpenAI API key is stored for the runner. Widal applied for $1,000 of OpenAI credits on 23 Nov 2026, which sets the OpenAI cap at $900 (the runner stops at 90% of it). If the key is not there when the Claude stages end, the runner stops, and the OpenAI stages run when it is started again with the key stored.
 
 **Two fixes for trials that report no cost**, which are Codex's trials:
 - A trial that ended on an error is an error of the harness only when it spent nothing. This used the
