@@ -63,6 +63,18 @@ NVM_LINK = (
     ' mkdir -p "$XDG_CONFIG_HOME/nvm" && ln -s "$XDG_CONFIG_HOME/nvm" "$HOME/.nvm"; fi'
 )
 
+# Some task images (SWE-bench Pro) block GitHub in /etc/hosts when the container starts, so that the
+# agent cannot fetch the task's fix. Harbor's Codex install fetches nvm from GitHub, so it fails there.
+# The block is taken out for the install only and put back right after it, before the session starts
+# (and the setup's own block of GitHub runs after that).
+HOSTS_SAVED = "/var/tmp/.hosts-of-task"
+GITHUB_UNBLOCK = (
+    "if grep -qE '^0\\.0\\.0\\.0[[:space:]]+([a-z.]+\\.)?github(usercontent)?\\.com' /etc/hosts; then"
+    f" cp /etc/hosts {HOSTS_SAVED} &&"
+    f" grep -vE '^0\\.0\\.0\\.0[[:space:]]+([a-z.]+\\.)?github(usercontent)?\\.com' {HOSTS_SAVED} > /etc/hosts || true; fi"
+)
+GITHUB_REBLOCK = f"if [ -f {HOSTS_SAVED} ]; then cat {HOSTS_SAVED} > /etc/hosts && rm -f {HOSTS_SAVED}; fi"
+
 
 class CodexSetupAgent(Codex):
     """Harbor's Codex agent with one setup of the benchmark on top."""
@@ -84,7 +96,11 @@ class CodexSetupAgent(Codex):
         # $XDG_CONFIG_HOME/nvm when that is set, as in some task images: the install then fails before
         # the agent starts. A link from $HOME/.nvm to that folder makes both agree.
         await self.exec_as_agent(environment, command=NVM_LINK)
-        await super().install(environment)
+        await self.exec_as_root(environment, command=GITHUB_UNBLOCK)
+        try:
+            await super().install(environment)
+        finally:
+            await self.exec_as_root(environment, command=GITHUB_REBLOCK)
         for item in self._spec.get("uploads", []):
             await environment.upload_dir(item["from"], item["to"])
         for command in self._spec.get("rootInstall", []):
