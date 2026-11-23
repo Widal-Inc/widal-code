@@ -340,3 +340,27 @@ The quality stage from block 8 and the Haiku, Opus and Fable stages run their ta
 attribution stage has about ten setups, so it keeps running its task sets one after the other, which keeps
 the number of trials at once near what the main stage ran. As before, all setups of a block run at the same
 time under the same load.
+
+## Correction, 23 Nov 2026: the verifier ran with GitHub blocked
+
+The setups block GitHub in the container's `/etc/hosts` for the whole session, so that the agent cannot fetch
+the upstream fix. The block was still in place when Harbor's verifier ran next in the same container. The
+verifier of Terminal-Bench downloads uv from GitHub, so it failed, and the trial counted as not solved whatever
+the agent did. The oracle check ran without the block, so it did not show this. It was found at about 23:45
+UTC on 23 Nov 2026, by reading the verifiers' output.
+
+- **Affected.** In the main stage, all 350 verifier runs of 35 Terminal-Bench tasks, in every setup. In the
+  quality stage, the 40 verifier runs of 10 Terminal-Bench tasks in blocks 1 to 9. No verifier of swe-rebench
+  or SWE-bench Pro was affected.
+- **Fix.** The setup agent saves the task's `/etc/hosts` before the setup's own steps and puts it back when
+  the session ends, also after an error or a timeout. The session runs with the block as before, and the
+  verifier sees the container as the task set it up, as in the oracle check. The runner's checkout stays at
+  9f58453 and got this one file at 23:52 UTC, before quality block 10 started. Every later block and stage
+  uses it. The setup "widal-on" uploads the checkout into its containers, so they now also hold this file and
+  the edit of change 3, which the agent does not use.
+- **Analysis.** The verifier runs after the session, so the cost, the time and every other measure of the
+  session stand for the affected trials. A task whose verifier could not reach GitHub is left out of every
+  measure of tasks solved, in all setups, like a task that failed in the harness in all setups. In the main
+  stage that leaves 212 of 247 tasks for tasks solved. In the quality stage it leaves out the 10 Terminal-Bench
+  tasks of blocks 1 to 9. Running the 35 tasks of the main stage again in its ten setups would cost about $74
+  (what they cost the first time). They are not run again unless Nils decides so.

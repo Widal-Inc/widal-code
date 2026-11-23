@@ -126,6 +126,17 @@ def options_of(spec: dict[str, Any]) -> dict[str, Any]:
     return options
 
 
+# The /etc/hosts of the task, saved before the setup's own steps run. The setups block GitHub there (a
+# rootInstall step) so that the session cannot fetch the upstream fix, and the file is put back when the session
+# ends, so that Harbor's verifier, which runs next in the same container, sees the container as the task set it
+# up, as in the oracle check. Some verifiers download their tools from GitHub (Terminal-Bench's tests/test.sh
+# installs uv from it) and fail whatever the agent did while the block holds. Docker mounts /etc/hosts into the
+# container, so the file is written in place: `sed -i` cannot replace it.
+HOSTS_OF_TASK = "/var/tmp/.hosts-of-task"
+SAVE_HOSTS = f"cp /etc/hosts {HOSTS_OF_TASK}"
+RESTORE_HOSTS = f"if [ -f {HOSTS_OF_TASK} ]; then cat {HOSTS_OF_TASK} > /etc/hosts && rm -f {HOSTS_OF_TASK}; fi"
+
+
 class SetupAgentOptions(ClaudeCodeOptions):
     """Harbor checks every agent option against this schema before it starts a trial."""
 
@@ -152,10 +163,21 @@ class SetupAgent(ClaudeCode):
         await super().install(environment)
         for item in self._spec.get("uploads", []):
             await environment.upload_dir(item["from"], item["to"])
+        await self.exec_as_root(environment, command=SAVE_HOSTS)
         for command in self._spec.get("rootInstall", []):
             await self.exec_as_root(environment, command=command)
         for command in self._spec.get("agentInstall", []):
             await self.exec_as_agent(environment, command=command)
+
+    async def run(self, instruction: str, environment, context) -> None:
+        """Runs the session, then puts back the task's /etc/hosts (see HOSTS_OF_TASK), also when it fails or times out."""
+        try:
+            await super().run(instruction=instruction, environment=environment, context=context)
+        finally:
+            try:
+                await self.exec_as_root(environment, command=RESTORE_HOSTS, timeout_sec=60)
+            except Exception as error:  # the verifier then runs with the block, as before
+                print(f"Could not put back the task's /etc/hosts: {error}")
 
     def build_cli_flags(self) -> str:
         flags = super().build_cli_flags()
