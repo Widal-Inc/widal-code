@@ -75,6 +75,13 @@ GITHUB_UNBLOCK = (
 )
 GITHUB_REBLOCK = f"if [ -f {HOSTS_SAVED} ]; then cat {HOSTS_SAVED} > /etc/hosts && rm -f {HOSTS_SAVED}; fi"
 
+# Removes every line that blocks GitHub from /etc/hosts, in place: Docker mounts the file into the
+# container, so `sed -i` cannot replace it. The same command as in setup_agent.py.
+UNBLOCK_GITHUB = (
+    "{ grep -v '^0\\.0\\.0\\.0 .*github' /etc/hosts || true; } > /tmp/hosts.unblocked"
+    " && cat /tmp/hosts.unblocked > /etc/hosts && rm -f /tmp/hosts.unblocked"
+)
+
 
 class CodexSetupAgent(Codex):
     """Harbor's Codex agent with one setup of the benchmark on top."""
@@ -107,3 +114,18 @@ class CodexSetupAgent(Codex):
             await self.exec_as_root(environment, command=command)
         for command in self._spec.get("agentInstall", []):
             await self.exec_as_agent(environment, command=command)
+
+    async def run(self, instruction: str, environment, context) -> None:
+        """Runs the session, then lifts the block of GitHub before Harbor's verifier runs in the same container.
+
+        Some verifiers download their tools from GitHub (Terminal-Bench's tests/test.sh installs uv from
+        it), and with the block they fail whatever the agent did. This runs also when the session fails
+        or runs out of time, and a failure here never becomes the trial's error.
+        """
+        try:
+            await super().run(instruction=instruction, environment=environment, context=context)
+        finally:
+            try:
+                await self.exec_as_root(environment, command=UNBLOCK_GITHUB, timeout_sec=60)
+            except Exception as error:  # the verifier then reports the failed download, as before
+                print(f"Could not lift the block of GitHub: {error}")
