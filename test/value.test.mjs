@@ -473,6 +473,14 @@ test('standing text: instruction files, plugin skills and hook text by source, w
   assert.deepEqual(standingOf({ type: 'hook_additional_context', hookEvent: 'UserPromptSubmit', content: ['abc'] }), [['hook UserPromptSubmit', JSON.stringify(['abc']).length]])
   assert.deepEqual(standingOf({ type: 'hook_additional_context', hookName: 'odd name;', content: 'a' }), [['hook other', 3]])
   assert.deepEqual(standingOf({ type: 'file' }), [])
+  // A plugin's agents in the list of agents, and what a hook at the start of a session printed.
+  assert.deepEqual(standingOf({ type: 'agent_listing_delta', addedLines: ['- shop:builder: Builds', '- Explore: Reads', 7] }), [['plugin shop', '- shop:builder: Builds'.length + 1]])
+  assert.deepEqual(standingOf({ type: 'hook_success', hookEvent: 'SessionStart', content: 'MODE ON\nRules' }), [['hook SessionStart', 'MODE ON\nRules'.length]])
+  assert.deepEqual(standingOf({ type: 'hook_success', hookEvent: 'PostToolUse', content: 'ok' }), [])
+  // The parser counts what such a hook printed as context, and keeps it as standing text.
+  const hooked = parse([JSON.stringify({ type: 'attachment', attachment: { type: 'hook_success', hookEvent: 'SessionStart', content: 'z'.repeat(500), stdout: 'z'.repeat(500) } }), ...logLines([{}], { owner: false })])
+  assert.deepEqual(hooked[0].st, [['hook SessionStart', 500]])
+  assert.deepEqual(hooked[0].add, [['(attached: hook output)', 500]])
 
   // A log whose start brings a plugin's skills: the record of the first call keeps the sources.
   const start = [
@@ -483,10 +491,10 @@ test('standing text: instruction files, plugin skills and hook text by source, w
   assert.deepEqual(sessions[0].st, [['plugin big', `- big:one: ${'w'.repeat(8000)}`.length + 1]])
   const p = proposals(sessions, { ownFile: () => undefined })
   const st = p.all.find((x) => x.id === 'standing-text')
-  assert.equal(st.title, 'Turn off the plugin "big" or trim its skills')
+  assert.equal(st.title, 'Turn off the plugin "big" or trim its skills and agents')
   const starts = analyze(sessions).blocks.filter((b) => b.label.startsWith('(system prompt') && b.tokens > 0)
-  near(st.saving, sum(starts, (b) => (b.entry + b.carry) * Math.min(1, sessions[0].st[0][1] / 4 / b.tokens)))
-  assert.match(st.evidence, /^The skills of the plugin "big" are in 6 main sessions of Claude Code\./)
+  near(st.saving, sum(starts, (b) => (b.entry + b.carry) * Math.min(1, sessions[0].st[0][1] / 3 / b.tokens)))
+  assert.match(st.evidence, /^The skills and agents of the plugin "big" are in 6 main sessions of Claude Code\. It has about 8,012 characters/)
   assert.equal(st.apply, false)
   // In fewer than 5 sessions a source is not proposed.
   assert.equal(proposals(sessions.filter((r) => !/standing-[45]/.test(r.f)), { ownFile: () => undefined }).all.find((x) => x.id === 'standing-text'), undefined)
