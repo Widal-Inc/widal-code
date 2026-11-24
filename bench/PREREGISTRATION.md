@@ -383,3 +383,24 @@ UTC on 23 Nov 2026, by reading the verifiers' output.
   In the quality stage, the 10 Terminal-Bench tasks of blocks 1 to 9 still count in no solved number.
 - **Not changed.** The setups, the tasks, the measures and the stop rules. The rerun ran on a later day than the
   rest of the main stage, with all setups side by side as before.
+
+## Change 4, 24 Nov 2026: a second runner, the current Widal.Code for Fable, and a stage "current"
+
+Nils asked on 24 Nov 2026 to finish version 1 sooner and to make the remaining stages teach us something
+about the Widal.Code we have now.
+
+- **A second runner.** A copy of the first runner (made from an image of it at about 15:50 UTC, with no reboot)
+  started at 16:23 UTC. It runs Fable (pilot and stage, with the same setups, tasks, budgets and caps as
+  `model fable` in `v1-chain.sh`) and Claude Opus 5.5 in fast mode (as in `v1-after.sh`) beside the first
+  runner, which goes on with Haiku and Opus and stops its chain after the Opus stage, so that no stage runs
+  twice. The two runners do not see each other's spend, so the cap of the API key is checked by adding both.
+- **The current Widal.Code for Fable.** The pinned Widal.Code (9f58453) proposed only the shell output cap for
+  Sonnet and Haiku, which made no measurable difference to cost. Fable's Widal.Code setup is made by the
+  current Widal.Code instead (`bench/harbor-widal.mjs` at main, b043880), from the Fable pilot's baseline
+  sessions, as before. The stage runner, the tasks and the baseline are unchanged.
+- **A stage "current".** The current Widal.Code against its own baseline in the same stage, on Claude Sonnet
+  5.5, on 100 tasks held out from the pilot (the same seed as the Opus stage), two runs each, cap $100. Its
+  Widal.Code setup was made from the 67 sessions of the Sonnet pilot's baseline: `tools-unused` (Task,
+  Workflow, ScheduleWakeup, ReportFindings, ListAgents, SendMessage and WebSearch denied, an estimated 9.6% of
+  cost) and the shell output cap. The primary measure is the cost ratio against `cur-baseline`, with the
+  share solved as a check, as in the main stage.
