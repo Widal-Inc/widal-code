@@ -54,6 +54,39 @@ const CONTEXT_ATTACHMENTS = new Set([
   'mcp_instructions_delta', 'deferred_tools_delta', 'agent_listing_delta', 'queued_command', 'hook_additional_context',
 ])
 
+// The kinds of instruction files that Claude Code puts into a session's start ("instructions").
+const INSTRUCTION_KINDS = new Set(['User', 'Project', 'Local', 'Managed', 'AutoMem'])
+// A plugin's skill in the list of skills: "<plugin>:<skill>".
+const PLUGIN_SKILL = /^([A-Za-z0-9._-]{1,64}):[^:]+$/
+
+/**
+ * The standing text that one attachment brings, as `[source, characters]`: each instruction file
+ * (CLAUDE.md, AGENTS.md and the files they name, and the automatic memory) by its kind and path,
+ * the skills of each plugin in the list of skills, and the text that a hook added. A path in the
+ * home folder starts with "~", so that the name of the person's home folder is not kept. Nothing
+ * of the text itself is kept.
+ */
+export function standingOf(a, homeDir = process.env.HOME ?? '') {
+  if (a.type === 'instructions' && Array.isArray(a.files)) {
+    return a.files.filter((f) => isObject(f) && INSTRUCTION_KINDS.has(f.type) && text(f.path) && typeof f.content === 'string')
+      .map((f) => [`${f.type} ${homeDir && f.path.startsWith(`${homeDir}/`) ? `~${f.path.slice(homeDir.length)}` : f.path}`, f.content.length])
+  }
+  if (a.type === 'skill_listing' && typeof a.content === 'string') {
+    const byPlugin = new Map()
+    for (const line of a.content.split('\n')) {
+      const m = /^- ([^:\s]+:[^:\s]+):/.exec(line)
+      const plugin = m && PLUGIN_SKILL.exec(m[1])?.[1]
+      if (plugin) byPlugin.set(plugin, (byPlugin.get(plugin) ?? 0) + line.length + 1)
+    }
+    return [...byPlugin].map(([plugin, chars]) => [`plugin ${plugin}`, chars])
+  }
+  if (a.type === 'hook_additional_context') {
+    const event = [a.hookEvent, a.hookName].find((n) => typeof n === 'string' && /^[A-Za-z]{1,40}$/.test(n)) ?? 'other'
+    return [[`hook ${event}`, JSON.stringify(a.content ?? '').length]]
+  }
+  return []
+}
+
 // What Claude Code writes when the person interrupts the agent: "[Request interrupted by user]",
 // or the same with " for tool use" before the bracket closes.
 const INTERRUPTED = /^\[Request interrupted by user[^\]]*\]$/
@@ -195,6 +228,7 @@ export class ClaudeParser {
     this.toolUse = new Map()
     this.programs = new Map()
     this.pending = []
+    this.standing = []
     this.errors = 0
     this.interrupted = false
     this.afterCompact = false
@@ -244,6 +278,11 @@ export class ClaudeParser {
       }
       if (CLOUD_ID.test(m.id)) this.cloud = true
       if (this.afterCompact) r.ac = true
+      // The standing text that came in before this call (see standingOf).
+      if (this.standing.length) {
+        r.st = this.standing
+        this.standing = []
+      }
       // What happened before this call: tool results that failed, and an interrupt by the person.
       if (this.errors) r.err = this.errors
       if (this.interrupted) r.intr = 1
@@ -330,6 +369,7 @@ export class ClaudeParser {
     const a = d.attachment
     if (!a || !CONTEXT_ATTACHMENTS.has(a.type)) return
     this.pending.push([`(attached: ${a.type})`, JSON.stringify(a).length])
+    this.standing.push(...standingOf(a))
   }
 
   /**

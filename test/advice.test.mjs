@@ -811,7 +811,7 @@ test('the cache of parsed logs keeps the new numbers, and a cache from before th
   const cache = join(process.env.WIDAL_HOME, 'cache')
   for (const f of readdirSync(cache)) {
     const entry = JSON.parse(readFileSync(join(cache, f), 'utf8'))
-    assert.equal(entry.v, 13)
+    assert.equal(entry.v, 14)
     writeFileSync(join(cache, f), JSON.stringify({ ...entry, v: 8, records: [] }))
   }
   assert.deepEqual(await mine(), expected)
