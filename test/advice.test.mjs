@@ -1043,7 +1043,7 @@ test('the measure command works for every applied change', () => {
   }
   const unknown = run('no-such-change')
   assert.equal(unknown.status, 1)
-  assert.match(unknown.stderr, /^widal: There is no change "no-such-change"\. The changes are: subagent-cache-1h, model-switch-cost, cold-start-warn, subagent-model, effort-default, keep-warm, compact-keep, autocompact-window, bash-output-cap, no-bypass, deny-secret-files, transcript-days\n$/)
+  assert.match(unknown.stderr, /^widal: There is no change "no-such-change"\. The changes are: subagent-cache-1h, model-switch-cost, cold-start-warn, subagent-model, effort-default, keep-warm, compact-keep, autocompact-window, bash-output-cap, no-bypass, deny-secret-files, tools-unused, transcript-days\n$/)
   // A change that was not applied.
   writeFileSync(join(env.WIDAL_HOME, 'actions.json'), JSON.stringify({ 'subagent-model': state }))
   assert.equal(run('effort-default').stdout, 'effort-default is not applied. Apply it with: widal apply effort-default\n')

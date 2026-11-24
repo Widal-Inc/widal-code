@@ -37,6 +37,34 @@ function save(state) {
 const CHEAPER = 'claude-sonnet-5-5'
 const SUBAGENT_MODEL = 'CLAUDE_CODE_SUBAGENT_MODEL'
 
+/**
+ * Built-in tools of Claude Code that a session can do without, with the tokens each one adds to the
+ * start of every session: what a session's first call carried less when the tool was denied alone
+ * ("permissions.deny": ["<name>"]). Measured on 24 Nov 2026 with Claude Code 2.1.331 and no other
+ * settings. Most built-in tools are deferred and add only their name (about 6 tokens), so they are not
+ * here. Tools that everyday work needs (Bash, Read, Edit, Write, Grep, Glob) are never proposed, and
+ * neither are ToolSearch and Skill: denying them makes the start larger. The subagent tool is denied
+ * as "Task" and appears as "Agent" in the logs of newer versions.
+ */
+export const START_TOOLS = {
+  Task: { tokens: 2926, called: ['Task', 'Agent'] },
+  Workflow: { tokens: 2064, called: ['Workflow'] },
+  ScheduleWakeup: { tokens: 1695, called: ['ScheduleWakeup'] },
+  ReportFindings: { tokens: 907, called: ['ReportFindings'] },
+  ListAgents: { tokens: 646, called: ['ListAgents'] },
+  WebFetch: { tokens: 635, called: ['WebFetch'] },
+  SendMessage: { tokens: 202, called: ['SendMessage'] },
+  WebSearch: { tokens: 141, called: ['WebSearch'] },
+}
+
+/** The tools that "--tools" names, checked: a list of names from START_TOOLS, at least one. */
+function toolsArg(args) {
+  const names = String(args?.tools ?? '').split(',').map((t) => t.trim()).filter(Boolean)
+  const unknown = names.filter((t) => !Object.hasOwn(START_TOOLS, t))
+  if (!names.length || unknown.length) throw new Error(`--tools takes a list of these tools, with commas and no spaces: ${Object.keys(START_TOOLS).join(', ')}.`)
+  return [...new Set(names)]
+}
+
 /** The effort levels that Claude Code's "effortLevel" setting takes, lowest first. */
 export const EFFORT_LEVELS = ['low', 'medium', 'high', 'xhigh']
 
@@ -389,6 +417,44 @@ export const ACTIONS = {
       return Array.isArray(deny) && SECRET_DENY.every((r) => deny.includes(r))
     },
     back: 'The deny rules that this tool added are out. Your other rules stay.',
+  },
+  'tools-unused': {
+    what: 'Adds the tools that --tools names to "permissions.deny" in Claude Code\'s settings, so that new sessions start without their definitions. The other rules stay.',
+    note: 'New sessions start without those tools. A session that needs one of them can no longer call it. Check the effect with: widal measure tools-unused',
+    options: ['--tools'],
+    apply: (bin, args, earlier) => {
+      const tools = toolsArg(args)
+      const s = read()
+      const p = permissionsOf(s)
+      if (p.deny !== undefined && !Array.isArray(p.deny)) throw new Error(`"permissions.deny" in ${settingsFile()} is not a list, so this tool does not change it.`)
+      const added = tools.filter((t) => !p.deny?.includes(t))
+      const found = { noDeny: p.deny === undefined, noPermissions: s.permissions === undefined }
+      p.deny = [...(p.deny ?? []), ...added]
+      s.permissions = p
+      write(s)
+      // Applied before with other tools: keep what the first apply found, and add to what was added.
+      if (earlier) return { ...earlier, added: [...new Set([...(earlier.added ?? []), ...added])], tools: [...new Set([...(earlier.tools ?? []), ...tools])] }
+      return { added, tools, ...found }
+    },
+    undo: (before) => {
+      const s = read()
+      const p = permissionsOf(s)
+      if (!Array.isArray(p.deny)) return
+      const added = new Set(before?.added ?? [])
+      const rest = p.deny.filter((r) => !added.has(r))
+      if (rest.length === p.deny.length) return
+      if (before?.noDeny && !rest.length) delete p.deny
+      else p.deny = rest
+      keepPermissions(s, p, before?.noPermissions)
+      write(s)
+    },
+    inPlace: (args, before) => {
+      const tools = args ? toolsArg(args) : before?.tools ?? []
+      const deny = read().permissions?.deny
+      return Array.isArray(deny) && tools.length > 0 && tools.every((t) => deny.includes(t))
+    },
+    done: (args) => `Added ${toolsArg(args).join(', ')} to "permissions.deny" in Claude Code's settings. New sessions start without ${toolsArg(args).length === 1 ? 'that tool' : 'those tools'}.`,
+    back: 'The tools that this tool denied are allowed again. Your other rules stay.',
   },
   'transcript-days': {
     what: 'Sets "cleanupPeriodDays" and "desktopSessionCleanupPeriodDays" in Claude Code\'s settings to 7 days, or to the days that --days names (1 to 365). Claude Code then deletes session transcripts that are older, also those of desktop and Cowork sessions.',

@@ -5,7 +5,7 @@
 // were. So it says what the same work would have cost, not whether the work would have gone the
 // same way. Every proposal says what it rests on, how it is done, what can go wrong, and whether
 // this tool can apply it.
-import { EFFORT_LEVELS } from './actions.mjs'
+import { EFFORT_LEVELS, START_TOOLS } from './actions.mjs'
 import { COMMANDS, NO_TOOL, READING, analyze, compactionsOf, highEffort, kindOf, lowerEfforts, measures, median, strongModel, totals } from './analyze.mjs'
 import { count, day, model, money, pct, plain, project, table, tok, when } from './format.mjs'
 import { agentFile } from './install.mjs'
@@ -41,6 +41,12 @@ const SHORT_SESSION = 20
 const SHORT_SHARE = 0.8
 // A lower effort level is compared with only when the person has this many calls of their own at it.
 const OWN_CALLS = 200
+// The tools proposal needs this many main sessions of Claude Code: with fewer, a tool that was not
+// called may just not have been needed yet.
+const TOOL_SESSIONS = 20
+// The first block of a session: its system prompt, its tool definitions and its first message.
+const isStart = (b) => b.label.startsWith('(system prompt')
+const inSubagent = (b) => /\/subagents\//.test(b.f)
 
 // The cap on a shell command's output that the proposal asks for, in characters. Claude Code
 // gives a failed command an excerpt of about 10,000 characters inline, so a cap of this size does
@@ -299,6 +305,33 @@ export function proposals(records, { ownFile = agentFile, analyzed } = {}) {
     apply: false,
   })
 
+  // Built-in tools that no session called: each one's definition is in the start of every main
+  // session, written to the cache on the first call and read again on every later call. The replay
+  // keeps the tools' share of what each start cost to enter and to carry. Only Claude Code's main
+  // sessions: a subagent's tools are set apart from these. The sizes are those measured on one
+  // version of Claude Code (START_TOOLS in actions.mjs).
+  const ccCalls = calls.filter(claudeCode)
+  const called = new Set(ccCalls.flatMap((e) => (e.r.tools ?? []).map(([name]) => name)))
+  const mainStarts = blocks.filter((b) => b.s === 'claude' && isStart(b) && !inSubagent(b) && b.tokens > 0)
+  const sessions = new Set(mainStarts.map((b) => b.ses)).size
+  const unused = Object.entries(START_TOOLS).filter(([, t]) => !t.called.some((name) => called.has(name)))
+  if (unused.length && sessions >= TOOL_SESSIONS) {
+    const cut = sum(unused, ([, t]) => t.tokens)
+    const names = unused.map(([name]) => name)
+    const startCost = sum(mainStarts, (b) => b.entry + b.carry)
+    list.push({
+      id: 'tools-unused',
+      title: `Leave out ${count(names.length)} built-in ${names.length === 1 ? 'tool' : 'tools'} that no session called`,
+      saving: sum(mainStarts, (b) => (b.entry + b.carry) * Math.min(1, cut / b.tokens)),
+      tools: names,
+      evidence: `In ${count(sessions)} main sessions of Claude Code, no call used ${names.join(', ')}. Their definitions are in the start of every session, about ${tok(cut)} tokens of a start of about ${tok(median(mainStarts.map((b) => b.tokens)))}. Entering and carried on the later calls, the starts cost ${money(startCost)}, and the replay keeps the tools' share of that.`,
+      how: `Deny those tools in Claude Code's settings: "permissions": { "deny": [${names.map((n) => `"${n}"`).join(', ')}] }. New sessions then start without their definitions. The sizes were measured on Claude Code 2.1.331, and other versions can differ.`,
+      risk: `A session that needs one of these tools can no longer call it${names.includes('Task') ? ': without "Task" there are no subagents' : ''}. Undo it when that happens. Compare before and after with: widal measure tools-unused`,
+      apply: true,
+      args: `--tools ${names.join(',')}`,
+    })
+  }
+
   // A proposal shows only when its saving is above 0 and at least 1% of the total. One without an amount comes last.
   const shown = list.filter((p) => p.saving === null || (p.saving > 0 && p.saving >= 0.01 * t.total))
   return { total: t.total, calls: calls.length, list: shown.sort((a, b) => (b.saving ?? 0) - (a.saving ?? 0)), all: list }
@@ -403,6 +436,7 @@ const MEASURED = {
   'effort-default': ['Main session calls', (e) => claudeCode(e) && !e.r.agent],
   'autocompact-window': ['Main session calls', (e) => claudeCode(e) && !e.r.agent],
   'bash-output-cap': ['Calls of Claude Code', claudeCode],
+  'tools-unused': ['Main session calls', (e) => claudeCode(e) && !e.r.agent],
 }
 
 /**
@@ -508,6 +542,20 @@ export function measureReport(records, { id, at, before: keptBefore, metas }) {
     out.push(m.after.compactions
       ? 'An earlier automatic point shows as more compactions per session, a smaller size before a compaction and a lower carrying cost. The work before and after is not the same work, so read these lines with care.'
       : 'No main session was compacted since the change. Look again after a few days of normal work.')
+    out.push('', 'The same calls: what they cost, and signs of how the work went.', '')
+  }
+
+  if (id === 'tools-unused') {
+    // What leaving out tools acts on: the size of the start of each main session.
+    const starts = analyze(records).blocks.filter((b) => b.s === 'claude' && isStart(b) && !inSubagent(b) && b.tokens > 0 && b.ts >= at - BEFORE_DAYS * 86400e3)
+    const side = (on) => starts.filter((b) => on(b.ts)).map((b) => b.tokens)
+    const [was, is] = [side((ts) => ts < at), side((ts) => ts >= at)]
+    out.push(table([
+      ['', 'before', 'after'],
+      ['Main sessions', count(was.length), count(is.length)],
+      ['Start of a session, median', was.length ? `${tok(median(was))} tokens` : 'none', is.length ? `${tok(median(is))} tokens` : 'none'],
+    ], [1, 2]), '')
+    out.push(is.length ? 'Leaving out tools shows as a smaller start. The first message is part of the start too, so read the line with care.' : 'No main session started since the change. Look again after a few days of normal work.')
     out.push('', 'The same calls: what they cost, and signs of how the work went.', '')
   }
 
