@@ -1008,3 +1008,22 @@ test('transcript-days: 7 days or --days, both keys, undo puts back what was ther
   assert.match(r.stdout, /to 14 in Claude Code's settings/)
   assert.deepEqual(readSettings(), { theme: 'dark', cleanupPeriodDays: 14, desktopSessionCleanupPeriodDays: 14 })
 })
+
+test('tools-unused: apply denies the named tools, a second apply adds to them, undo takes out only what it added', () => {
+  freshState()
+  writeSettings({ theme: 'dark', permissions: { deny: ['Read(./.env)', 'WebFetch'] } })
+  assert.equal(actions.apply('tools-unused', OWN, NOW, ['--tools', 'Workflow,WebFetch'])[0], 'Added Workflow, WebFetch to "permissions.deny" in Claude Code\'s settings. New sessions start without those tools.')
+  assert.deepEqual(readSettings().permissions.deny, ['Read(./.env)', 'WebFetch', 'Workflow'])
+  assert.deepEqual(actions.apply('tools-unused', OWN, NOW, ['--tools', 'Workflow']), ['tools-unused is already applied.'])
+  actions.apply('tools-unused', OWN, NOW, ['--tools', 'Task'])
+  assert.deepEqual(readSettings().permissions.deny, ['Read(./.env)', 'WebFetch', 'Workflow', 'Task'])
+  assert.deepEqual(actions.undo('tools-unused', OWN), ['tools-unused is taken back. The tools that this tool denied are allowed again. Your other rules stay.'])
+  assert.deepEqual(readSettings(), { theme: 'dark', permissions: { deny: ['Read(./.env)', 'WebFetch'] } })
+  writeSettings({})
+  actions.apply('tools-unused', OWN, NOW, ['--tools', 'ListAgents'])
+  actions.undo('tools-unused', OWN)
+  assert.deepEqual(readSettings(), {})
+  // Only the tools that the proposal knows: never Bash, Read or ToolSearch.
+  for (const bad of ['Bash', 'ToolSearch', 'Workflow,Read', '']) assert.throws(() => actions.apply('tools-unused', OWN, NOW, ['--tools', bad]), /--tools takes a list of these tools/)
+  assert.throws(() => actions.apply('tools-unused', OWN, NOW), /--tools takes a list of these tools/)
+})

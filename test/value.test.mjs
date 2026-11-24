@@ -429,3 +429,32 @@ test('findings give a share of the weekly limit for cache losses, context and to
     files()
   }
 })
+
+test('tools that no session called: the replay keeps their share of each main session start, and names the tools to deny', async () => {
+  const { START_TOOLS } = await import('../src/actions.mjs')
+  // 20 main sessions that call Bash, Read and the subagent tool (logged as "Agent"), and web search once.
+  const one = (i) => records([{ tools: [['Bash', { command: 'npm test' }]] }, { tools: [['Read', { file_path: '/work/a.js' }]] }, { tools: [[i === 0 ? 'WebSearch' : 'Agent', {}]] }, {}], { file: `/logs/tools-${i}.jsonl` })
+  const calls = Array.from({ length: 20 }, (_, i) => one(i)).flat()
+  const p = proposals(calls, { ownFile: () => undefined })
+  const tools = p.all.find((x) => x.id === 'tools-unused')
+  assert.ok(tools, 'the proposal is there')
+  assert.deepEqual(tools.tools, ['Workflow', 'ScheduleWakeup', 'ReportFindings', 'ListAgents', 'WebFetch', 'SendMessage'])
+  assert.equal(tools.args, '--tools Workflow,ScheduleWakeup,ReportFindings,ListAgents,WebFetch,SendMessage')
+  const cut = sum(tools.tools, (t) => START_TOOLS[t].tokens)
+  const starts = analyze(calls).blocks.filter((b) => b.label.startsWith('(system prompt') && b.tokens > 0)
+  assert.equal(starts.length, 20)
+  near(tools.saving, sum(starts, (b) => (b.entry + b.carry) * Math.min(1, cut / b.tokens)))
+  assert.ok(tools.saving > 0)
+  assert.match(tools.evidence, /^In 20 main sessions of Claude Code, no call used Workflow, ScheduleWakeup, ReportFindings, ListAgents, WebFetch, SendMessage\./)
+  assert.doesNotMatch(tools.risk, /subagents/, 'the subagent tool was called, so it is not denied')
+  // With fewer than 20 sessions, a tool that was not called may just not have been needed yet.
+  assert.equal(proposals(calls.filter((r) => r.f !== '/logs/tools-19.jsonl'), { ownFile: () => undefined }).all.find((x) => x.id === 'tools-unused'), undefined)
+  // Cowork's sessions are not Claude Code's: its settings do not reach them.
+  const asCowork = calls.map((r) => ({ ...r, s: 'cowork', id: `cw-${r.id}` }))
+  assert.equal(proposals(asCowork, { ownFile: () => undefined }).all.find((x) => x.id === 'tools-unused'), undefined)
+  // Without the subagent tool in any call, it is proposed too, and the risk says what it takes away.
+  const noAgent = Array.from({ length: 20 }, (_, i) => records([{ tools: [['Bash', { command: 'ls' }]] }, {}], { file: `/logs/tools-b-${i}.jsonl` })).flat()
+  const all = proposals(noAgent, { ownFile: () => undefined }).all.find((x) => x.id === 'tools-unused')
+  assert.deepEqual(all.tools, Object.keys(START_TOOLS))
+  assert.match(all.risk, /without "Task" there are no subagents/)
+})
