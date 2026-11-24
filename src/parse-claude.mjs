@@ -56,13 +56,18 @@ const CONTEXT_ATTACHMENTS = new Set([
 
 // The kinds of instruction files that Claude Code puts into a session's start ("instructions").
 const INSTRUCTION_KINDS = new Set(['User', 'Project', 'Local', 'Managed', 'AutoMem'])
+// The label of what such a hook printed, in the context.
+export const HOOK_OUTPUT = '(attached: hook output)'
+// The hooks whose printed output Claude Code puts into the context.
+const PRINTING_HOOKS = new Set(['SessionStart', 'UserPromptSubmit'])
 // A plugin's skill in the list of skills: "<plugin>:<skill>".
 const PLUGIN_SKILL = /^([A-Za-z0-9._-]{1,64}):[^:]+$/
 
 /**
  * The standing text that one attachment brings, as `[source, characters]`: each instruction file
  * (CLAUDE.md, AGENTS.md and the files they name, and the automatic memory) by its kind and path,
- * the skills of each plugin in the list of skills, and the text that a hook added. A path in the
+ * the skills and the agents of each plugin in the lists of skills and agents, the text that a hook
+ * added, and what a hook at the start of a session or of a prompt printed (it goes into the context). A path in the
  * home folder starts with "~", so that the name of the person's home folder is not kept. Nothing
  * of the text itself is kept.
  */
@@ -80,6 +85,16 @@ export function standingOf(a, homeDir = process.env.HOME ?? '') {
     }
     return [...byPlugin].map(([plugin, chars]) => [`plugin ${plugin}`, chars])
   }
+  if (a.type === 'agent_listing_delta' && Array.isArray(a.addedLines)) {
+    const byPlugin = new Map()
+    for (const line of a.addedLines) {
+      const m = typeof line === 'string' && /^- ([^:\s]+:[^:\s]+):/.exec(line)
+      const plugin = m && PLUGIN_SKILL.exec(m[1])?.[1]
+      if (plugin) byPlugin.set(plugin, (byPlugin.get(plugin) ?? 0) + line.length + 1)
+    }
+    return [...byPlugin].map(([plugin, chars]) => [`plugin ${plugin}`, chars])
+  }
+  if (a.type === 'hook_success' && PRINTING_HOOKS.has(a.hookEvent) && typeof a.content === 'string' && a.content) return [[`hook ${a.hookEvent}`, a.content.length]]
   if (a.type === 'hook_additional_context') {
     const event = [a.hookEvent, a.hookName].find((n) => typeof n === 'string' && /^[A-Za-z]{1,40}$/.test(n)) ?? 'other'
     return [[`hook ${event}`, JSON.stringify(a.content ?? '').length]]
@@ -367,8 +382,11 @@ export class ClaudeParser {
 
   #attachment(d) {
     const a = d.attachment
-    if (!a || !CONTEXT_ATTACHMENTS.has(a.type)) return
-    this.pending.push([`(attached: ${a.type})`, JSON.stringify(a).length])
+    if (!isObject(a)) return
+    if (CONTEXT_ATTACHMENTS.has(a.type)) this.pending.push([`(attached: ${a.type})`, JSON.stringify(a).length])
+    // What a hook at the start of a session or of a prompt printed goes into the context too.
+    else if (a.type === 'hook_success' && PRINTING_HOOKS.has(a.hookEvent) && typeof a.content === 'string' && a.content) this.pending.push([HOOK_OUTPUT, a.content.length])
+    else return
     this.standing.push(...standingOf(a))
   }
 

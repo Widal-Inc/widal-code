@@ -9,6 +9,7 @@ import { EFFORT_LEVELS, START_TOOLS } from './actions.mjs'
 import { COMMANDS, NO_TOOL, READING, analyze, compactionsOf, highEffort, kindOf, lowerEfforts, measures, median, strongModel, totals } from './analyze.mjs'
 import { count, day, model, money, pct, plain, project, table, tok, when } from './format.mjs'
 import { agentFile } from './install.mjs'
+import { HOOK_OUTPUT } from './parse-claude.mjs'
 import { priceOf, rates } from './prices.mjs'
 
 const sum = (list, f) => list.reduce((n, x) => n + f(x), 0)
@@ -47,9 +48,11 @@ const TOOL_SESSIONS = 20
 // The first block of a session: its system prompt, its tool definitions and its first message.
 const isStart = (b) => b.label.startsWith('(system prompt')
 const inSubagent = (b) => /\/subagents\//.test(b.f)
-// Characters per token of standing text, an estimate for English prose: the logs give the size of an
-// instruction file in characters, and the start of a session in tokens.
-const STANDING_CHARS = 4
+// Characters per token of standing text, an estimate: the logs give the size of standing text in
+// characters, and the start of a session in tokens. On the benchmark of 23 Nov 2026, the sessions of a
+// setup whose plugin added about 11,800 characters of skills, agents and hook text started about
+// 3,900 tokens larger than those of the baseline, on the same tasks: about 3 characters per token.
+const STANDING_CHARS = 3
 // A source of standing text is proposed only when it was in the start of this many sessions.
 const STANDING_SESSIONS = 5
 const HOOK_LATER = '(attached: hook_additional_context)'
@@ -347,16 +350,17 @@ export function proposals(records, { ownFile = agentFile, analyzed } = {}) {
   for (const e of ccCalls) if (!e.r.agent && !firstOf.has(e.r.f)) firstOf.set(e.r.f, e)
   const bySource = new Map()
   const add = (source, cost, chars, f) => {
-    const x = bySource.get(source) ?? { source, cost: 0, chars: [], sessions: new Set() }
+    const x = bySource.get(source) ?? { source, cost: 0, perSession: new Map(), sessions: new Set() }
     x.cost += cost
-    if (chars) x.chars.push(chars)
+    // A plugin brings skills and agents: its size in a session is the sum of both.
+    if (chars) x.perSession.set(f, (x.perSession.get(f) ?? 0) + chars)
     x.sessions.add(f)
     bySource.set(source, x)
   }
   for (const b of mainStarts) {
     for (const [source, chars] of firstOf.get(b.f)?.r.st ?? []) add(source, (b.entry + b.carry) * Math.min(1, chars / STANDING_CHARS / b.tokens), chars, b.f)
   }
-  for (const b of blocks) if (b.s === 'claude' && b.label === HOOK_LATER && !inSubagent(b)) add('later hooks', b.entry + b.carry, 0, b.f)
+  for (const b of blocks) if (b.s === 'claude' && (b.label === HOOK_LATER || b.label === HOOK_OUTPUT) && !inSubagent(b)) add('later hooks', b.entry + b.carry, 0, b.f)
   const standing = [...bySource.values()].filter((x) => x.sessions.size >= STANDING_SESSIONS).sort((a, b) => b.cost - a.cost)
   if (standing.length) {
     const [top, ...rest] = standing
@@ -364,21 +368,22 @@ export function proposals(records, { ownFile = agentFile, analyzed } = {}) {
     const what = name.join(' ')
     const words = (x) => {
       const [k, ...n] = x.source.split(' ')
-      return k === 'plugin' ? `the skills of the plugin "${n.join(' ')}"` : k === 'hook' ? `what the ${n.join(' ')} hook adds` : k === 'later' ? 'what hooks add to later prompts' : n.join(' ')
+      return k === 'plugin' ? `the skills and agents of the plugin "${n.join(' ')}"` : k === 'hook' ? `what the ${n.join(' ')} hook adds` : k === 'later' ? 'what hooks add to later prompts' : n.join(' ')
     }
-    const size = top.chars.length ? ` It has about ${count(median(top.chars))} characters, about ${tok(median(top.chars) / STANDING_CHARS)} tokens.` : ''
+    const sizes = [...top.perSession.values()]
+    const size = sizes.length ? ` It has about ${count(median(sizes))} characters, about ${tok(median(sizes) / STANDING_CHARS)} tokens, in each session.` : ''
     list.push({
       id: 'standing-text',
       source: top.source,
-      title: kind === 'plugin' ? `Turn off the plugin "${what}" or trim its skills` : kind === 'hook' ? `Shorten what the ${what} hook adds` : kind === 'later' ? 'Shorten what hooks add to later prompts' : `Shorten ${what}`,
+      title: kind === 'plugin' ? `Turn off the plugin "${what}" or trim its skills and agents` : kind === 'hook' ? `Shorten what the ${what} hook adds` : kind === 'later' ? 'Shorten what hooks add to later prompts' : `Shorten ${what}`,
       saving: top.cost,
-      evidence: `${kind === 'plugin' ? `The skills of the plugin "${what}" are` : kind === 'hook' ? `What the ${what} hook adds is` : kind === 'later' ? 'Text that hooks add to later prompts is' : `${what} (${kind === 'AutoMem' ? 'the automatic memory' : `${kind.toLowerCase()} instructions`}) is`} in ${count(top.sessions.size)} main sessions of Claude Code.${size} Entering and carried on the later calls, it cost ${money(top.cost)}. ${rest.length ? `Next: ${rest.slice(0, 2).map((x) => `${words(x)}, ${money(x.cost)}`).join('; ')}.` : ''}`.trim(),
+      evidence: `${kind === 'plugin' ? `The skills and agents of the plugin "${what}" are` : kind === 'hook' ? `What the ${what} hook adds is` : kind === 'later' ? 'Text that hooks add to later prompts is' : `${what} (${kind === 'AutoMem' ? 'the automatic memory' : `${kind.toLowerCase()} instructions`}) is`} in ${count(top.sessions.size)} main sessions of Claude Code.${size} Entering and carried on the later calls, it cost ${money(top.cost)}. ${rest.length ? `Next: ${rest.slice(0, 2).map((x) => `${words(x)}, ${money(x.cost)}`).join('; ')}.` : ''}`.trim(),
       how: kind === 'plugin'
-        ? `Turn the plugin off where it is not needed ("enabledPlugins" in Claude Code's settings, or /plugin), or keep only the skills you use. Its skills are listed at the start of every session, also when none is called.`
+        ? `Turn the plugin off where it is not needed ("enabledPlugins" in Claude Code's settings, or /plugin), or keep only the skills you use. Its skills and agents are listed at the start of every session, also when none is called.`
         : kind === 'hook' || kind === 'later'
           ? 'Make the hook add less text, or only when it is needed. What a hook adds is paid for on every call that follows.'
           : 'Keep in the file only what most sessions need, in short lines. Move the rest into files that the instructions name, so that the agent reads them only when the work needs them.',
-      risk: 'Rules or skills that are gone can no longer guide the work. The amount assumes about 4 characters per token, so it is an estimate. Compare the work before and after.',
+      risk: 'Rules or skills that are gone can no longer guide the work. The amount assumes about 3 characters per token, so it is an estimate. Compare the work before and after.',
       apply: false,
     })
   }
