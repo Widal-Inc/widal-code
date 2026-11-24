@@ -364,3 +364,22 @@ UTC on 23 Nov 2026, by reading the verifiers' output.
   stage that leaves 212 of 247 tasks for tasks solved. In the quality stage it leaves out the 10 Terminal-Bench
   tasks of blocks 1 to 9. Running the 35 tasks of the main stage again in its ten setups would cost about $74
   (what they cost the first time). They are not run again unless Nils decides so.
+
+## Correction, 24 Nov 2026: the 35 Terminal-Bench tasks of the main stage run again
+
+- **What Nils decided.** On 24 Nov 2026, after the correction above, Nils decided to run the 35 Terminal-Bench
+  tasks of the main stage again instead of leaving them out of tasks solved.
+- **How.** A stage "main-tb" ran those 35 tasks in all 10 setups of the main stage (5 arms, 2 runs each), in one
+  block, 2 trials at a time per setup, from 01:08 to 03:48 UTC, with a cap of $100. It used the same file of
+  setups, the same Claude Code version and the same seed, with the verifier fix in place (`setup_agent.py` puts
+  back `/etc/hosts` when the session ends). Its records were written apart, in `/opt/bench/v1-tb`, and cost
+  $62.44.
+- **Analysis.** For each of the 35 tasks, the record of each setup and run in the rerun replaces the main stage's
+  record of that setup and run. The main stage's report is made from those records (`/opt/bench/v1-main-final`),
+  and the earlier reports are kept as `report-main-original.md` and `report-main-excluded.md`. No trial of the
+  rerun's tests failed to reach GitHub. One task, torch-pipeline-parallelism, failed in the harness in 9 of its
+  10 runs, so with the two teleport tasks the main stage counts 246 tasks.
+- **Quality.** The quality report pools these main records with the quality stage's, as the pre-registration says.
+  In the quality stage, the 10 Terminal-Bench tasks of blocks 1 to 9 still count in no solved number.
+- **Not changed.** The setups, the tasks, the measures and the stop rules. The rerun ran on a later day than the
+  rest of the main stage, with all setups side by side as before.
