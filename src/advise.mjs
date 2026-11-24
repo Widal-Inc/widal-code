@@ -47,6 +47,12 @@ const TOOL_SESSIONS = 20
 // The first block of a session: its system prompt, its tool definitions and its first message.
 const isStart = (b) => b.label.startsWith('(system prompt')
 const inSubagent = (b) => /\/subagents\//.test(b.f)
+// Characters per token of standing text, an estimate for English prose: the logs give the size of an
+// instruction file in characters, and the start of a session in tokens.
+const STANDING_CHARS = 4
+// A source of standing text is proposed only when it was in the start of this many sessions.
+const STANDING_SESSIONS = 5
+const HOOK_LATER = '(attached: hook_additional_context)'
 
 // The cap on a shell command's output that the proposal asks for, in characters. Claude Code
 // gives a failed command an excerpt of about 10,000 characters inline, so a cap of this size does
@@ -329,6 +335,51 @@ export function proposals(records, { ownFile = agentFile, analyzed } = {}) {
       risk: `A session that needs one of these tools can no longer call it${names.includes('Task') ? ': without "Task" there are no subagents' : ''}. Undo it when that happens. Compare before and after with: widal measure tools-unused`,
       apply: true,
       args: `--tools ${names.join(',')}`,
+    })
+  }
+
+  // Standing text: what every main session of Claude Code carries from its start, by source. That is
+  // each instruction file (CLAUDE.md, AGENTS.md, the automatic memory), the skills of each plugin in
+  // the list of skills, and what hooks add. The replay keeps each source's share of the start of the
+  // sessions it was in, entered and carried, from its size in characters. Text that a hook adds to a
+  // later prompt is its own block, and counts as it is.
+  const firstOf = new Map()
+  for (const e of ccCalls) if (!e.r.agent && !firstOf.has(e.r.f)) firstOf.set(e.r.f, e)
+  const bySource = new Map()
+  const add = (source, cost, chars, f) => {
+    const x = bySource.get(source) ?? { source, cost: 0, chars: [], sessions: new Set() }
+    x.cost += cost
+    if (chars) x.chars.push(chars)
+    x.sessions.add(f)
+    bySource.set(source, x)
+  }
+  for (const b of mainStarts) {
+    for (const [source, chars] of firstOf.get(b.f)?.r.st ?? []) add(source, (b.entry + b.carry) * Math.min(1, chars / STANDING_CHARS / b.tokens), chars, b.f)
+  }
+  for (const b of blocks) if (b.s === 'claude' && b.label === HOOK_LATER && !inSubagent(b)) add('later hooks', b.entry + b.carry, 0, b.f)
+  const standing = [...bySource.values()].filter((x) => x.sessions.size >= STANDING_SESSIONS).sort((a, b) => b.cost - a.cost)
+  if (standing.length) {
+    const [top, ...rest] = standing
+    const [kind, ...name] = top.source.split(' ')
+    const what = name.join(' ')
+    const words = (x) => {
+      const [k, ...n] = x.source.split(' ')
+      return k === 'plugin' ? `the skills of the plugin "${n.join(' ')}"` : k === 'hook' ? `what the ${n.join(' ')} hook adds` : k === 'later' ? 'what hooks add to later prompts' : n.join(' ')
+    }
+    const size = top.chars.length ? ` It has about ${count(median(top.chars))} characters, about ${tok(median(top.chars) / STANDING_CHARS)} tokens.` : ''
+    list.push({
+      id: 'standing-text',
+      source: top.source,
+      title: kind === 'plugin' ? `Turn off the plugin "${what}" or trim its skills` : kind === 'hook' ? `Shorten what the ${what} hook adds` : kind === 'later' ? 'Shorten what hooks add to later prompts' : `Shorten ${what}`,
+      saving: top.cost,
+      evidence: `${kind === 'plugin' ? `The skills of the plugin "${what}" are` : kind === 'hook' ? `What the ${what} hook adds is` : kind === 'later' ? 'Text that hooks add to later prompts is' : `${what} (${kind === 'AutoMem' ? 'the automatic memory' : `${kind.toLowerCase()} instructions`}) is`} in ${count(top.sessions.size)} main sessions of Claude Code.${size} Entering and carried on the later calls, it cost ${money(top.cost)}. ${rest.length ? `Next: ${rest.slice(0, 2).map((x) => `${words(x)}, ${money(x.cost)}`).join('; ')}.` : ''}`.trim(),
+      how: kind === 'plugin'
+        ? `Turn the plugin off where it is not needed ("enabledPlugins" in Claude Code's settings, or /plugin), or keep only the skills you use. Its skills are listed at the start of every session, also when none is called.`
+        : kind === 'hook' || kind === 'later'
+          ? 'Make the hook add less text, or only when it is needed. What a hook adds is paid for on every call that follows.'
+          : 'Keep in the file only what most sessions need, in short lines. Move the rest into files that the instructions name, so that the agent reads them only when the work needs them.',
+      risk: 'Rules or skills that are gone can no longer guide the work. The amount assumes about 4 characters per token, so it is an estimate. Compare the work before and after.',
+      apply: false,
     })
   }
 

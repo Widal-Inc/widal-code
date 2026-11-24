@@ -458,3 +458,36 @@ test('tools that no session called: the replay keeps their share of each main se
   assert.deepEqual(all.tools, Object.keys(START_TOOLS))
   assert.match(all.risk, /without "Task" there are no subagents/)
 })
+
+test('standing text: instruction files, plugin skills and hook text by source, with home paths shortened and no text kept', async () => {
+  const { standingOf } = await import('../src/parse-claude.mjs')
+  assert.deepEqual(standingOf({ type: 'instructions', files: [
+    { path: '/home/pat/.claude/CLAUDE.md', type: 'User', content: 'x'.repeat(300) },
+    { path: '/work/shop/CLAUDE.md', type: 'Project', content: '@AGENTS.md' },
+    { path: '/work/shop/AGENTS.md', type: 'Project', content: 'y'.repeat(2000) },
+    { path: '/elsewhere', type: 'Odd', content: 'z' },
+    { path: 7, type: 'User', content: 'z' },
+  ] }, '/home/pat'), [['User ~/.claude/CLAUDE.md', 300], ['Project /work/shop/CLAUDE.md', 10], ['Project /work/shop/AGENTS.md', 2000]])
+  const listing = '- init: Start a project\n- shop:deploy: Deploys the shop\n- shop:check: Checks it\n- other:one: More\n- loop: Repeat'
+  assert.deepEqual(standingOf({ type: 'skill_listing', content: listing }), [['plugin shop', '- shop:deploy: Deploys the shop'.length + 1 + '- shop:check: Checks it'.length + 1], ['plugin other', '- other:one: More'.length + 1]])
+  assert.deepEqual(standingOf({ type: 'hook_additional_context', hookEvent: 'UserPromptSubmit', content: ['abc'] }), [['hook UserPromptSubmit', JSON.stringify(['abc']).length]])
+  assert.deepEqual(standingOf({ type: 'hook_additional_context', hookName: 'odd name;', content: 'a' }), [['hook other', 3]])
+  assert.deepEqual(standingOf({ type: 'file' }), [])
+
+  // A log whose start brings a plugin's skills: the record of the first call keeps the sources.
+  const start = [
+    JSON.stringify({ type: 'attachment', attachment: { type: 'skill_listing', content: `- big:one: ${'w'.repeat(8000)}` } }),
+    ...logLines([{ tools: [['Bash', { command: 'ls' }]] }, {}, {}], { owner: false }),
+  ]
+  const sessions = Array.from({ length: 6 }, (_, i) => parse(start, `/logs/standing-${i}.jsonl`)).flat()
+  assert.deepEqual(sessions[0].st, [['plugin big', `- big:one: ${'w'.repeat(8000)}`.length + 1]])
+  const p = proposals(sessions, { ownFile: () => undefined })
+  const st = p.all.find((x) => x.id === 'standing-text')
+  assert.equal(st.title, 'Turn off the plugin "big" or trim its skills')
+  const starts = analyze(sessions).blocks.filter((b) => b.label.startsWith('(system prompt') && b.tokens > 0)
+  near(st.saving, sum(starts, (b) => (b.entry + b.carry) * Math.min(1, sessions[0].st[0][1] / 4 / b.tokens)))
+  assert.match(st.evidence, /^The skills of the plugin "big" are in 6 main sessions of Claude Code\./)
+  assert.equal(st.apply, false)
+  // In fewer than 5 sessions a source is not proposed.
+  assert.equal(proposals(sessions.filter((r) => !/standing-[45]/.test(r.f)), { ownFile: () => undefined }).all.find((x) => x.id === 'standing-text'), undefined)
+})
