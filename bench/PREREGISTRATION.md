@@ -404,3 +404,24 @@ about the Widal.Code we have now.
   Workflow, ScheduleWakeup, ReportFindings, ListAgents, SendMessage and WebSearch denied, an estimated 9.6% of
   cost) and the shell output cap. The primary measure is the cost ratio against `cur-baseline`, with the
   share solved as a check, as in the main stage.
+
+## Change 5, 25 Nov 2026: a stage "confirm" for the unused tools
+
+The stage "current" found the current Widal.Code 11% cheaper than its baseline (95% interval -22% to +2%),
+cheaper on 75 of 99 tasks. Because the interval still reaches a small increase, Nils asked on 25 Nov 2026 for
+one more stage of the same size before `tools-unused` counts as proven.
+
+- **Tasks.** 100 tasks that passed the oracle, sampled with a new seed (20261125), with the tasks of the pilot
+  and of the stage "current" excluded, so no task of "current" is run again.
+- **Setups, fixed before the stage.** `conf-baseline` is the baseline. `conf-widal-on` is a copy of
+  `cur-widal-on` with no new run of `widal advise`: the same seven tools denied, the same shell output cap,
+  the same Widal.Code (b043880). Claude Sonnet 5.5, two runs each, budget $4 per session, cap $100 for the
+  stage (Nils allowed a little more if needed).
+- **Runner.** The second runner, with the baseline and Widal.Code setups of one run number at the same time,
+  as in the rerun of "current" (two setups at once instead of four, which caused start timeouts).
+- **Primary measure.** The cost ratio of `conf-widal-on` against `conf-baseline` in this stage alone. The
+  saving counts as proven when the upper end of its 95% interval is below 1.
+- **Check.** The share solved may fall by at most 3 points, as in question 2; if the interval is wider, the
+  report states the margin the tasks reached.
+- **Secondary.** The two stages together ("current" and "confirm", about 200 tasks), reported, not used for
+  the decision.
