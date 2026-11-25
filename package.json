@@ -1,6 +1,6 @@
 {
   "name": "@widal/widal-code",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "private": true,
   "description": "Shows what your AI coding agents spend, and helps to spend less.",
   "license": "MIT",

@@ -53,7 +53,7 @@ const result = (r) => [r.status, r.stdout, r.stderr]
 test('package.json names the package, its version and its command, and the tool has no dependencies', () => {
   const pkg = json('package.json')
   assert.equal(pkg.name, '@widal/widal-code')
-  assert.equal(pkg.version, '0.3.1')
+  assert.equal(pkg.version, '0.3.2')
   assert.equal(pkg.private, true)
   assert.equal(pkg.type, 'module')
   // The command, and for one release the command under the name before.

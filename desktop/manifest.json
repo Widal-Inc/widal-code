@@ -2,7 +2,7 @@
   "manifest_version": "0.3",
   "name": "widal-code",
   "display_name": "Widal.Code",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Shows what your AI agents spend (Claude Code, Codex and Cowork on this computer), and how to use less of your plan.",
   "long_description": "Widal.Code reads the logs that Claude Code, Codex and Cowork keep on this computer, and answers questions about them in a chat: what your agents spent this week, by project and model, how much of your plan's limits is used, and where you can save.\n\nAsk for example: \"What did my agents spend this week, and where can I save?\"\n\nDollar figures are list prices per token. When you pay by the token they are spend. On a subscription they are API value: what the same use would cost by the token, next to your plan's price. There the plan's percent is what counts.\n\nWidal.Code cannot see chat on claude.ai, in the Claude app or on the phone, sessions in the cloud, or other computers.\n\nIt also lists the open findings of Widal.Code's security checks, with where each one is, the controls it touches and its fix. Widal.Code flags risks and certifies nothing.\n\nPrivacy: reads local agent logs, returns numbers only, sends nothing anywhere. It never returns the text of a session, and it never changes a setting.",
   "author": {

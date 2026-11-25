@@ -6,7 +6,7 @@ Widal.Code shows what the AI coding agents on your machine spend, and what the s
 
 The project is called Widal.Code. Its command is `widal`, and its folder on your machine is `~/.widal`. It was called Kestrel until 17 Nov 2026: see "Coming from Kestrel".
 
-Status: version 0.3.1, started on 2026-11-12. So far it has run on macOS only. No dependencies, Node 22 or newer. Made by Widal, Inc. Free and open source under the MIT licence (see "Licence").
+Status: version 0.3.2, started on 2026-11-12. So far it has run on macOS only. No dependencies, Node 22 or newer. Made by Widal, Inc. Free and open source under the MIT licence (see "Licence").
 
 ## What it looks like
 
