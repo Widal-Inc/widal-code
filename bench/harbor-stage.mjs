@@ -3,18 +3,26 @@
 //
 //   node bench/harbor-stage.mjs --config <stage.json> [--plan]
 //
-// The tasks are shuffled with a fixed seed and cut into blocks. Every setup runs every task of a block,
-// side by side, before the next block starts, so a stop at any point leaves complete pairs. After each
-// block the runner reads Harbor's results into records (bench/harbor.mjs), adds up the spend per
-// provider and per stage from the cost that Claude Code reports, writes status.md, and stops when:
+// The tasks are shuffled with a fixed seed and cut into blocks. Every setup runs every task of a block
+// before the next block starts, so a stop at any point leaves complete pairs. Inside a block the run
+// numbers go one after another: the setups of run 1 run at the same time, then the setups of run 2, and
+// so on. A setup is compared with the reference setup of the same run number, so the two still run at
+// the same time under the same load. Starting every setup of a block at once (four setups in the runs
+// of Nov 2026) put too many trials on the runner, and trials ran out of time while they started.
 //
+// Before the first block the runner waits until Docker answers `docker info`. After each block it reads
+// Harbor's results into records (bench/harbor.mjs), adds up the spend per provider and per stage from
+// the cost that Claude Code reports, writes status.md, and stops when:
+//
+// - a trial of the block ended because the model account reached its usage limit;
 // - the stage reached `stopAt` (90%) of its cap, or a provider reached it of its cap;
 // - more than `maxHarnessErrors` (10%) of a block's trials ended on an error of the harness;
 // - a setup solved `safetyGap` (20 points) fewer tasks than the reference setup after two blocks.
 //
 // status.md shows the spend and the health of the run, never the comparison between the setups, so
 // that nobody reads the result before the stage ends. A stage that is run again skips every task a
-// setup already finished. --plan prints the blocks and the commands and runs nothing.
+// setup already finished. --plan prints the blocks, the order of the run numbers and the commands, and
+// runs nothing.
 //
 // The stage file:
 //   name          the stage, for example "pilot"
@@ -36,13 +44,19 @@
 //   blockSize     tasks per block (default 25)
 //   seed          the seed of the shuffle
 //   concurrency   trials at a time per setup (default 2)
+//   runNumbersTogether   true: every setup of a block starts at the same time, whatever its run number,
+//                 as the runner did until 25 Nov 2026 (default false: the run numbers one after another)
 //   taskSetsTogether   true: within a setup, the task sets of a block (one Harbor command each) run at the
 //                 same time instead of one after the other, each with at most `concurrency` trials at a time
 //                 and at most half its tasks at once, so that a block waits for its slowest task once and not
 //                 once per task set (default false)
-//   setupTimeoutMultiplier   Harbor's --agent-setup-timeout-multiplier (default 2): installing Claude Code
-//                 in many containers at once can take longer than Harbor's 360 seconds, and the setup
-//                 ends before the agent starts, so a longer limit changes no measure
+//   setupTimeoutMultiplier   Harbor's --agent-setup-timeout-multiplier (default 5, which is 30 minutes):
+//                 installing Claude Code in many containers at once can take longer than Harbor's 360
+//                 seconds, and the setup ends before the agent starts, so a longer limit changes no measure
+//   dockerWait    the seconds to wait for Docker to answer `docker info` before the first block (default
+//                 300; 0 does not check, for a stage that does not run its tasks in Docker)
+//   downloadRetries   how often a Harbor command starts again when the download of its tasks failed
+//                 (default 2)
 //   cap           the most the stage may spend, in dollars
 //   providerCaps  the most each provider may spend over all stages, for example {"api": 1500, "bedrock": 1500}
 //   stopAt, maxHarnessErrors, safetyGap   the stop rules (defaults 0.9, 0.1, 0.2)
@@ -50,11 +64,12 @@ import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { importJobs, readRecords, taskFile } from './harbor.mjs'
+import { importJobs, readRecords, taskFile, trialsOf, USAGE_LIMIT_ERROR } from './harbor.mjs'
 import { seeded } from './stats.mjs'
 
 const HERE = fileURLToPath(new URL('.', import.meta.url))
 const ROOT = join(HERE, '..')
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 /** The tasks in an order fixed by the seed. */
 export function shuffled(list, seed) {
@@ -76,7 +91,7 @@ export const blocksOf = (tasks, size, seed) => {
 
 /** The defaults of a stage file, filled in and checked. */
 export function stageOf(config) {
-  const c = { blockSize: 25, concurrency: 2, setupTimeoutMultiplier: 2, stopAt: 0.9, maxHarnessErrors: 0.1, safetyGap: 0.2, env: {}, ...config }
+  const c = { blockSize: 25, concurrency: 2, setupTimeoutMultiplier: 5, dockerWait: 300, downloadRetries: 2, stopAt: 0.9, maxHarnessErrors: 0.1, safetyGap: 0.2, env: {}, ...config }
   for (const key of ['name', 'out', 'jobs', 'setupsFile', 'claudeCode']) if (typeof c[key] !== 'string' || !c[key]) throw new Error(`The stage needs "${key}".`)
   if (!(c.cap > 0)) throw new Error('The stage needs a "cap" in dollars.')
   if (!Array.isArray(c.setups) || !c.setups.length) throw new Error('The stage needs "setups".')
@@ -129,6 +144,9 @@ function healthOf(records, stage) {
  * @param {{blocksDone: number, lastBlock?: object[]}} progress The blocks done, and the records of the last one.
  */
 export function stopRule(records, stage, { blocksDone, lastBlock = [] }) {
+  // The usage limit comes first: every later session would end on the same error, whatever the caps say.
+  const limited = lastBlock.filter((r) => r.harnessError === USAGE_LIMIT_ERROR).length
+  if (limited) return { stop: true, why: `the model account reached its usage limit: ${limited} of ${lastBlock.length} trials of the last block ended on that error and count in no number` }
   const ledger = ledgerOf(records)
   const spent = ledger.stages[stage.name] ?? 0
   if (spent >= stage.stopAt * stage.cap) return { stop: true, why: `the stage spent $${spent.toFixed(2)}, ${Math.round((100 * spent) / stage.cap)}% of its cap of $${stage.cap}` }
@@ -200,6 +218,17 @@ export function agentOf(stage, setup) {
   return ['-a', setup.agent]
 }
 
+/**
+ * The setups of a block in the groups that run one after another. Each run number is a group, in rising
+ * order, and the setups of a group run at the same time. With `runNumbersTogether` all setups are one
+ * group, with no run number.
+ */
+export function groupsOf(stage) {
+  if (stage.runNumbersTogether) return [{ rep: null, setups: stage.setups }]
+  const reps = [...new Set(stage.setups.map((s) => s.rep))].sort((a, b) => a - b)
+  return reps.map((rep) => ({ rep, setups: stage.setups.filter((s) => s.rep === rep) }))
+}
+
 /** The Harbor commands of one setup for one block: one per task set. */
 export function commandsOf(stage, setup, block, n) {
   const byDataset = new Map()
@@ -259,44 +288,138 @@ export function mask(text) {
   return out
 }
 
-function runCommand({ program, args }, log) {
+/**
+ * Runs a program and gives its exit code and its output. A program that cannot start ends with code 127,
+ * and one that is ended at the time limit of `options.timeout` has no exit code.
+ */
+function runProgram(program, args, options = {}) {
   return new Promise((resolve) => {
-    // bench/harbor/bin comes first in PATH: its "docker" locks the build of a task's image across the
-    // Harbor processes of the setups, which Harbor itself does only inside one process.
-    const PATH = `${join(ROOT, 'bench', 'harbor', 'bin')}:${process.env.PATH ?? ''}`
-    const child = spawn(program, args, { cwd: ROOT, env: { ...process.env, PATH, PYTHONPATH: ROOT, HARBOR_TELEMETRY: 'off' }, stdio: ['ignore', 'pipe', 'pipe'] })
+    const child = spawn(program, args, { stdio: ['ignore', 'pipe', 'pipe'], ...options })
     const out = []
     child.stdout.on('data', (d) => out.push(d))
     child.stderr.on('data', (d) => out.push(d))
-    child.on('close', (code) => {
-      // A key never reaches the log: Harbor does not print it, and this masks it all the same.
-      writeFileSync(log, mask(Buffer.concat(out).toString('utf8')))
-      resolve(code)
-    })
+    child.on('error', (error) => resolve({ code: 127, output: error.message }))
+    child.on('close', (code) => resolve({ code, output: Buffer.concat(out).toString('utf8') }))
   })
 }
 
-async function main() {
-  const f = {}
-  const argv = process.argv.slice(2)
-  for (let i = 0; i < argv.length; i++) if (argv[i].startsWith('--')) f[argv[i].slice(2)] = argv[i + 1] && !argv[i + 1].startsWith('--') ? argv[++i] : true
-  if (typeof f.config !== 'string') {
-    console.error('usage: node bench/harbor-stage.mjs --config <stage.json> [--plan]')
-    process.exit(1)
+/** Starts one Harbor command of a stage and gives its exit code and its output. */
+function runHarbor({ program, args }) {
+  // bench/harbor/bin comes first in PATH: its "docker" locks the build of a task's image across the
+  // Harbor processes of the setups, which Harbor itself does only inside one process.
+  const PATH = `${join(ROOT, 'bench', 'harbor', 'bin')}:${process.env.PATH ?? ''}`
+  return runProgram(program, args, { cwd: ROOT, env: { ...process.env, PATH, PYTHONPATH: ROOT, HARBOR_TELEMETRY: 'off' } })
+}
+
+/** Docker did not answer in time. The stage command prints the message of this error alone. */
+export class DockerNotReady extends Error {}
+
+/**
+ * Waits until Docker answers `docker info`. On a machine that has just started, Docker can come up after
+ * the stage, and a block that starts before it loses every trial.
+ * @param {{run?: Function, wait?: Function, now?: Function, seconds?: number, every?: number}} [options]
+ *   `run` starts a program and gives {code, output}, `wait` sleeps and `now` is the clock, so that a test
+ *   can pass made-up ones in. `seconds` is the time limit, and `every` the seconds between two tries.
+ */
+export async function dockerReady({ run = runProgram, wait = sleep, now = Date.now, seconds = 300, every = 5 } = {}) {
+  const end = now() + seconds * 1000
+  for (;;) {
+    // Each try has its own limit of 30 seconds, so a Docker that hangs does not hold the stage.
+    const r = await run('docker', ['info'], { timeout: 30_000 })
+    if (r.code === 0) return
+    if (now() >= end) {
+      const last = String(r.output ?? '').trim().split('\n').pop()
+      throw new DockerNotReady(`Docker did not answer "docker info" within ${seconds} seconds${last ? ` (${last})` : ''}. Start Docker and run the stage again. A stage that does not run its tasks in Docker sets "dockerWait" to 0.`)
+    }
+    await wait(every * 1000)
   }
-  const stage = stageOf(JSON.parse(readFileSync(f.config, 'utf8')))
-  const blocks = blocksOf(stage.tasks, stage.blockSize, stage.seed)
-  mkdirSync(stage.out, { recursive: true })
-  if (f.plan) {
-    blocks.forEach((block, n) => {
-      console.log(`block ${n + 1}: ${block.length} tasks`)
-      for (const setup of stage.setups) {
-        const commands = commandsOf(stage, setup, block, n + 1)
-        for (const c of stage.taskSetsTogether ? togetherOf(commands, stage.concurrency) : commands) console.log(`  ${setup.id}: ${c.tasks.length} tasks of ${c.args[c.args.indexOf('-d') + 1]}, ${c.args[c.args.indexOf('-n') + 1]} at a time`)
-      }
-    })
+}
+
+/** How Harbor's output shows that a download of the tasks did not reach its server. */
+export const DOWNLOAD_FAILED = /ApiConnectionError/
+
+/**
+ * Runs one Harbor command, and again when the download of its tasks failed. The command is started again
+ * only when it ended with an error, its output shows the failed download, and it made no trial of its
+ * tasks, so that no session runs twice.
+ * @param {{program: string, args: string[], folder: string, tasks: string[]}} command
+ * @param {{run: Function, trials: Function, wait?: Function, retries?: number, pause?: number}} options
+ *   `run` starts the command and gives {code, output}, and `trials` counts the trials the command has made
+ *   so far. `retries` is how often it starts again, and `pause` the seconds before each new start.
+ * @returns {Promise<{code: number, output: string, attempts: number}>} The last exit code, the output of
+ *   every attempt, and the number of attempts.
+ */
+export async function runWithRetry(command, { run, trials, wait = sleep, retries = 2, pause = 30 }) {
+  let output = ''
+  for (let attempt = 1; ; attempt++) {
+    const before = trials(command)
+    const r = await run(command)
+    output += r.output
+    const again = attempt <= retries && r.code !== 0 && DOWNLOAD_FAILED.test(r.output) && trials(command) === before
+    if (!again) return { code: r.code, output, attempts: attempt }
+    output += `\n[harbor-stage] The download of the tasks failed (attempt ${attempt} of ${retries + 1}). The command starts again in ${pause} seconds.\n`
+    await wait(pause * 1000)
+  }
+}
+
+/** Runs one setup on one block: its Harbor commands, then the import of their trials. */
+async function runSetup(stage, setup, block, n, { run, wait }) {
+  const into = { arm: setup.arm, rep: setup.rep, setup: setup.agent && setup.agent !== 'codex' ? null : setup.id, extra: { stage: stage.name, provider: setup.provider, setup: setup.id } }
+  const start = async (c, log) => {
+    mkdirSync(c.folder, { recursive: true })
+    const r = await runWithRetry(c, { run, wait, trials: (x) => trialsOf(x.folder, x.tasks), retries: stage.downloadRetries })
+    // A key never reaches the log: Harbor does not print it, and this masks it all the same.
+    writeFileSync(log, mask(r.output))
+  }
+  if (!stage.taskSetsTogether) {
+    for (const c of commandsOf(stage, setup, block, n)) {
+      await start(c, join(c.folder, 'harbor.log'))
+      importJobs(c.folder, stage.out, into)
+    }
     return
   }
+  const commands = togetherOf(commandsOf(stage, setup, block, n), stage.concurrency)
+  if (!commands.length) return
+  await Promise.all(
+    commands.map(async (c) => {
+      await wait(c.delay)
+      await start(c, c.log)
+    }),
+  )
+  // Read once all task sets of the setup have ended, so that no trial that still runs is read.
+  importJobs(commands[0].folder, stage.out, into)
+}
+
+/** What --plan prints: each block, its groups of setups in the order they run, and each Harbor command. */
+export function planOf(stage) {
+  const lines = []
+  blocksOf(stage.tasks, stage.blockSize, stage.seed).forEach((block, n) => {
+    lines.push(`block ${n + 1}: ${block.length} tasks`)
+    groupsOf(stage).forEach((group, i) => {
+      const setups = `${group.setups.length} ${group.setups.length === 1 ? 'setup' : 'setups at the same time'}`
+      lines.push(`  ${i ? 'then ' : ''}${group.rep === null ? 'all run numbers' : `run ${group.rep}`}, ${setups}:`)
+      for (const setup of group.setups) {
+        const commands = commandsOf(stage, setup, block, n + 1)
+        for (const c of stage.taskSetsTogether ? togetherOf(commands, stage.concurrency) : commands) lines.push(`    ${setup.id}: ${c.tasks.length} tasks of ${c.args[c.args.indexOf('-d') + 1]}, ${c.args[c.args.indexOf('-n') + 1]} at a time`)
+      }
+    })
+  })
+  return lines
+}
+
+/**
+ * Runs the blocks of a stage until they are done or a stop rule holds, and writes the status file and the
+ * ledger after each block.
+ * @param {object} stage The stage, from stageOf.
+ * @param {{run?: Function, program?: Function, wait?: Function, now?: Function}} [options] `run` starts one
+ *   Harbor command and gives {code, output}, `program` starts `docker info`, `wait` sleeps and `now` is the
+ *   clock. A test passes made-up ones in, so that nothing here needs Harbor or Docker.
+ * @returns {Promise<{blocks: number, blocksDone: number, stopped: string | null}>}
+ */
+export async function runStage(stage, { run = runHarbor, program = runProgram, wait = sleep, now = Date.now } = {}) {
+  const blocks = blocksOf(stage.tasks, stage.blockSize, stage.seed)
+  mkdirSync(stage.out, { recursive: true })
+  if (stage.dockerWait) await dockerReady({ run: program, wait, now, seconds: stage.dockerWait })
   let stopped = null
   let blocksDone = 0
   for (const [n, block] of blocks.entries()) {
@@ -305,31 +428,9 @@ async function main() {
       stopped = rule.why
       break
     }
-    // Every setup runs the block at the same time, each with its own trials at a time.
-    await Promise.all(
-      stage.setups.map(async (setup) => {
-        const into = () => ({ arm: setup.arm, rep: setup.rep, setup: setup.agent && setup.agent !== 'codex' ? null : setup.id, extra: { stage: stage.name, provider: setup.provider, setup: setup.id } })
-        if (!stage.taskSetsTogether) {
-          for (const c of commandsOf(stage, setup, block, n + 1)) {
-            mkdirSync(c.folder, { recursive: true })
-            await runCommand(c, join(c.folder, 'harbor.log'))
-            importJobs(c.folder, stage.out, into())
-          }
-          return
-        }
-        const commands = togetherOf(commandsOf(stage, setup, block, n + 1), stage.concurrency)
-        if (!commands.length) return
-        await Promise.all(
-          commands.map(async (c) => {
-            await new Promise((resolve) => setTimeout(resolve, c.delay))
-            mkdirSync(c.folder, { recursive: true })
-            await runCommand(c, c.log)
-          }),
-        )
-        // Read once all task sets of the setup have ended, so that no trial that still runs is read.
-        importJobs(commands[0].folder, stage.out, into())
-      }),
-    )
+    // The groups run one after another. The setups of a group run the block at the same time, each with
+    // its own trials at a time.
+    for (const group of groupsOf(stage)) await Promise.all(group.setups.map((setup) => runSetup(stage, setup, block, n + 1, { run, wait })))
     blocksDone = n + 1
     const records = readRecords(stage.out)
     const names = new Set(block.map((t) => t.task))
@@ -345,7 +446,29 @@ async function main() {
   const records = readRecords(stage.out)
   writeFileSync(join(stage.out, `status-${stage.name}.md`), statusOf(records, stage, { blocksDone, blocks: blocks.length, stopped }))
   writeFileSync(join(stage.out, 'ledger.json'), `${JSON.stringify(ledgerOf(records), null, 2)}\n`)
-  console.log(stopped ? `Stopped after ${blocksDone} of ${blocks.length} blocks: ${stopped}.` : `Done: ${blocks.length} blocks.`)
+  return { blocks: blocks.length, blocksDone, stopped }
+}
+
+async function main() {
+  const f = {}
+  const argv = process.argv.slice(2)
+  for (let i = 0; i < argv.length; i++) if (argv[i].startsWith('--')) f[argv[i].slice(2)] = argv[i + 1] && !argv[i + 1].startsWith('--') ? argv[++i] : true
+  if (typeof f.config !== 'string') {
+    console.error('usage: node bench/harbor-stage.mjs --config <stage.json> [--plan]')
+    process.exit(1)
+  }
+  const stage = stageOf(JSON.parse(readFileSync(f.config, 'utf8')))
+  if (f.plan) {
+    console.log(planOf(stage).join('\n'))
+    return
+  }
+  const { blocks, blocksDone, stopped } = await runStage(stage).catch((error) => {
+    // Docker that is not up is the state of the machine, so the message is printed without a stack.
+    if (!(error instanceof DockerNotReady)) throw error
+    console.error(error.message)
+    process.exit(1)
+  })
+  console.log(stopped ? `Stopped after ${blocksDone} of ${blocks} blocks: ${stopped}.` : `Done: ${blocks} blocks.`)
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) await main()
