@@ -468,3 +468,95 @@ Harbor. No stage has run with them yet.
   models (`--compare-models`). The reference is the setup named with `--reference`, or else the first one called
   "baseline" or with an id that ends in "-baseline". The stage "opus-fast" had one setup and no baseline of its
   own. The stage files that exist are not changed.
+
+## Change 6, 25 Nov 2026: a stage "lean" for the skill tool, on two models
+
+The stage "confirm" found the setup with the seven unused tools left out 11% cheaper than its baseline on
+Claude Sonnet 5.5 (95% interval -20% to -1%, cheaper on 78 of 100 tasks), with the same share solved (0.0
+points, -7.0 to +7.0). By the rule of change 5 `tools-unused` counts as proven on Sonnet 5.5, and Widal.Code
+0.3.2 applies it by default. Two questions are open, and Nils asked on 25 Nov 2026 for a cheap test of them
+and for a report that holds up before anything is published:
+
+1. Claude Code's skill tool is part of every request, and no session of this benchmark has called it. Does
+   leaving it out as well keep the result, and does the whole setup cost less than Claude Code's default?
+2. Does that hold on Claude Haiku 5.5, where no stage has run these setups?
+
+**What was seen before this change was written.** A test on 20 tasks ("lean-pilot", about $11, not
+registered) ran six setups once on Sonnet 5.5 and Haiku 5.5: the default, eight tools left out (the seven and
+the skill tool), and eight tools left out with another effort level. It was run to see that the setups work.
+When this change was written, at 16:25 UTC on 25 Nov 2026, the last 11 of its sessions were still running, and
+116 sessions had been read. In those 116 the eight tools were gone from every session that left them out, and
+no session of any setup called one of the eight tools. In the 59 sessions of the first 10 tasks, the first
+request of a session was about 13,000 tokens smaller with the tools left out (median 33,314 against 20,529 on
+Sonnet 5.5, 34,437 against 21,352 on Haiku 5.5). The cost sums per setup were seen as well, for the first 10
+tasks in full and for the second 10 in part. With 20 tasks they decide nothing: the test counts in no result
+of this stage, its numbers are reported as a test, and its 20 tasks are left out of this stage. The noise of
+the stages "confirm" and "haiku" was also looked at, to size this stage.
+
+- **Setups, fixed before the stage.** Settings only, with no plugin, no hook and no shell output cap, so the
+  stage measures the tools alone. (The stage "confirm" ran the seven tools together with Widal.Code's plugin
+  and its shell output cap.)
+  - `base`: Claude Code's default settings, as the baseline of every stage.
+  - `tools7`: Task, Workflow, ScheduleWakeup, ReportFindings, ListAgents, SendMessage and WebSearch denied
+    in the settings (`permissions.deny`), which is what Widal.Code 0.3.2 applies by default.
+  - `skill`: the same seven and Skill denied.
+
+  Sonnet 5.5 runs `base` and `skill` (`lean-s-base`, `lean-s-skill`). Haiku 5.5 runs all three
+  (`lean-h-base`, `lean-h-tools7`, `lean-h-skill`). Claude Code 2.1.330, one run per setup, and the session
+  budgets of the earlier stages ($4 on Sonnet 5.5, $2 on Haiku 5.5).
+- **Tasks.** Of the 269 tasks that passed the oracle and were not in the test, 150 are drawn with the seed
+  20261127, each task set with its share (56, 41, 29 and 24). Haiku 5.5 runs the 150. Sonnet 5.5 runs 65 of
+  those 150, drawn the same way (24, 18, 13 and 10). Most of these tasks ran in earlier stages. That gives no
+  setup an advantage here, because no setup is made from sessions: the two lists of tools were fixed before
+  the stage, and every setup of a model runs the same tasks. The setups and both lists of tasks, as written
+  on the runner before the stage started, are in `bench/harbor/v1-lean/stage.json`.
+- **Order and runner.** The second runner. The tasks are shuffled with the stage's seed and run in blocks of
+  25. The setups of a model run each block side by side, as in "confirm", and the two models run at the same
+  time (`lean-sonnet` and `lean-haiku`, each with its own records and its own cap). The last sessions of the
+  test were still running on that runner when the stage started, which loads every setup alike. The stage
+  runs with the code the stage "confirm" ran with (the runner's checkout at 9f58453 with its local changes, and
+  the copy of the block loop), not with the harness changes of the correction of 25 Nov 2026, which have not
+  run in a real container yet.
+- **Size, and what it can show.** The API account has a monthly usage limit, and by our own records about $65
+  to $75 of it is left, so the stage is sized to about $36 (caps: $24 for Sonnet 5.5, $20 for Haiku 5.5).
+  From the earlier stages (the standard deviation of a task's log cost ratio between two setups, each run
+  once, was 0.33 on Sonnet 5.5 and 0.48 on Haiku 5.5), the 95% intervals are expected to be about 7 points
+  wide to each side for the cost of a typical task and about 11 to 14 points for the ratio of the totals, on
+  each model. The share solved will be known to about 10 points on Sonnet 5.5 and 8 points on Haiku 5.5.
+- **Primary measure, per model.** The cost ratio of `skill` against `base`, as the ratio of the totals, like
+  in every stage before. The saving counts as proven on a model when the upper end of its 95% interval is
+  below 1. A statement about both models needs both intervals below 1, so two tests need no correction.
+- **Named secondary measure.** The cost of a typical task: the geometric mean of the per-task cost ratios
+  with its 95% interval (`typicalRatio` in `bench/stats.mjs`). The ratio of the totals moves with a few long
+  sessions (in "confirm" 10 of 100 tasks held 29% of the baseline's cost, in "haiku" 10 tasks held 36%), and
+  the typical task does not. The report gives both and says which is which. A saving that only the typical
+  task shows is reported as "a typical task costs less", never as a lower bill.
+- **Check.** The difference in the share solved, `skill` minus `base`, per model and for both models
+  together. This stage is too small for the margin of 3 points, so the report states the margin the tasks
+  reached, as change 1 says. The safety rule of 20 points stands.
+- **Secondary, reported, not used for the decision.**
+  - On Haiku 5.5: `tools7` against `base`, and `skill` against `tools7`. From the token counts the skill
+    tool is about half the size of the seven tools together, so it is expected to be worth about 5% of cost,
+    which is less than this stage can tell from chance. An interval that includes no change is reported as
+    "not shown", not as "no saving".
+  - What explains a saving: the prompt tokens of the first request of each session, the requests per session
+    and the output tokens, per setup.
+  - The calls of a tool that was left out, per setup, and how often `base` called one of the eight tools.
+  - Haiku 5.5 against Sonnet 5.5 in the setup `base`, on the 65 tasks both ran.
+  - The results per task set.
+- **What the stage cannot show.** No task of this benchmark has a skill, so the stage cannot measure what a
+  person loses when the model can no longer pick a skill by itself. A check on 25 Nov 2026 (Claude Code
+  2.1.331, Haiku 5.5, one project skill) found that a skill the person types still runs with the skill tool
+  denied, and that a skill the model would have to pick itself does not: the model no longer knows that it
+  exists. The sessions are short (in "confirm" the median was 43 seconds), and the API organization of this
+  benchmark needs Claude Code's experimental betas turned off, which makes the start of a session larger than
+  on a person's own sign-in. Both change the saving in percent that a person would see.
+- **Decision rule, set before the stage.** Widal.Code adds the skill tool to the tools it proposes to leave
+  out only when all of these hold: the primary measure holds on both models; on neither model is the share
+  solved by `skill` lower than by `base` with an interval that excludes no change; on Haiku 5.5 `skill` does
+  not cost more than `tools7` in the ratio of the totals; and no session of `base` called the skill tool.
+  Otherwise the default stays as it is in 0.3.2. Nothing is published and no default changes before Nils has
+  read the report.
+- **The usage limit.** A session that ends on the account's usage limit ("You have reached your specified API
+  usage limits") is not a result. A guard on the runner stops both models at the first such session, and the
+  tasks of the blocks that were running then are left out in every setup.
