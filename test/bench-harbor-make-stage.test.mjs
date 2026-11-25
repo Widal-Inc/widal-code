@@ -1,10 +1,13 @@
-// The stage files of version 1 (bench/harbor-make-stage.mjs): which tasks a stage gets, and its setups.
+// The stage files of version 1 (bench/harbor-make-stage.mjs): which tasks a stage gets, its setups, and
+// the stages it refuses to write.
 import assert from 'node:assert/strict'
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
-import { addCopies, pickTasks, setupOf } from '../bench/harbor-make-stage.mjs'
+import { fileURLToPath } from 'node:url'
+import { addCopies, checkStage, pickTasks, referenceOf, setupOf } from '../bench/harbor-make-stage.mjs'
 
 const list = (n, dataset = 'd') => ({ tasks: Array.from({ length: n }, (_, i) => ({ dataset, task: `${dataset}/t${i}` })) })
 
@@ -63,4 +66,82 @@ test('a copy can run in fast mode, and a copy for Codex keeps only what Codex re
   const codex = doc.find((s) => s.id === 'openai-sol')
   assert.deepEqual(codex.rootInstall, block)
   for (const key of ['settings', 'budget', 'fastMode']) assert.ok(!(key in codex), key)
+})
+
+// The stages that are refused. A stage is compared with its own baseline, the reference setup.
+
+const SONNET = 'anthropic/claude-sonnet-5-5'
+const OPUS = 'anthropic/claude-opus-5-5'
+const setupsOf = (ids, model = SONNET) => ids.map((id) => setupOf(id, { model, provider: 'api' }))
+
+test('the reference is the setup named, or else the stage\'s baseline by its id', () => {
+  assert.equal(referenceOf(setupsOf(['baseline', 'baseline-2', 'tool', 'tool-2'])), 'baseline')
+  assert.equal(referenceOf(setupsOf(['tool', 'opus-baseline=baseline', 'opus-baseline-2=baseline'])), 'opus-baseline', 'not the first setup, and not run 2')
+  assert.equal(referenceOf(setupsOf(['opus-fast=baseline'])), null, 'a copy of the baseline under another id is not the baseline')
+  assert.equal(referenceOf(setupsOf(['baselines', 'tool'])), null)
+  assert.equal(referenceOf(setupsOf(['opus-fast=baseline']), 'opus-fast'), 'opus-fast', 'the one named wins')
+})
+
+test('a stage is refused when its reference setup is not among its setups', () => {
+  const setups = setupsOf(['opus-fast=baseline'])
+  assert.throws(() => checkStage({ name: 'opus-fast', reference: referenceOf(setups), setups }), /^Error: The stage "opus-fast" has no baseline among its setups \(opus-fast\): .* Add the missing setup "baseline" to --setups, or name the baseline of this stage with --reference\.$/)
+  // A reference that is named and not there is named in the error.
+  const two = setupsOf(['tool', 'tool-2'])
+  assert.throws(() => checkStage({ name: 'main', reference: 'opus-baseline', setups: two }), /The stage "main" has no setup "opus-baseline" \(its setups: tool, tool-2\)\. .* Add the missing setup "opus-baseline" to --setups/)
+  // The same setups pass once the person says that this setup is the stage's own reference.
+  checkStage({ name: 'opus-fast', reference: 'opus-fast', setups })
+})
+
+test('a stage is refused when its reference has fewer runs than another setup, and the missing run is named', () => {
+  const setups = setupsOf(['baseline', 'tool', 'tool-2'])
+  assert.throws(() => checkStage({ name: 'main', reference: 'baseline', setups }), /The stage "main" has no setup "baseline-2": the reference "baseline" has fewer runs than "tool"\. .* Add "baseline-2" to --setups\./)
+  const three = setupsOf(['opus-baseline=baseline', 'a', 'a-2', 'a-3', 'b', 'b-2'])
+  assert.throws(() => checkStage({ name: 'main', reference: 'opus-baseline', setups: three }), /has no setup "opus-baseline-2", "opus-baseline-3": the reference "opus-baseline" has fewer runs than "a", "b"\./)
+  // Run 2 without run 1 is a missing run as well.
+  assert.throws(() => checkStage({ name: 'main', reference: 'baseline-2', setups: setupsOf(['baseline-2', 'tool', 'tool-2']) }), /has no setup "baseline":/)
+  // As many runs, or more runs of the reference, are fine.
+  checkStage({ name: 'main', reference: 'baseline', setups: setupsOf(['baseline', 'baseline-2', 'tool', 'tool-2']) })
+  checkStage({ name: 'main', reference: 'baseline', setups: setupsOf(['baseline', 'baseline-2', 'tool']) })
+  checkStage({ name: 'noise', reference: 'baseline', setups: setupsOf(['baseline', 'baseline-2']) })
+})
+
+test('a stage is refused when a setup runs another model than the reference, unless it compares models', () => {
+  const setups = [...setupsOf(['baseline', 'tool']), ...setupsOf(['tool-on-opus'], OPUS)]
+  const stage = { name: 'main', reference: 'baseline', setups }
+  assert.throws(() => checkStage(stage), /The stage "main" has setups that run another model than the reference "baseline" \(anthropic\/claude-sonnet-5-5\): "tool-on-opus" \(anthropic\/claude-opus-5-5\)\. .* Pass --compare-models if the stage is meant to compare models\./)
+  checkStage(stage, { compareModels: true })
+  // The other refusals hold for a stage that compares models too.
+  assert.throws(() => checkStage({ ...stage, reference: 'opus-baseline' }, { compareModels: true }), /has no setup "opus-baseline"/)
+})
+
+test('the command writes no stage file and no copy of a setup for a stage it refuses', () => {
+  const folder = mkdtempSync(join(tmpdir(), 'widal-make-stage-'))
+  const tasks = join(folder, 'tasks.json')
+  const setupsFile = join(folder, 'setups.json')
+  const out = join(folder, 'stage.json')
+  writeFileSync(tasks, JSON.stringify(list(4)))
+  writeFileSync(setupsFile, JSON.stringify({ setups: [{ id: 'baseline', name: 'B', budget: 4 }] }))
+  const before = readFileSync(setupsFile, 'utf8')
+  const make = (...more) =>
+    spawnSync(process.execPath, [fileURLToPath(new URL('../bench/harbor-make-stage.mjs', import.meta.url)), '--name', 'opus-fast', '--tasks', tasks, '--model', OPUS, '--provider', 'api', '--cap', '50', '--out', out, '--setups-file', setupsFile, '--base', folder, ...more], { encoding: 'utf8' })
+
+  const noBaseline = make('--setups', 'opus-fast=baseline', '--fast')
+  assert.notEqual(noBaseline.status, 0)
+  assert.match(noBaseline.stderr, /The stage "opus-fast" has no baseline among its setups \(opus-fast\)/)
+  const fewerRuns = make('--setups', 'opus-baseline=baseline,opus-fast=baseline,opus-fast-2=baseline')
+  assert.notEqual(fewerRuns.status, 0)
+  assert.match(fewerRuns.stderr, /has no setup "opus-baseline-2"/)
+  assert.ok(!existsSync(out), 'no stage file')
+  assert.equal(readFileSync(setupsFile, 'utf8'), before, 'no copy of a setup')
+
+  // With its own baseline the stage is written, and the baseline is its reference wherever it stands.
+  const fine = make('--setups', 'opus-fast=baseline,opus-baseline=baseline')
+  assert.equal(fine.status, 0, fine.stderr)
+  const stage = JSON.parse(readFileSync(out, 'utf8'))
+  assert.equal(stage.reference, 'opus-baseline')
+  assert.deepEqual(stage.setups.map((x) => x.id), ['opus-fast', 'opus-baseline'])
+  // A person can say that a setup is the stage's own reference.
+  const named = make('--setups', 'opus-fast=baseline', '--reference', 'opus-fast')
+  assert.equal(named.status, 0, named.stderr)
+  assert.equal(JSON.parse(readFileSync(out, 'utf8')).reference, 'opus-fast')
 })
