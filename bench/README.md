@@ -275,7 +275,9 @@ node bench/harbor.mjs report --out <folder>
 The report sets each setup against the baseline on the tasks that both ran: the share of tasks
 solved, the cost per task and per solved task, and the time, each with a 95% interval, and a sign
 test on the cost. A trial that ended on an error of the harness before the agent spent anything
-counts in no number and is listed apart.
+counts in no number and is listed apart. So does a trial that ended because the model account
+reached its usage limit, also when the session had spent something: its record has the error
+"UsageLimitReached", found in the last lines of the agent's output or in Harbor's error.
 
 Both example setups block GitHub inside the container (`rootInstall`), because some task sets
 allow the internet and a session could otherwise fetch the real fix. Give every setup of a run the
@@ -289,27 +291,51 @@ Harbor starts each task with `docker compose`. On a Linux machine whose Docker h
 plugin (Amazon Linux, for example), install the plugin first.
 
 Claude Code signs in inside the container with `ANTHROPIC_API_KEY`, or with a token of a
-subscription from `claude setup-token` in `CLAUDE_CODE_OAUTH_TOKEN`. A run starts real sessions and
-costs what they cost. Most task images are built for Intel processors, so on a Mac with Apple
+subscription from `claude setup-token` in `CLAUDE_CODE_OAUTH_TOKEN`. Harbor passes the variables of a
+command to `docker compose exec` on its command line, where the process list of the machine shows
+them. The setup agent writes the variables that hold a key to a file in the container instead, and
+removes the file when the session ends. This covers Claude Code's sessions only: a key that a stage
+gives with Harbor's `--ae`, as the Codex stages do, is still on a command line. A run starts real
+sessions and costs what they cost. Most task images are built for Intel processors, so on a Mac with Apple
 silicon they run under emulation and slowly, and a few hundred images need much disk. A cloud
 machine, or one of Harbor's cloud sandboxes (`--env`), suits a full run better.
 
 `bench/harbor-stage.mjs` runs a whole stage: every setup on every task, in blocks shuffled with a
-fixed seed, so that a stop at any point leaves complete pairs. After each block it reads the results,
-adds up the spend per provider and per stage from the cost that Claude Code reports, and writes
-`status-<stage>.md` and `ledger.json`. It stops at 90% of the stage's cap or of a provider's cap,
-when more than 10% of a block's trials fail in the harness, or when a setup solves 20 points fewer
-tasks than the reference setup after two blocks. The status file shows spend and errors, never the
-solved tasks or the cost per setup, so that nobody reads the result before the stage ends. All setups
-of a stage use one provider. Run it again after a stop and it skips what is done
-(`node bench/harbor-stage.mjs --config <stage.json>`, and `--plan` to see the blocks first; the
-comment at the top of the file describes the stage file).
+fixed seed, so that a stop at any point leaves complete pairs. Inside a block the setups do not all
+start at once. The setups of one run number run the block at the same time, and the run numbers run
+one after another: the first run of every setup, then the second. So a setup and the reference setup
+of the same run number still run at the same time, and a stage with two runs has half as many trials
+on the machine at once. (`"runNumbersTogether": true` in the stage file starts every setup of a block
+at once.) After each block the runner reads the results, adds up the spend per provider and per stage
+from the cost that Claude Code reports, and writes `status-<stage>.md` and `ledger.json`. It stops
+when a trial of the block ended at the usage limit of the model account, at 90% of the stage's cap or
+of a provider's cap, when more than 10% of a block's trials fail in the harness, or when a setup
+solves 20 points fewer tasks than the reference setup after two blocks. The status file shows spend
+and errors, never the solved tasks or the cost per setup, so that nobody reads the result before the
+stage ends. All setups of a stage use one provider. Run it again after a stop and it skips what is
+done, and runs again the trials that ended on an error of the harness
+(`node bench/harbor-stage.mjs --config <stage.json>`, and `--plan` to see the blocks and the order of
+the run numbers first; the comment at the top of the file describes the stage file).
+
+Before the first block the runner waits until Docker answers `docker info`, for at most 5 minutes
+(`dockerWait`), and ends with an error that says so when it does not. A Harbor command that fails
+because the download of its tasks did not reach the server ("ApiConnectionError") starts again, at
+most twice (`downloadRetries`), and only when it had made no trial yet.
 
 Each setup writes its own job folders (`<jobs>/<stage>/<setup>/block-<n>`), and the import files a
 trial only under the setup that ran it. A run of the stage puts `bench/harbor/bin` first in PATH: its
 `docker` lets only one Harbor process at a time build the image of a task's environment, and the
-others then find the image in Docker's cache. Harbor gets twice its usual time to set up the agent
-(`setupTimeoutMultiplier`), because installing Claude Code in many containers at once is slow.
+others then find the image in Docker's cache. Harbor gets five times its usual time to set up the
+agent, which is 30 minutes (`setupTimeoutMultiplier`), because installing Claude Code in many
+containers at once is slow.
+
+`bench/harbor-make-stage.mjs` writes a stage file from the task lists and the oracle check (the
+comment at the top of the file has its options). It refuses a stage that cannot be compared with its
+own baseline, and writes nothing then. The reference setup of a stage is its baseline: the setup
+named with `--reference`, or else the first one called "baseline" or with an id that ends in
+"-baseline". The stage is refused when that setup is not among its setups, when it has fewer runs
+than another setup (the error names the missing setup, for example "baseline-2"), or when a setup
+runs another model than the reference and the stage was not made with `--compare-models`.
 
 In version 0.1 Widal.Code proposed its changes from the baseline's own sessions. For a new task
 set, run the baseline first, point `widal advise` at the sessions Harbor kept for it (in each
