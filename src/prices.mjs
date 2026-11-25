@@ -31,8 +31,9 @@ const BUILT_IN = {
   'claude-sonnet-5': { in: 2, out: 10, read: 0.2 },
   'claude-sonnet-4-6': { in: 3, out: 15, read: 0.3 },
   'claude-sonnet-4-5': { in: 3, out: 15, read: 0.3 },
-  // Above 100,000 prompt tokens Claude Haiku 5.5 costs five times as much. The cache read price of
-  // that tier is an assumption (the same ratio).
+  // Above 100,000 prompt tokens Claude Haiku 5.5 costs five times as much, and so does its cache read
+  // ($0.05). From Anthropic's pricing page, read on 2026-11-25. Two test calls above 100,000 tokens
+  // gave the same cost here as in Claude Code's own count.
   'claude-haiku-5-5': { in: 0.1, out: 0.5, read: 0.01, longOver: 100_000, long: { in: 0.5, out: 2.5, read: 0.05 } },
   'claude-haiku-4-5': { in: 1, out: 5, read: 0.1 },
 
@@ -94,8 +95,9 @@ export function rates(call) {
   // `sum` marks tokens added up over many calls: the size of one prompt is then unknown, and the
   // standard price is used.
   if (p.long && prompt > p.longOver && !call.sum) p = p.long
-  // Fast mode is twice the standard price on the models that have it. That it also doubles the
-  // cache prices is an assumption.
+  // Fast mode is twice the standard price on the models that have it. The cache prices double with
+  // it: the cache multipliers apply on top of the fast mode price (Anthropic's pricing page, read on
+  // 2026-11-25).
   const x = (call.sp === 'fast' ? 2 : 1) / 1e6
   return { in: p.in * x, w5: (p.w5 ?? p.in * 1.25) * x, w1: (p.w1 ?? p.in * 2) * x, read: p.read * x, out: p.out * x }
 }
