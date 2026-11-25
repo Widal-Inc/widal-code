@@ -1,11 +1,13 @@
 // A stage of the benchmark on public task sets (bench/harbor-stage.mjs): blocks, the ledger, the stop
-// rules, the status file and the Harbor commands. Nothing here starts Harbor.
+// rules, the status file, the Harbor commands and the order they run in. Nothing here starts Harbor or
+// Docker: the loop of the stage runs on a made-up Harbor that writes made-up trial folders.
 import assert from 'node:assert/strict'
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
-import { blocksOf, commandsOf, ledgerOf, perSet, shuffled, stageOf, statusOf, stopRule, togetherOf } from '../bench/harbor-stage.mjs'
+import { blocksOf, commandsOf, DockerNotReady, dockerReady, groupsOf, ledgerOf, perSet, planOf, runStage, runWithRetry, shuffled, stageOf, statusOf, stopRule, togetherOf } from '../bench/harbor-stage.mjs'
+import { readRecords } from '../bench/harbor.mjs'
 
 const dir = mkdtempSync(join(tmpdir(), 'widal-code-bench-stage-test-'))
 const tasks = Array.from({ length: 7 }, (_, i) => ({ dataset: i < 4 ? 'org/set-a' : 'org/set-b', task: `org/task-${i}` }))
@@ -163,7 +165,7 @@ test('each setup, also a second run of an arm, gets a job folder of its own', ()
   assert.equal(one.folder, join(s.jobs, 'pilot', 'baseline', 'block-1'))
   assert.equal(two.folder, join(s.jobs, 'pilot', 'baseline-2', 'block-1'))
   const i = one.args.indexOf('--agent-setup-timeout-multiplier')
-  assert.equal(one.args[i + 1], '2', 'the setup of an agent gets twice Harbor\'s time by default')
+  assert.equal(one.args[i + 1], '5', 'the setup of an agent gets five times Harbor\'s time by default, which is 30 minutes')
   const none = stageOf({ ...base, setupTimeoutMultiplier: 0 })
   assert.ok(!commandsOf(none, none.setups[0], [tasks[3]], 1)[0].args.includes('--agent-setup-timeout-multiplier'))
 })
@@ -180,4 +182,225 @@ test('the docker of bench/harbor/bin passes commands on and locks only builds', 
   assert.equal(run('ps', '-q'), 'real ps -q')
   assert.equal(run('compose', '--project-name', 'p', '--project-directory', '/x/task', 'build'), 'real compose --project-name p --project-directory /x/task build')
   assert.equal(run('compose', '--project-directory', '/x/task', 'up', '-d'), 'real compose --project-directory /x/task up -d')
+})
+
+// The loop of a stage, on a made-up Harbor.
+
+const two = [
+  { id: 'baseline', model: 'anthropic/claude-sonnet-5-5', provider: 'api' },
+  { id: 'tool', model: 'anthropic/claude-sonnet-5-5', provider: 'api' },
+  { id: 'baseline-2', arm: 'baseline', rep: 2, model: 'anthropic/claude-sonnet-5-5', provider: 'api' },
+  { id: 'tool-2', arm: 'tool', rep: 2, model: 'anthropic/claude-sonnet-5-5', provider: 'api' },
+]
+
+/** A stage with folders of its own, two runs of two arms, one block, and no wait for Docker. */
+const fresh = (name, over = {}) => stageOf({ ...base, out: join(dir, name, 'out'), jobs: join(dir, name, 'jobs'), setups: two, blockSize: 7, dockerWait: 0, ...over })
+
+/** The line with which Claude Code ends a session that the API refused at the usage limit. */
+const refused = JSON.stringify({ type: 'result', subtype: 'success', is_error: true, result: 'API Error: 400 {"type":"error","error":{"type":"invalid_request_error","message":"You have reached your specified API usage limits. You will regain access on 2026-12-01 at 00:00 UTC."}}' })
+
+// Harbor gives every job a folder of its own, also when a command runs again.
+let jobs = 0
+
+/**
+ * A made-up Harbor. It notes when a command starts and ends, and writes one trial folder per task of
+ * the command, as Harbor does. `fail` can make an attempt end with an error before any trial, and
+ * `output` gives the agent's output of a trial.
+ */
+function madeUpHarbor(events, { fail = () => null, output = () => null } = {}) {
+  return async (c) => {
+    const setup = c.args.find((a) => a.startsWith('setup=')).slice('setup='.length)
+    events.push(`start ${setup}`)
+    await new Promise((resolve) => setImmediate(resolve))
+    const failure = fail(setup, c)
+    if (failure) {
+      events.push(`failed ${setup}`)
+      return { code: 1, output: failure }
+    }
+    const job = join(c.folder, `job-${++jobs}`)
+    for (const task of c.tasks) {
+      const trial = join(job, `${task.split('/').pop()}__${setup}`)
+      mkdirSync(join(trial, 'agent'), { recursive: true })
+      const text = output(setup, task)
+      if (text) writeFileSync(join(trial, 'agent', 'claude-code.txt'), text)
+      writeFileSync(join(trial, 'result.json'), JSON.stringify({
+        task_name: task,
+        trial_name: `${task.split('/').pop()}__${setup}`,
+        config: { task: { source: 'set' }, agent: { kwargs: { setup } } },
+        agent_result: { cost_usd: 0.5 },
+        verifier_result: { rewards: { reward: text ? 0 : 1 } },
+        exception_info: null,
+      }))
+    }
+    events.push(`end ${setup}`)
+    return { code: 0, output: `${c.tasks.length} trials\n` }
+  }
+}
+
+const noWait = async () => {}
+
+test('the setups of a block run in groups: one run number after another', () => {
+  const s = fresh('groups')
+  assert.deepEqual(groupsOf(s).map((g) => [g.rep, g.setups.map((x) => x.id)]), [[1, ['baseline', 'tool']], [2, ['baseline-2', 'tool-2']]])
+  const turned = fresh('groups', { setups: [two[2], two[0], two[3], two[1]] })
+  assert.deepEqual(groupsOf(turned).map((g) => g.rep), [1, 2], 'run 1 comes first, whatever the order in the stage file')
+  const together = fresh('groups', { runNumbersTogether: true })
+  assert.deepEqual(groupsOf(together).map((g) => [g.rep, g.setups.length]), [[null, 4]])
+})
+
+test('the setups of one run number run at the same time, and the run numbers one after another', async () => {
+  const events = []
+  const s = fresh('order')
+  const end = await runStage(s, { run: madeUpHarbor(events), wait: noWait })
+  assert.deepEqual(end, { blocks: 1, blocksDone: 1, stopped: null })
+  const first = (text) => events.indexOf(text)
+  const last = (text) => events.lastIndexOf(text)
+  assert.ok(first('start tool') < first('end baseline'), 'the two setups of run 1 run at the same time')
+  assert.ok(first('start baseline-2') > Math.max(last('end baseline'), last('end tool')), 'run 2 starts when every setup of run 1 has ended')
+  assert.ok(first('start tool-2') < first('end baseline-2'), 'the two setups of run 2 run at the same time')
+  const records = readRecords(s.out)
+  assert.equal(records.length, 28, 'seven tasks in four setups')
+  assert.deepEqual([...new Set(records.map((r) => `${r.arm} ${r.rep}`))].sort(), ['baseline 1', 'baseline 2', 'tool 1', 'tool 2'])
+  assert.ok(existsSync(join(s.out, 'status-pilot.md')) && existsSync(join(s.out, 'ledger.json')))
+})
+
+test('with runNumbersTogether every setup of a block starts at once, as before', async () => {
+  const events = []
+  await runStage(fresh('at-once', { runNumbersTogether: true }), { run: madeUpHarbor(events), wait: noWait })
+  assert.deepEqual(events.slice(0, 4), ['start baseline', 'start tool', 'start baseline-2', 'start tool-2'])
+})
+
+test('task sets that run together keep the order of the run numbers', async () => {
+  const events = []
+  const waits = []
+  const s = fresh('sets-together', { taskSetsTogether: true, concurrency: 8 })
+  await runStage(s, { run: madeUpHarbor(events), wait: async (ms) => waits.push(ms) })
+  assert.deepEqual(events.slice(0, 4).sort(), ['start baseline', 'start baseline', 'start tool', 'start tool'], 'both task sets of both setups of run 1 start before any ends')
+  assert.ok(events.indexOf('start baseline-2') > Math.max(events.lastIndexOf('end baseline'), events.lastIndexOf('end tool')))
+  assert.ok(waits.includes(2500), 'the second task set of a setup starts 2.5 seconds after the first')
+  assert.equal(readRecords(s.out).length, 28)
+})
+
+test('--plan prints the groups in the order they run', () => {
+  const plan = planOf(fresh('plan'))
+  assert.deepEqual(plan.filter((l) => !l.startsWith('    ')), ['block 1: 7 tasks', '  run 1, 2 setups at the same time:', '  then run 2, 2 setups at the same time:'])
+  assert.deepEqual(plan.filter((l) => l.startsWith('    ')).map((l) => l.trim().split(':')[0]), ['baseline', 'baseline', 'tool', 'tool', 'baseline-2', 'baseline-2', 'tool-2', 'tool-2'])
+  assert.match(plan[2], /^ {4}baseline: \d tasks of org\/set-[ab], 2 at a time$/)
+  assert.equal(planOf(fresh('plan', { runNumbersTogether: true }))[1], '  all run numbers, 4 setups at the same time:')
+  assert.equal(planOf(fresh('plan', { setups: [two[0]] }))[1], '  run 1, 1 setup:')
+})
+
+test('a trial that ended at the usage limit stops the stage after the block, with that reason', async () => {
+  const events = []
+  // Two blocks. In block 1 the account reaches its usage limit while "tool" runs.
+  const s = fresh('usage-limit', { blockSize: 4 })
+  const hit = blocksOf(s.tasks, s.blockSize, s.seed)[0][0].task
+  const end = await runStage(s, { run: madeUpHarbor(events, { output: (setup, task) => (setup === 'tool' && task === hit ? `${refused}\n` : null) }), wait: noWait })
+  assert.equal(end.blocksDone, 1)
+  assert.equal(end.blocks, 2)
+  assert.match(end.stopped, /^the model account reached its usage limit: 1 of 16 trials of the last block/)
+  assert.ok(events.includes('end baseline-2') && events.includes('end tool-2'), 'the block is finished first, so that every setup has run it')
+  const records = readRecords(s.out)
+  assert.equal(records.length, 16, 'block 2 did not run')
+  const limited = records.filter((r) => r.harnessError === 'UsageLimitReached')
+  assert.deepEqual(limited.map((r) => [r.arm, r.task, r.error, r.closed]), [['tool', hit, 'UsageLimitReached', false]])
+  assert.match(readFileSync(join(s.out, 'status-pilot.md'), 'utf8'), /Stopped: the model account reached its usage limit/)
+
+  // Run again once the account works: only the trial that hit the limit runs again in block 1, and the
+  // stage goes on with block 2.
+  const again = []
+  const next = await runStage(s, { run: madeUpHarbor(again), wait: noWait })
+  assert.deepEqual(next, { blocks: 2, blocksDone: 2, stopped: null })
+  assert.deepEqual(again.slice(0, 2), ['start tool', 'end tool'], 'block 1 runs the one trial that hit the limit and nothing else')
+  assert.equal(readRecords(s.out).length, 28)
+  assert.equal(readRecords(s.out).filter((r) => r.harnessError).length, 0)
+})
+
+test('the usage limit comes before the other stop rules', () => {
+  const s = stageOf(base)
+  const block = [record({ harnessError: 'UsageLimitReached', error: 'UsageLimitReached', cost: 95, closed: false }), record({ task: 'org/task-1', harnessError: 'EnvironmentStartError', cost: 0 }), record({ task: 'org/task-2' })]
+  assert.match(stopRule(block, s, { blocksDone: 1, lastBlock: block }).why, /usage limit: 1 of 3 trials/)
+  assert.match(stopRule(block, s, { blocksDone: 1 }).why, /the stage spent/, 'before a block, only the records of that block count for the usage limit')
+})
+
+test('the stage waits until Docker answers, and gives up with a clear error', async () => {
+  let clock = 0
+  const wait = async (ms) => (clock += ms)
+  const calls = []
+  const after = (tries) => async (program, args) => {
+    calls.push([program, ...args].join(' '))
+    return calls.length > tries ? { code: 0, output: 'Server Version: 29' } : { code: 1, output: 'Client:\nCannot connect to the Docker daemon at unix:///var/run/docker.sock.\n' }
+  }
+  await dockerReady({ run: after(2), wait, now: () => clock, seconds: 300, every: 5 })
+  assert.deepEqual(calls, ['docker info', 'docker info', 'docker info'])
+  assert.equal(clock, 10_000, 'two waits of five seconds')
+
+  calls.length = 0
+  clock = 0
+  await assert.rejects(dockerReady({ run: after(Infinity), wait, now: () => clock, seconds: 20, every: 5 }), /Docker did not answer "docker info" within 20 seconds \(Cannot connect to the Docker daemon at unix:\/\/\/var\/run\/docker\.sock\.\)\. Start Docker/)
+  assert.equal(calls.length, 5, 'tries at 0, 5, 10, 15 and 20 seconds')
+  await assert.rejects(dockerReady({ run: after(Infinity), wait, now: () => clock, seconds: 0 }), DockerNotReady)
+
+  // The stage itself: no Harbor command starts while Docker does not answer, and "dockerWait": 0 skips the check.
+  const events = []
+  calls.length = 0
+  clock = 0
+  await assert.rejects(runStage(fresh('no-docker', { dockerWait: 10 }), { run: madeUpHarbor(events), program: after(Infinity), wait, now: () => clock }), /within 10 seconds/)
+  assert.deepEqual(events, [])
+  calls.length = 0
+  await runStage(fresh('docker-up', { dockerWait: 10 }), { run: madeUpHarbor(events), program: after(1), wait, now: () => clock })
+  assert.equal(calls.length, 2)
+  assert.ok(events.length > 0)
+  assert.equal(stageOf(base).dockerWait, 300)
+})
+
+test('a Harbor command whose download of the tasks failed starts again, at most twice', async () => {
+  const failed = 'harbor_client.errors.ApiConnectionError: Connection failed\n'
+  const command = { program: '/x/harbor.sh', args: [], folder: '/x', tasks: ['org/task-0'] }
+  const attempt = (results, made = () => 0) => {
+    const waits = []
+    let n = 0
+    return { waits, run: () => runWithRetry(command, { run: async () => results[n++], trials: () => made(n), wait: async (ms) => waits.push(ms), retries: 2, pause: 30 }) }
+  }
+  const down = { code: 1, output: failed }
+  const fine = { code: 0, output: 'done\n' }
+
+  const third = attempt([down, down, fine])
+  const r = await third.run()
+  assert.equal(r.code, 0)
+  assert.equal(r.attempts, 3)
+  assert.deepEqual(third.waits, [30_000, 30_000])
+  assert.match(r.output, /ApiConnectionError[\s\S]*attempt 1 of 3[\s\S]*attempt 2 of 3[\s\S]*done/, 'the log keeps every attempt')
+
+  const never = await attempt([down, down, down, fine]).run()
+  assert.deepEqual([never.code, never.attempts], [1, 3], 'two new starts, then the error stands')
+
+  const other = await attempt([{ code: 1, output: 'Traceback: ValueError\n' }, fine]).run()
+  assert.equal(other.attempts, 1, 'another error is not tried again')
+
+  const ended = await attempt([{ code: 0, output: `1 trial ended on ApiConnectionError\n` }, fine]).run()
+  assert.equal(ended.attempts, 1, 'a command that ended without an error is not started again')
+
+  const spent = await attempt([down, fine], (n) => n).run()
+  assert.equal(spent.attempts, 1, 'a command that made a trial is not started again, so that no session runs twice')
+})
+
+test('a failed download does not lose the block', async () => {
+  const events = []
+  const failedOnce = new Set()
+  const s = fresh('download', { setups: [two[0]] })
+  const fail = (setup, c) => {
+    const key = c.args[c.args.indexOf('-d') + 1]
+    if (failedOnce.has(key)) return null
+    failedOnce.add(key)
+    return 'ApiConnectionError: Connection failed\n'
+  }
+  const waits = []
+  const end = await runStage(s, { run: madeUpHarbor(events, { fail }), wait: async (ms) => waits.push(ms) })
+  assert.equal(end.stopped, null)
+  assert.equal(readRecords(s.out).length, 7, 'every task of the block has its record')
+  assert.deepEqual(events, ['start baseline', 'failed baseline', 'start baseline', 'end baseline', 'start baseline', 'failed baseline', 'start baseline', 'end baseline'])
+  assert.deepEqual(waits, [30_000, 30_000])
+  assert.match(readFileSync(join(s.jobs, 'pilot', 'baseline', 'block-1', 'harbor.log'), 'utf8'), /ApiConnectionError[\s\S]*The download of the tasks failed \(attempt 1 of 3\)[\s\S]*trials/)
+  assert.equal(stageOf(base).downloadRetries, 2)
 })

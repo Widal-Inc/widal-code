@@ -35,12 +35,18 @@ Fields of a setup, all optional except "id":
   offers on Claude Opus 5.5 and Claude Fable 5.2 at twice the standard price.
 
 "${setups}" in a text stands for the folder of the file of setups.
+
+The agent also keeps API keys off the command line. Harbor passes the variables of a command to
+`docker compose exec` as `-e NAME=value`, where the runner's process list shows them. The variables
+that hold a key reach the container in a file instead (see KEYS_FILE).
 """
 
 from __future__ import annotations
 
 import json
+import re
 import shlex
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -137,6 +143,34 @@ SAVE_HOSTS = f"cp /etc/hosts {HOSTS_OF_TASK}"
 RESTORE_HOSTS = f"if [ -f {HOSTS_OF_TASK} ]; then cat {HOSTS_OF_TASK} > /etc/hosts && rm -f {HOSTS_OF_TASK}; fi"
 
 
+# Harbor passes the variables of a command to `docker compose exec` as `-e NAME=value`. While a session
+# runs, which can be an hour, everyone who can list the runner's processes could read the API key there.
+# So the variables that hold a key, found by their name, are written to a file in the container, and the
+# command reads that file before it does anything else. The session gets the same variables as before.
+# The file is uploaded with `docker compose cp`, which names the file and not what is in it. It lies
+# outside /logs, which Harbor copies to the runner, and it is removed when the session ends.
+KEY_NAME = re.compile(r"KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL", re.IGNORECASE)
+KEYS_FILE = "/var/tmp/.keys-of-session"
+READ_KEYS = f". {KEYS_FILE} || exit 1; "
+REMOVE_KEYS = f"rm -f {KEYS_FILE}"
+
+
+def split_keys(env: dict[str, str] | None) -> tuple[dict[str, str], dict[str, str]]:
+    """A command's variables in two parts: those that hold a key, and the rest.
+
+    A variable holds a key when its name says so and it has a value. A name that only looks like one
+    (a limit of tokens, for example) goes into the file too, and reaches the command all the same.
+    """
+    env = env or {}
+    keys = {name: value for name, value in env.items() if value and KEY_NAME.search(name)}
+    return keys, {name: value for name, value in env.items() if name not in keys}
+
+
+def keys_text(keys: dict[str, str]) -> str:
+    """The file of keys: one export per key, quoted so that the shell takes the value as it is."""
+    return "".join(f"export {name}={shlex.quote(value)}\n" for name, value in sorted(keys.items()))
+
+
 class SetupAgentOptions(ClaudeCodeOptions):
     """Harbor checks every agent option against this schema before it starts a trial."""
 
@@ -158,6 +192,7 @@ class SetupAgent(ClaudeCode):
             kwargs.setdefault(key, value)
         super().__init__(logs_dir, *args, **kwargs)
         self._resolved_env_vars.update(self._spec.get("env", {}))
+        self._keys_in_file: dict[str, str] | None = None
 
     async def install(self, environment) -> None:
         await super().install(environment)
@@ -170,7 +205,10 @@ class SetupAgent(ClaudeCode):
             await self.exec_as_agent(environment, command=command)
 
     async def run(self, instruction: str, environment, context) -> None:
-        """Runs the session, then puts back the task's /etc/hosts (see HOSTS_OF_TASK), also when it fails or times out."""
+        """Runs the session, then puts back the task's /etc/hosts (see HOSTS_OF_TASK), also when it fails or times out.
+
+        The file of keys (see KEYS_FILE) is removed then too, so the verifier's container does not hold it.
+        """
         try:
             await super().run(instruction=instruction, environment=environment, context=context)
         finally:
@@ -178,6 +216,44 @@ class SetupAgent(ClaudeCode):
                 await self.exec_as_root(environment, command=RESTORE_HOSTS, timeout_sec=60)
             except Exception as error:  # the verifier then runs with the block, as before
                 print(f"Could not put back the task's /etc/hosts: {error}")
+            self._keys_in_file = None
+            try:
+                await self.exec_as_root(environment, command=REMOVE_KEYS, timeout_sec=60)
+            except Exception as error:  # the container is deleted after the verifier anyway
+                print(f"Could not remove the file of keys: {error}")
+
+    async def _keys_to_file(self, environment, command: str, env: dict[str, str] | None) -> tuple[str, dict[str, str] | None]:
+        """Takes the keys out of a command's variables and makes the command read them from the file of keys.
+
+        The file is uploaded once per session, and again only when the keys change. It belongs to the
+        user that runs the agent's commands and only that user can read it. When Harbor names no user,
+        the commands run as the image's own user, whom this agent cannot name, so the file is then
+        readable inside the container, which holds one session that has the keys anyway.
+        """
+        keys, rest = split_keys(env)
+        if not keys:
+            return command, env
+        if keys != self._keys_in_file:
+            with tempfile.TemporaryDirectory(prefix="bench-keys-") as folder:
+                local = Path(folder) / "keys"
+                local.touch(mode=0o600)
+                local.write_text(keys_text(keys))
+                await environment.upload_file(local, KEYS_FILE)
+            user = getattr(environment, "default_user", None)
+            access = f"chmod 644 {KEYS_FILE}" if user is None else f"chown {shlex.quote(str(user))} {KEYS_FILE} && chmod 600 {KEYS_FILE}"
+            await super().exec_as_root(environment, command=access)
+            self._keys_in_file = keys
+        return READ_KEYS + command, rest
+
+    async def exec_as_agent(self, environment, command: str, env: dict[str, str] | None = None, cwd: str | None = None, timeout_sec: int | None = None) -> Any:
+        """Harbor's command as the agent's user, with the keys in a file and not on the command line."""
+        command, env = await self._keys_to_file(environment, command, env)
+        return await super().exec_as_agent(environment, command, env=env, cwd=cwd, timeout_sec=timeout_sec)
+
+    async def exec_as_root(self, environment, command: str, env: dict[str, str] | None = None, cwd: str | None = None, timeout_sec: int | None = None) -> Any:
+        """Harbor's command as root, with the keys in a file and not on the command line."""
+        command, env = await self._keys_to_file(environment, command, env)
+        return await super().exec_as_root(environment, command, env=env, cwd=cwd, timeout_sec=timeout_sec)
 
     def build_cli_flags(self) -> str:
         flags = super().build_cli_flags()

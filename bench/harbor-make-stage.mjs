@@ -6,6 +6,10 @@
 //     --setups baseline,baseline-2,widal-on,widal-on-2 --model anthropic/claude-sonnet-5-5 --provider api \
 //     --cap 500 --out /opt/bench/stages/main.json [--setups-file /opt/bench/setups/setups-v1.json]
 //
+// A stage is refused, and nothing is written, when it cannot be compared with its own baseline: when its
+// reference setup is not among its setups, when the reference has fewer runs than another setup, or when
+// a setup runs another model than the reference (see referenceOf and checkStage).
+//
 // Options:
 //   --tasks         one or more task lists (comma), each {"tasks": [{"dataset", "task"}]}
 //   --oracle        the oracle summary (one JSON line per trial): only tasks whose reference solution
@@ -17,6 +21,13 @@
 //   --setups        setup ids (comma). An id ending in "-2" (or -3 ...) is the second (third) run of the
 //                   setup without that ending: same arm, run number 2. "id=spec" makes the setup "id"
 //                   a copy of the setup "spec" in --setups-file, written there if it is missing.
+//   --reference     the id of the stage's own baseline among --setups. The report sets every other setup
+//                   against it, and the safety rule compares with it. Without this option it is the
+//                   first setup called "baseline" or with an id that ends in "-baseline", such as
+//                   "opus-baseline". A stage that has neither is refused.
+//   --compare-models   the stage is meant to compare models, so a setup may run another model than the
+//                   reference. (--model gives every setup of a stage the same model, so today this
+//                   check can only refuse a stage that other code passes to checkStage.)
 //   --model, --provider, --agent   for every setup of the stage (one provider per stage)
 //   --cap, --concurrency, --block-size, --seed
 //   --budget        the most one session may spend, in dollars, for the copies this stage writes
@@ -97,6 +108,40 @@ export function addCopies(file, setups, { budget = null, settings = null, effort
   return added
 }
 
+/**
+ * The id of the reference setup of a stage, which is the stage's own baseline: the one named with
+ * --reference, or else the first setup called "baseline" or with an id that ends in "-baseline".
+ * @returns {string | null} null when no setup is named and none has such an id.
+ */
+export function referenceOf(setups, named = null) {
+  return named ?? setups.find((s) => /(^|-)baseline$/.test(s.id))?.id ?? null
+}
+
+/**
+ * Refuses a stage that cannot be compared with its own baseline. The reference setup is that baseline:
+ * the report sets every other setup against it, a run against the same run number. So the reference
+ * must be among the setups, it must have every run number that another setup has, and every setup must
+ * run the reference's model, unless the stage is meant to compare models. Each error names the setup
+ * that is missing or differs.
+ * @param {{name: string, reference: string | null, setups: {id: string, arm: string, rep: number, model: string}[]}} stage
+ * @param {{compareModels?: boolean}} [options]
+ */
+export function checkStage({ name, reference, setups }, { compareModels = false } = {}) {
+  const ids = setups.map((s) => s.id).join(', ')
+  const why = "The reference setup is the stage's own baseline: every other setup of the stage is set against it."
+  if (!reference) throw new Error(`The stage "${name}" has no baseline among its setups (${ids}): no setup is called "baseline" or has an id that ends in "-baseline". ${why} Add the missing setup "baseline" to --setups, or name the baseline of this stage with --reference.`)
+  const ref = setups.find((s) => s.id === reference)
+  if (!ref) throw new Error(`The stage "${name}" has no setup "${reference}" (its setups: ${ids}). ${why} Add the missing setup "${reference}" to --setups, or name another setup with --reference.`)
+  const runs = new Set(setups.filter((s) => s.arm === ref.arm).map((s) => s.rep))
+  const more = setups.filter((s) => s.arm !== ref.arm && !runs.has(s.rep))
+  if (more.length) {
+    const missing = [...new Set(more.map((s) => s.rep))].sort((a, b) => a - b).map((n) => (n === 1 ? ref.arm : `${ref.arm}-${n}`))
+    throw new Error(`The stage "${name}" has no setup ${missing.map((id) => `"${id}"`).join(', ')}: the reference "${ref.arm}" has fewer runs than ${[...new Set(more.map((s) => `"${s.arm}"`))].join(', ')}. A run is compared with the reference's run of the same number. Add ${missing.map((id) => `"${id}"`).join(', ')} to --setups.`)
+  }
+  const other = setups.filter((s) => s.model !== ref.model)
+  if (other.length && !compareModels) throw new Error(`The stage "${name}" has setups that run another model than the reference "${ref.id}" (${ref.model}): ${other.map((s) => `"${s.id}" (${s.model})`).join(', ')}. A setup is compared with a baseline on the same model. Pass --compare-models if the stage is meant to compare models.`)
+}
+
 function flags(argv) {
   const f = {}
   for (let i = 0; i < argv.length; i++) if (argv[i].startsWith('--')) f[argv[i].slice(2)] = argv[i + 1] && !argv[i + 1].startsWith('--') ? argv[++i] : true
@@ -121,6 +166,9 @@ function main() {
     seed: Number(f.seed ?? SEED),
   })
   const setups = f.setups.split(',').map((e) => setupOf(e, { model: f.model, provider: f.provider, agent: f.agent }))
+  const reference = referenceOf(setups, typeof f.reference === 'string' ? f.reference : null)
+  // Checked before anything is written, so a refused stage leaves no stage file and no copy of a setup.
+  checkStage({ name: f.name, reference, setups }, { compareModels: f['compare-models'] === true })
   const setupsFile = f['setups-file'] ?? join(base, 'setups', 'setups-v1.json')
   if (existsSync(setupsFile)) {
     const added = addCopies(setupsFile, setups, { budget: f.budget ? Number(f.budget) : null, settings: f.settings ? JSON.parse(f.settings) : null, effort: typeof f.effort === 'string' ? f.effort : null, fast: f.fast === true })
@@ -141,7 +189,7 @@ function main() {
     commands: { [f.provider]: f.command ? f.command.split(',') : commands[f.provider] },
     env: f.env ? { [f.provider]: JSON.parse(f.env) } : {},
     setups: setups.map(({ spec, ...s }) => s),
-    reference: setups[0].id,
+    reference,
     tasks,
     blockSize: Number(f['block-size'] ?? 25),
     seed: Number(f.seed ?? SEED),

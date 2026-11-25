@@ -425,3 +425,46 @@ one more stage of the same size before `tools-unused` counts as proven.
   report states the margin the tasks reached.
 - **Secondary.** The two stages together ("current" and "confirm", about 200 tasks), reported, not used for
   the decision.
+
+## Correction, 25 Nov 2026: what the runs taught the harness
+
+None of the changes below changes a measure of a finished stage. They alter no setup, task, measure or cap, and no
+number of a stage that has ended. They put into the harness what the runs of 22 to 25 Nov 2026 did by hand, or with
+a copy of the block loop outside the checkout. They are covered by tests with made-up trial folders and a made-up
+Harbor. No stage has run with them yet.
+
+- **The run numbers of a block run one after another.** The setups of one run number run a block at the same time,
+  and then the setups of the next run number do. Four setups at once caused start timeouts in the stage "current",
+  so its rerun and the stage "confirm" ran this way, with a copy of the block loop (change 5).
+  `bench/harbor-stage.mjs` now does this itself. A setup and the reference setup of the same run number still run
+  at the same time, under the same load. The stage option `runNumbersTogether` starts every setup of a block at
+  once, as before.
+- **The limit for the agent's setup is 30 minutes by default.** The correction of 23 Nov 2026 raised it for every
+  later stage, and each stage file then had to set `setupTimeoutMultiplier` to 5. The default was 2 (12 minutes)
+  and is now 5. The setup runs before the agent and spends nothing.
+- **A trial that the usage limit ended is an error of the harness.** When the model account reaches its usage
+  limit, the API refuses every session, whatever the setup. Such a trial says nothing about a setup. Its record now
+  has the error "UsageLimitReached", counts in no number, and the trial runs again when the stage runs again, like
+  every other error of the harness. This holds also when the session had spent something before it was refused. The
+  error is read from the last lines of the agent's own output and from Harbor's error, not from what the model or a
+  tool wrote. The stage finishes the block, stops, and gives the usage limit as the reason. In the runs of 24 Nov
+  2026 the stages were stopped by hand at the usage limit, and such a trial was marked by hand. A record of a trial
+  that finished is still never replaced by one that ended on an error of the harness, so reading the trials of a
+  finished stage again changes no number of it.
+- **The runner waits for Docker, and tries a failed download of the tasks again.** Before the first block the
+  runner waits until Docker answers `docker info`, for at most 5 minutes, and ends with an error when it does not.
+  The Fable pilot did not wait for Docker. A Harbor command that fails because the download of its tasks did not
+  reach the server ("ApiConnectionError") starts again, at most twice, and only when it had made no trial, so that
+  no session runs twice. Both happen before a trial starts.
+- **An API key is no longer on a command line.** Harbor passes the variables of a command to `docker compose exec`
+  on its command line, so the process list of the runner showed the API key while a session ran.
+  `bench/harbor/setup_agent.py` now writes the variables that hold a key to a file in the container, which each
+  command reads first, and removes the file when the session ends. The session gets the same variables as before.
+  This covers the sessions of Claude Code. A key that a stage gives with Harbor's `--ae`, as the Codex stages do,
+  is still on a command line.
+- **A stage needs its own baseline.** `bench/harbor-make-stage.mjs` refuses to write a stage whose reference setup
+  is not among its setups, or whose reference has fewer runs than another setup, and names the setup that is
+  missing. It also refuses a setup that runs another model than the reference, unless the stage is made to compare
+  models (`--compare-models`). The reference is the setup named with `--reference`, or else the first one called
+  "baseline" or with an id that ends in "-baseline". The stage "opus-fast" had one setup and no baseline of its
+  own. The stage files that exist are not changed.

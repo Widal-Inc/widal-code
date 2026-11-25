@@ -5,7 +5,7 @@ import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
-import { importJobs, markdown, markVerifier, readRecords, recordOf, report, taskFile, verifierBlocked } from '../bench/harbor.mjs'
+import { endOf, importJobs, markdown, markVerifier, readRecords, recordOf, report, taskFile, trialsOf, USAGE_LIMIT, usageLimitReached, verifierBlocked } from '../bench/harbor.mjs'
 import { signTest } from '../bench/stats.mjs'
 
 const dir = mkdtempSync(join(tmpdir(), 'widal-code-bench-harbor-test-'))
@@ -220,4 +220,111 @@ test('a task whose verifier could not reach GitHub counts in cost but in no solv
   assert.match(text, /1 tasks count in cost and time but in no solved number/)
   assert.match(text, /## Tasks whose tests could not reach GitHub/)
   assert.match(text, /- tb/)
+})
+
+// The usage limit of the model account. The texts are made up after what the runs showed: the API's
+// error 400 as Claude Code prints it, in the last line of the agent's output or in Harbor's exception.
+
+const LIMIT_MESSAGE = 'You have reached your specified API usage limits. You will regain access on 2026-12-01 at 00:00 UTC.'
+const API_ERROR = `API Error: 400 {"type":"error","error":{"type":"invalid_request_error","message":"${LIMIT_MESSAGE}"}}`
+/** Lines of Claude Code's output: what the model says, what a tool gives back, and how the session ends. */
+const says = (text) => JSON.stringify({ type: 'assistant', message: { role: 'assistant', content: [{ type: 'text', text }] } })
+const tool = (text) => JSON.stringify({ type: 'user', message: { role: 'user', content: [{ type: 'tool_result', content: text }] } })
+const ends = (text, over = {}) => JSON.stringify({ type: 'result', subtype: 'success', is_error: false, result: text, ...over })
+
+function writeOutput(jobs, r, text, name = 'claude-code.txt') {
+  const folder = join(jobs, 'job-1', r.trial_name, 'agent')
+  mkdirSync(folder, { recursive: true })
+  writeFileSync(join(folder, name), text)
+}
+
+test('the text of the usage limit is matched in any case of letters, and nothing near it', () => {
+  assert.ok(USAGE_LIMIT.test(LIMIT_MESSAGE))
+  assert.ok(USAGE_LIMIT.test('API ERROR 400: USAGE LIMITS REACHED'))
+  assert.ok(USAGE_LIMIT.test('Claude AI usage limit reached'))
+  assert.ok(USAGE_LIMIT.test("You've hit your usage limit."))
+  assert.ok(USAGE_LIMIT.test('harbor.agents.installed.base.ApiUsageLimitError'))
+  for (const other of ['API Error: 429 rate limit', 'Reached maximum budget ($4)', 'API Error: 500 Internal server error', 'the limit of the context window', '']) assert.ok(!USAGE_LIMIT.test(other), other)
+})
+
+test('only the agent\'s own last words count, not the model\'s text or a tool\'s output', () => {
+  const quoted = [says(`The test expects "${LIMIT_MESSAGE}"`), tool(`raise UsageError("usage limit reached")`), ends('Done. The client now reports "usage limit reached".')].join('\n')
+  assert.equal(endOf(quoted), '', 'a session that ended well has no error line')
+  assert.equal(usageLimitReached({}, quoted), false)
+
+  const refused = [says('I will read the file.'), says(API_ERROR), ends(API_ERROR, { is_error: true })].join('\n')
+  assert.equal(endOf(refused), ends(API_ERROR, { is_error: true }))
+  assert.equal(usageLimitReached({}, refused), true)
+
+  assert.equal(usageLimitReached({}, JSON.stringify({ type: 'result', subtype: 'error_during_execution', result: 'usage limit reached' })), true, 'a result whose subtype is an error')
+  assert.equal(usageLimitReached({}, JSON.stringify({ type: 'turn.failed', error: { message: "You've hit your usage limit." } })), true, 'a failed turn of Codex is an error line too')
+  assert.equal(usageLimitReached({}, 'Claude AI usage limit reached|1764547200\n'), true, 'a line that is not JSON is the program\'s own')
+  assert.equal(usageLimitReached({}, ends('Reached maximum budget ($4)', { subtype: 'error_max_budget_usd', is_error: true })), false, 'the budget of one session is the agent\'s own limit')
+  assert.equal(usageLimitReached({}, '{"type":"result","is_error":true,"result":"usage limit reached'), false, 'half a line is not read')
+
+  const exception = (type, message) => ({ exception_info: { exception_type: type, exception_message: message } })
+  assert.equal(usageLimitReached(exception('NonZeroAgentExitCodeError', `Command failed (exit 1): claude --print\nstdout: ${API_ERROR}\nstderr: None`)), true)
+  assert.equal(usageLimitReached(exception('ApiUsageLimitError', 'Command failed (exit 1)')), true, 'Harbor names the error itself')
+  assert.equal(usageLimitReached(exception('AgentTimeoutError', 'Agent execution timed out after 3000 seconds')), false)
+})
+
+test('a trial that ended at the usage limit is an error of the harness, also when it spent money', () => {
+  const refused = ends(API_ERROR, { is_error: true })
+  // The session spent $0.07 before the account was refused, and the verifier gave reward 0.
+  const spent = recordOf(result({ task: 't', setup: 'x', cost: 0.07, reward: 0, error: 'NonZeroAgentExitCodeError' }), { output: refused })
+  assert.equal(spent.harnessError, 'UsageLimitReached')
+  assert.equal(spent.error, 'UsageLimitReached')
+  assert.equal(spent.closed, false)
+  assert.equal(spent.cost, 0.07, 'the money was spent, so the ledger still counts it')
+  // Claude Code ended with exit code 0, so Harbor saw no error at all.
+  const quiet = recordOf(result({ task: 't', setup: 'x', cost: 0.07, reward: 0 }), { output: refused })
+  assert.equal(quiet.harnessError, 'UsageLimitReached')
+  // The same trial without that line is the agent's miss, as before.
+  const miss = recordOf(result({ task: 't', setup: 'x', cost: 0.07, reward: 0, error: 'NonZeroAgentExitCodeError' }), { output: ends('I could not fix it.') })
+  assert.equal(miss.harnessError, null)
+  assert.equal(miss.error, 'NonZeroAgentExitCodeError')
+})
+
+test('import reads the end of the agent\'s output, and the report counts such a trial in no number', () => {
+  const jobs = join(dir, 'jobs-limit')
+  const out = join(dir, 'out-limit')
+  const refused = `${ends(API_ERROR, { is_error: true })}\n`
+  for (const task of ['a/t1', 'a/t2', 'a/t3']) {
+    writeTrial(jobs, result({ task, setup: 'baseline', cost: 2 }))
+    writeTrial(jobs, result({ task, setup: 'tool', cost: 1, reward: task === 'a/t3' ? 0 : 1 }))
+  }
+  // t3 of "tool" ended at the usage limit. t2 of "tool" only quotes the words, in megabytes of output:
+  // the last part of the file is read from the start of a line, so the cut line of the model is dropped.
+  writeOutput(jobs, result({ task: 'a/t3', setup: 'tool' }), `${says('I will read the file.')}\n${refused}`)
+  writeOutput(jobs, result({ task: 'a/t2', setup: 'tool' }), `${says(`usage limit reached ${'x'.repeat(400_000)} usage limit reached`)}\n${ends('Done.')}\n`)
+  // A Codex trial keeps its output under another name.
+  writeTrial(jobs, result({ task: 'a/t4', setup: 'tool', cost: 1, reward: 0 }))
+  writeOutput(jobs, result({ task: 'a/t4', setup: 'tool' }), `${JSON.stringify({ type: 'turn.failed', error: { message: "You've hit your usage limit." } })}\n`, 'codex.txt')
+
+  importJobs(jobs, out)
+  const records = readRecords(out)
+  assert.deepEqual(records.filter((r) => r.harnessError).map((r) => [r.arm, r.task, r.harnessError]), [['tool', 'a/t3', 'UsageLimitReached'], ['tool', 'a/t4', 'UsageLimitReached']])
+  const r = report(records)
+  const row = r.arms.find((x) => x.arm === 'tool')
+  assert.equal(row.tasks, 2, 'the two trials at the usage limit count in no total')
+  assert.equal(row.solved, 2, 'and not as tasks the tool failed')
+  assert.deepEqual(r.failed.map((f) => [f.task, f.error]), [['a/t3', 'UsageLimitReached'], ['a/t4', 'UsageLimitReached']])
+  assert.match(markdown(r), /\| tool \| a\/t3 \| 1 \| UsageLimitReached \|/)
+
+  // A trial that finished is not replaced when it runs again and ends at the usage limit.
+  const again = join(dir, 'jobs-limit-again')
+  const rerun = { ...result({ task: 'a/t1', setup: 'tool', cost: 0.01, reward: 0 }), trial_name: 'a/t1__again' }
+  writeTrial(again, rerun)
+  writeOutput(again, rerun, refused)
+  assert.equal(importJobs(again, out).length, 0)
+  assert.equal(readRecords(out).find((x) => x.arm === 'tool' && x.task === 'a/t1').closed, true)
+})
+
+test('the trials of given tasks in a jobs folder are counted', () => {
+  const jobs = join(dir, 'jobs-count')
+  assert.equal(trialsOf(jobs, ['a/t1']), 0, 'a folder that is not there has no trial')
+  writeTrial(jobs, result({ task: 'a/t1', setup: 'baseline' }))
+  writeTrial(jobs, result({ task: 'a/t2', setup: 'baseline' }))
+  assert.equal(trialsOf(jobs, ['a/t1', 'a/t9']), 1)
+  assert.equal(trialsOf(jobs, ['a/t1', 'a/t2']), 2)
 })

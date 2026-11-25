@@ -8,7 +8,8 @@
 // "import" reads every trial of Harbor's jobs folder (each one is a folder with a result.json) and
 // writes one record per trial to <folder>/harbor/<arm>/<task>-r<rep>.json. The arm is the setup
 // that the trial ran (Harbor's agent option "setup"), or --arm. A trial that ended on an error of
-// the harness, not of the agent, is kept with that error and counts in no total.
+// the harness, not of the agent, is kept with that error and counts in no total. A trial that ended
+// because the model account reached its usage limit is such an error, with the name "UsageLimitReached".
 //
 // "report" sets each arm against the baseline on the tasks that both finished without such an
 // error: the share of tasks solved, the cost and the time, each with a 95% interval, and a sign
@@ -16,7 +17,7 @@
 //
 // "mark-verifier" sets `verifierBlocked` on the records of the trials of a jobs folder, from each trial's
 // verifier/test-stdout.txt, for records written before import did it (correction of 24 Nov 2026).
-import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, statSync, writeFileSync } from 'node:fs'
+import { closeSync, existsSync, fstatSync, mkdirSync, openSync, readdirSync, readFileSync, readSync, renameSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { cost as callCost } from '../src/prices.mjs'
@@ -61,6 +62,79 @@ function verifierLog(folder) {
   return existsSync(file) ? readFileSync(file, 'utf8') : ''
 }
 
+/**
+ * How a trial shows that the model account reached its usage limit, in any case of letters. The API then
+ * refuses every call with an error 400 ("You have reached your specified API usage limits"), which Claude
+ * Code prints as "API Error: 400". A subscription says "usage limit reached" or "You've hit your usage
+ * limit". Harbor versions that know the error name it ApiUsageLimitError.
+ */
+export const USAGE_LIMIT = /specified API usage limits|usage limits? (is |are |was |were )?reached|hit your usage limit|ApiUsageLimitError/i
+
+/** The name of the error of the harness for a trial that ended at the usage limit of the model account. */
+export const USAGE_LIMIT_ERROR = 'UsageLimitReached'
+
+/** The files in a trial's folder "agent" that hold the agent's output: Claude Code's and Codex's. */
+const AGENT_OUTPUT = ['claude-code.txt', 'codex.txt']
+
+/**
+ * The lines of an agent's output in which the agent's program itself says how it ended: of the JSON
+ * lines, the events "error" and "turn.failed" and a "result" that is an error, and every line that is
+ * not JSON (a crash). The model's text and the output of tools are left out, because the files of a
+ * task can hold the words of any error.
+ */
+export function endOf(output) {
+  const kept = []
+  for (const line of String(output ?? '').split('\n')) {
+    const text = line.trim()
+    if (!text) continue
+    if (!text.startsWith('{')) {
+      kept.push(text)
+      continue
+    }
+    let event
+    try {
+      event = JSON.parse(text)
+    } catch {
+      continue
+    }
+    const failed = event.type === 'error' || event.type === 'turn.failed' || (event.type === 'result' && (event.is_error === true || String(event.subtype ?? '').startsWith('error')))
+    if (failed) kept.push(text)
+  }
+  return kept.join('\n')
+}
+
+/**
+ * Whether a trial ended because the model account reached its usage limit: Harbor's exception says so,
+ * or the agent's own last lines do. Such a trial gets reward 0 whatever the task is, so it is an error
+ * of the harness and not a task the agent failed.
+ * @param {object} r The trial's result.json.
+ * @param {string} [output] The agent's output, or its last part.
+ */
+export function usageLimitReached(r, output = '') {
+  const e = r.exception_info
+  return USAGE_LIMIT.test(`${e?.exception_type ?? ''}\n${e?.exception_message ?? ''}\n${endOf(output)}`)
+}
+
+/** The last part of a file, from the start of a line: a session's output can be many megabytes. */
+function tailOf(file, bytes = 256 * 1024) {
+  const fd = openSync(file, 'r')
+  try {
+    const size = fstatSync(fd).size
+    const from = Math.max(0, size - bytes)
+    const buffer = Buffer.alloc(size - from)
+    readSync(fd, buffer, 0, buffer.length, from)
+    const text = buffer.toString('utf8')
+    return from > 0 ? text.slice(text.indexOf('\n') + 1) : text
+  } finally {
+    closeSync(fd)
+  }
+}
+
+/** The last part of the agent's output in a trial's folder, where the agent says how it ended. */
+function agentOutput(folder) {
+  return AGENT_OUTPUT.map((name) => join(folder, 'agent', name)).filter((file) => existsSync(file)).map((file) => tailOf(file)).join('\n')
+}
+
 const seconds = (timing) => (timing?.started_at && timing?.finished_at ? (Date.parse(timing.finished_at) - Date.parse(timing.started_at)) / 1000 : null)
 
 /** A file name for a task: Harbor's task names hold slashes and other signs. */
@@ -69,8 +143,10 @@ export const taskFile = (task) => task.replace(/[^A-Za-z0-9._-]+/g, '_').slice(0
 /**
  * The record of one trial of Harbor.
  * @param {object} r The trial's result.json.
+ * @param {{arm?: string, rep?: number, extra?: object, log?: string, output?: string}} [options]
+ *   `log` is the verifier's output, and `output` the agent's output or its last part.
  */
-export function recordOf(r, { arm, rep = 1, extra = {}, log = '' } = {}) {
+export function recordOf(r, { arm, rep = 1, extra = {}, log = '', output = '' } = {}) {
   const agent = r.agent_result ?? {}
   const rewards = r.verifier_result?.rewards ?? null
   const reward = rewards ? (rewards.reward ?? Object.values(rewards)[0] ?? null) : null
@@ -78,8 +154,10 @@ export function recordOf(r, { arm, rep = 1, extra = {}, log = '' } = {}) {
   const model = r.agent_info?.model_info?.name ?? r.config?.agent?.model_name ?? null
   const spend = costOf(agent, model)
   // An error before the agent ran, or one of the harness, is not the agent's miss. A trial that spent
-  // money ran the agent, also when the cost comes from its tokens (Codex reports none).
-  const harnessError = r.exception_info && !(spend.cost > 0) ? r.exception_info.exception_type : null
+  // money ran the agent, also when the cost comes from its tokens (Codex reports none). A trial that
+  // ended at the usage limit of the model account is an error of the harness whatever it spent.
+  const limited = usageLimitReached(r, output)
+  const harnessError = limited ? USAGE_LIMIT_ERROR : r.exception_info && !(spend.cost > 0) ? r.exception_info.exception_type : null
   return {
     v: 1,
     source: 'harbor',
@@ -96,7 +174,7 @@ export function recordOf(r, { arm, rep = 1, extra = {}, log = '' } = {}) {
     closed: reward !== null && reward >= 1,
     ...spend,
     tokens: { input: agent.n_input_tokens ?? null, cache: agent.n_cache_tokens ?? null, output: agent.n_output_tokens ?? null },
-    error: r.exception_info?.exception_type ?? null,
+    error: limited ? USAGE_LIMIT_ERROR : (r.exception_info?.exception_type ?? null),
     harnessError,
     verifierBlocked: verifierBlocked(log),
     ...extra,
@@ -135,7 +213,7 @@ export function importJobs(jobs, out, { arm, rep = 1, setup = null, extra = {} }
     const result = JSON.parse(readFileSync(join(folder, 'result.json'), 'utf8'))
     const own = result.config?.agent?.kwargs?.setup
     if (setup && own && own !== setup) continue
-    const record = recordOf(result, { arm, rep, extra, log: verifierLog(folder) })
+    const record = recordOf(result, { arm, rep, extra, log: verifierLog(folder), output: agentOutput(folder) })
     const dir = join(out, 'harbor', record.arm)
     const file = join(dir, `${taskFile(record.task)}-r${rep}.json`)
     if (record.harnessError && existsSync(file) && !JSON.parse(readFileSync(file, 'utf8')).harnessError) continue
@@ -144,6 +222,21 @@ export function importJobs(jobs, out, { arm, rep = 1, setup = null, extra = {} }
     records.push(record)
   }
   return records
+}
+
+/** How many trials of the given tasks a jobs folder holds. */
+export function trialsOf(jobs, tasks) {
+  if (!existsSync(jobs)) return 0
+  const names = new Set(tasks)
+  let found = 0
+  for (const folder of trialFolders(jobs)) {
+    try {
+      if (names.has(JSON.parse(readFileSync(join(folder, 'result.json'), 'utf8')).task_name)) found++
+    } catch {
+      // Harbor is writing this result right now, for another task set that shares the folder.
+    }
+  }
+  return found
 }
 
 /**
