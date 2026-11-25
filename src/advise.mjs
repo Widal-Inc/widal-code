@@ -516,20 +516,70 @@ const ENOUGH_CALLS = 500
 const ENOUGH_SESSIONS = 20
 
 /**
+ * The rule behind the closing sentence of a comparison, as a word: "early" while the after side is
+ * too small, "nothing" when there is no before side, "cheaper" when the calls cost at least 5% less
+ * and the signs of the work rose by at most 10%, "worse" when they cost less but the signs rose by
+ * more than 25%, and "unclear" otherwise. `before` and `after` are the measures of the two sides, as
+ * `measures` in analyze.mjs gives them. The automatic check of the default changes acts on the same
+ * sides (see defaults.mjs).
+ */
+export function judge(before, after) {
+  if (after.calls < ENOUGH_CALLS || after.sessions < ENOUGH_SESSIONS) return 'early'
+  if (!before.calls) return 'nothing'
+  const { cheaper, worse } = changeOf(before, after)
+  // The small number keeps a change of exactly 5%, 10% or 25% on the side the rule names.
+  if (cheaper >= 0.05 - 1e-9 && worse <= 0.1 + 1e-9) return 'cheaper'
+  if (cheaper > 0 && worse > 0.25 + 1e-9) return 'worse'
+  return 'unclear'
+}
+
+/**
+ * How the after side differs from the before side: `cheaper` is the part by which the cost per
+ * 1,000 calls fell (below 0 when it rose), and `worse` the larger rise of tool errors and rounds of
+ * fixing, as a part of what they were before. From nothing to something is a rise without limit.
+ */
+export function changeOf(before, after) {
+  const rise = (was, is) => (was > 0 ? (is - was) / was : is > 0 ? Infinity : 0)
+  return { cheaper: -rise(before.cost, after.cost), worse: Math.max(rise(before.errors, after.errors), rise(before.fixRounds, after.fixRounds)) }
+}
+
+const VERDICTS = {
+  early: 'Too early to judge.',
+  nothing: `Nothing to compare with: there are no such calls in the ${BEFORE_DAYS} days before the change.`,
+  cheaper: 'Cheaper, and the work looks the same.',
+  worse: 'Cheaper, but the work looks worse.',
+  unclear: 'No clear difference.',
+}
+
+/**
  * The closing sentence of a comparison. `before` and `after` are the measures of the two sides,
  * as `measures` in analyze.mjs gives them.
  */
 export function verdict(before, after) {
-  if (after.calls < ENOUGH_CALLS || after.sessions < ENOUGH_SESSIONS) return 'Too early to judge.'
-  if (!before.calls) return `Nothing to compare with: there are no such calls in the ${BEFORE_DAYS} days before the change.`
-  // How much a rate went up, as a part of what it was before. From nothing to something is a rise without limit.
-  const rise = (was, is) => (was > 0 ? (is - was) / was : is > 0 ? Infinity : 0)
-  const cheaper = -rise(before.cost, after.cost)
-  const worse = Math.max(rise(before.errors, after.errors), rise(before.fixRounds, after.fixRounds))
-  // The small number keeps a change of exactly 5%, 10% or 25% on the side the rule names.
-  if (cheaper >= 0.05 - 1e-9 && worse <= 0.1 + 1e-9) return 'Cheaper, and the work looks the same.'
-  if (cheaper > 0 && worse > 0.25 + 1e-9) return 'Cheaper, but the work looks worse.'
-  return 'No clear difference.'
+  return VERDICTS[judge(before, after)]
+}
+
+/**
+ * The calls that an applied change acts on, measured before and after it was applied: the two
+ * sides that `measureReport` compares in its last table. `at` is when the change was applied, and
+ * `before` is what is kept about it.
+ */
+export function measureSides(records, { id, at, before: keptBefore }) {
+  const { acts } = measuredCalls(id, keptBefore)
+  const measured = analyze(records).calls.filter((e) => e.r.ts >= at - BEFORE_DAYS * 86400e3 && e.c.known && acts(e))
+  return { before: measures(measured.filter((e) => e.r.ts < at)), after: measures(measured.filter((e) => e.r.ts >= at)) }
+}
+
+/** Which calls a change acts on, and the words for them. */
+function measuredCalls(id, keptBefore) {
+  let [label, acts] = MEASURED[id] ?? ['All calls', () => true]
+  const kinds = id === 'subagent-model' ? changedKinds(keptBefore) : undefined
+  if (kinds) {
+    const all = acts
+    label = `Calls of the ${quoted(kinds)} subagents`
+    acts = (e) => all(e) && kinds.includes(e.r.at)
+  }
+  return { label, acts }
 }
 
 /**
@@ -541,13 +591,7 @@ export function verdict(before, after) {
  * which the measure of "autocompact-window" counts.
  */
 export function measureReport(records, { id, at, before: keptBefore, metas }) {
-  let [label, acts] = MEASURED[id] ?? ['All calls', () => true]
-  const kinds = id === 'subagent-model' ? changedKinds(keptBefore) : undefined
-  if (kinds) {
-    const all = acts
-    label = `Calls of the ${quoted(kinds)} subagents`
-    acts = (e) => all(e) && kinds.includes(e.r.at)
-  }
+  const { label, acts } = measuredCalls(id, keptBefore)
   const calls = analyze(records).calls.filter((e) => e.r.ts >= at - BEFORE_DAYS * 86400e3)
   const out = [`${id}, applied on ${when(at)}. ${label} before and after.`, '']
 

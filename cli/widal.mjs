@@ -11,6 +11,7 @@ import { analyze } from '../src/analyze.mjs'
 import { ROOT, appCommand, appDir, copyApp, fromPlugin, nodeNote, refreshCopy, removeApp, version } from '../src/app.mjs'
 import { ACTIONS, actionsStatus, applied, apply, undo } from '../src/actions.mjs'
 import { adviseData, adviseReport, measureReport } from '../src/advise.mjs'
+import { defaultsReport, defaultsRows, runDefaults, runSince, setDefaults, startDefaults, takeNotes } from '../src/defaults.mjs'
 import { billing, billingText, storedLimits } from '../src/billing.mjs'
 import { boardCommand, readBoard, startBoardSync } from '../src/board.mjs'
 import { coldStartHook, config, keepWarmHook, limitHook, limitParts, modelSwitchHook, saveConfig, statusLine } from '../src/claude-code.mjs'
@@ -60,6 +61,8 @@ const USAGE = `widal: what your AI coding agents spend, and what the money pays 
   widal apply [name] [options]   make one of those changes in Claude Code (with a backup)
   widal undo [name]              take a change back
   widal measure [name]           before and after a change
+  widal defaults                 the changes Widal.Code makes on its own, after a benchmark proved them
+  widal defaults off|on          take back what they applied and stop them, or start them again
   widal limit --session 50 --day 200 [--action ask|warn|stop]
   widal limit --off              remove the limits
   widal plan                     how you pay: by subscription, or by the token (usage)
@@ -262,6 +265,16 @@ async function main() {
       // minutes old. That is not a part of the security checks, so it runs also while their hook
       // is off. It never waits and prints nothing. See src/board.mjs.
       if (argv[0] === 'check-settings' || argv[0] === 'check-turn') startBoardSync(Date.now())
+      // The hook at the start of a session also starts the run of the default changes in the
+      // background, once a day, and tells the person once what the last run did. That is not a part
+      // of the security checks either, so it runs also while their hook is off, and only once when
+      // both the plugin and the settings hold the hook. The words go to the person as a message, not
+      // to the model. See src/defaults.mjs.
+      if (argv[0] === 'check-settings' && !(plugin && inSettings('check-settings'))) {
+        startDefaults(Date.now())
+        const notes = takeNotes()
+        if (notes) process.stdout.write(JSON.stringify({ systemMessage: `widal: ${notes}` }))
+      }
       if (plugin && !pluginHookRuns(argv[0])) return
       // The hooks of the security checks. The two at the start of a session and at the end of a
       // turn start the checks in the background and print nothing. The gate before a shell command
@@ -340,6 +353,22 @@ async function main() {
       // Nothing: the next start tries again.
     }
     return
+  }
+  // The run of the default changes that the hook at the start of a session starts in the background.
+  // It prints nothing, and on any error it writes nothing more and ends with exit code 0.
+  if (cmd === 'defaults' && argv[0] === 'run') {
+    try {
+      const { records } = await load({ since: runSince() })
+      runDefaults(records, { bin: ownLink() })
+    } catch {
+      // Nothing: the next day's start tries again.
+    }
+    return
+  }
+  if (cmd === 'defaults') {
+    if (argv[0] === 'off' || argv[0] === 'on') return console.log(setDefaults(argv[0] === 'on', ownLink()).join('\n'))
+    if (argv[0] !== undefined) throw new Error('widal defaults takes nothing, "on" or "off".')
+    return console.log(defaultsReport())
   }
   // "widal check --cloud <provider>" is the same as "widal cloud-check <provider>". Reading an
   // option takes it out of the list, so it is read once.
@@ -747,6 +776,7 @@ function doctor() {
     ['Effort hint', hintSettingsText(hintConfig())],
     ['Compaction hint', compactHintSettingsText(compactHintConfig())],
     ...actionsStatus().map(([id, state]) => [`Change: ${id}`, state]),
+    ...defaultsRows().map(([id, state]) => [`Default: ${id}`, state]),
     ['Widal.Code board', boardRow()],
     ['Session logs found', `${found('claude')} of Claude Code, ${found('codex')} of Codex, ${found('cowork')} of Cowork`],
   ]))
