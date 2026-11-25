@@ -84,7 +84,7 @@ The plugin carries seven of this tool's hooks, so that they also run where Claud
 | `compact-keep` | Before a compaction | Gives Claude Code the text that a summary has to keep (see "Compaction") | `widal apply compact-keep` |
 | `cold-start` | When you send a prompt | Says what the prompt cost, when the session's cache had ended (see "Before a cache ends") | `widal apply cold-start-warn` |
 | `model-switch` | Before a change of model | Shows what the switch costs, and asks first from $0.50 (see "Before a cache ends") | `widal apply model-switch-cost` |
-| `check-settings` | When a session starts | Starts the check of the settings in the background (see "Security and compliance"). On a computer linked to a Widal.Code board, it also starts a sync with the board when the last one is 10 minutes old (see "The Widal.Code board"). | `widal connect` |
+| `check-settings` | When a session starts | Starts the check of the settings in the background (see "Security and compliance"). On a computer linked to a Widal.Code board, it also starts a sync with the board when the last one is 10 minutes old (see "The Widal.Code board"). Once a day it starts the run of the default changes, and it shows once what the last run did (see "Default changes"). | `widal connect` |
 | `check-turn` | When an agent's turn ends | Starts the checks of what the agent did and of the code it changed in the background. On a computer linked to a Widal.Code board, it also starts a sync with the board, as above. | `widal connect` |
 | `push-gate` | Before a shell command | Asks you first before a push while a high risk is open in the repository | `widal connect` |
 | `load-gate` | Before a subagent or a workflow starts | Holds the subagent in a queue while the computer's CPU or memory is busy, and refuses it if the computer stays busy (see "Too many agents at once") | none: plugin only |
@@ -863,7 +863,7 @@ many failed rounds at low effort: /effort medium keeps the cache
 
 - **Switch a model only at a boundary:** the start of a session, a subagent, after a summary of the context, or when the cache is gone. A switch in a running session sends the whole context to the new model again. So the tool proposes a model only for subagents and for new sessions.
 - **A change of the effort level keeps the cache** on the current models. So in a running session the effort level is the switch to use. That is what the hint is for.
-- **Nothing switches on its own.** Vendors that lowered a model or an effort level without asking took that back after complaints. So the tool proposes, and you decide: every change is one command that you run, and one command takes it back.
+- **No model or effort level switches on its own.** Vendors that lowered a model or an effort level without asking took that back after complaints. So the tool proposes those, and you decide: every such change is one command that you run, and one command takes it back. The default changes (see "Default changes") change neither.
 - **The signs in `widal measure` are signs, not proof.** The work before and after a change is not the same work. Tool errors, rounds of fixing and interrupts are published measures of how work went. None is proven for a single switch.
 
 ## Too many agents at once
@@ -975,9 +975,24 @@ The amounts overlap, so they do not add up. Not all of an amount can be saved.
 
 **What an organisation can do instead.** Team and Enterprise admins can export Cowork's tokens and cost per person. Enterprise with usage-based billing has an analytics API per person and product.
 
+## Default changes
+
+Widal.Code makes a few changes on its own, without `widal advise` and `widal apply`. A change becomes a default only after a stage of the benchmark in `bench/` proved it: it saved money with a 95% interval that excludes no saving, and kept the solved tasks within the margin set before the stage (`bench/PREREGISTRATION.md`).
+
+| Default | What it does | The stage that proved it |
+|---|---|---|
+| `tools-unused` | Leaves out the built-in tools of Claude Code that none of your sessions called, as `widal apply tools-unused` does | Stages "current" and "confirm", 24 and 25 Nov 2026: on 199 tasks with Claude Sonnet 5.5, two runs each, 11% less cost (95% interval 18% to 3% less), and solved tasks +1.3 points (-3.5 to +5.8) |
+
+How it works:
+
+- **Only when it fits.** Once a day, the hook at the start of a session starts a run in the background. It applies a default only when your own sessions of the last 30 days show that it fits: when `widal advise` would propose it. For `tools-unused` that is 20 main sessions or more in which no call used those tools.
+- **Measured on your sessions.** Each run measures an applied default as `widal measure` does: the calls it acts on, in the 14 days before and since. From 500 calls in 20 sessions after the change, a default that made those calls 10% or more costlier, or whose tool errors or rounds of fixing rose by more than 25%, is taken back. A default that is 5% or more cheaper with the same signs of the work is kept, and is not measured again.
+- **Told once.** What a run did is shown once at the start of the next session, as a message to you. The model does not see it.
+- **Yours to change.** `widal undo <name>` takes a default back, and it then stays off. A change that you applied yourself is left alone. `widal defaults` lists each default, what happened to it on this computer, and its stage. `widal doctor` lists them too. `widal defaults off` takes back what the defaults applied and stops them, and `widal defaults on` starts them again.
+
 ## Every change the tool can make to Claude Code's settings
 
-Claude Code's settings are in `~/.claude/settings.json`. The tool changes that file only when you run one of these commands.
+Claude Code's settings are in `~/.claude/settings.json`. The tool changes that file only when you run one of these commands, and for the default changes that a benchmark stage proved (see "Default changes"), which it applies with the same `widal apply` and you take back with the same `widal undo`.
 
 | Command | What it changes | How to undo it |
 |---|---|---|
@@ -1124,6 +1139,7 @@ Not built:
 | `src/finding-words.mjs`, `src/findings-text.mjs` | The words for a finding (where it is, its controls, the prompt of Hand to the agent), and the open findings as text |
 | `src/plugin.mjs` | The hooks that the plugin carries, and the rule that keeps a hook from acting twice |
 | `src/board.mjs` | The Widal.Code board: `widal board login`, `status`, `sync` and `logout`, what a sync sends, and its start in the background |
+| `src/defaults.mjs` | The default changes: the list with the stage that proved each one, the daily run in the background that applies, measures and takes back, `widal defaults`, and its state in `~/.widal/defaults.json` |
 | `assets/` | The Widal W mark as a drawing (`widal-code.svg`, the same as the board's) and in two sizes of PNG. The plugin's icon and the desktop extension's icon are `widal-code-512.png`. |
 | `src/prices.mjs` | List prices and the cost of one call |
 | `src/parse-claude.mjs`, `src/parse-codex.mjs`, `src/parse-cowork.mjs` | Read a session log into one record per model call |
