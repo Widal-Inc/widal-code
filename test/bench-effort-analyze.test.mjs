@@ -102,7 +102,7 @@ test('the analysis: a proven saving with no loss lets the advice cite it, and ch
   assert.match(text, /the upper end of the interval is below 1, so the saving counts as proven/)
   assert.match(text, /No default changes from this stage, whatever it shows\./)
   assert.match(text, /in every session whose files were read: yes\./)
-  assert.doesNotMatch(text, /[–—]/)
+  assert.equal([...text].some((c) => c.charCodeAt(0) === 0x2013 || c.charCodeAt(0) === 0x2014), false, 'no dash in the report')
 })
 
 test('the analysis: a session at another effort level than its setup fails the level check', () => {

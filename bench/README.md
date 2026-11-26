@@ -348,6 +348,13 @@ named with `--reference`, or else the first one called "baseline" or with an id 
 than another setup (the error names the missing setup, for example "baseline-2"), or when a setup
 runs another model than the reference and the stage was not made with `--compare-models`.
 
+A stage can keep all its files in one folder. The stage "effort" of `bench/PREREGISTRATION.md` (change
+7) has them in `bench/harbor/v1-effort/`: its two setups (`setups.json`), its stage file with the
+tasks (`stage.json`), the script that runs it (`run.sh`) and the analysis of its result
+(`analyze.mjs`), which was committed before the stage ran. `run.sh` starts the stage only from a
+checkout in which no file differs from its commit, then writes the report and the analysis beside the
+records.
+
 In version 0.1 Widal.Code proposed its changes from the baseline's own sessions. For a new task
 set, run the baseline first, point `widal advise` at the sessions Harbor kept for it (in each
 trial's `agent/sessions` folder), and put what it proposes into the setup.

@@ -185,7 +185,7 @@ function table(c) {
     `| Sessions that ended on a limit or an error of the agent | ${count(c.endedA)} against ${count(c.endedB)} |`,
   ]
   if (c.first) {
-    rows.push(`| Prompt tokens of the first request, median | ${c.first.a} against ${c.first.b} (${c.first.sessions} sessions on both sides) |`)
+    rows.push(`| Prompt tokens of the first request, median | ${Math.round(c.first.a)} against ${Math.round(c.first.b)} (${c.first.sessions} sessions on both sides) |`)
     rows.push(`| Requests per session, mean | ${c.requests.a.toFixed(1)} against ${c.requests.b.toFixed(1)}; ratio of the totals ${interval(c.requests.ratio)} |`)
   }
   return rows.join('\n')
