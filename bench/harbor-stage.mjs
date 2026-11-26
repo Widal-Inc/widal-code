@@ -19,6 +19,9 @@
 // - more than `maxHarnessErrors` (10%) of a block's trials ended on an error of the harness;
 // - a setup solved `safetyGap` (20 points) fewer tasks than the reference setup after two blocks.
 //
+// While the stage runs it can keep the disk of the machine from filling up with Docker images
+// (`diskCleanup`, off by default).
+//
 // status.md shows the spend and the health of the run, never the comparison between the setups, so
 // that nobody reads the result before the stage ends. A stage that is run again skips every task a
 // setup already finished. --plan prints the blocks, the order of the run numbers and the commands, and
@@ -57,11 +60,18 @@
 //                 300; 0 does not check, for a stage that does not run its tasks in Docker)
 //   downloadRetries   how often a Harbor command starts again when the download of its tasks failed
 //                 (default 2)
+//   diskCleanup   {"above": 70, "path": "/", "every": 120}: while the stage runs, the runner looks every
+//                 `every` seconds at how full the disk that holds `path` is. Above `above` percent it
+//                 removes Docker's build cache and the images that no container uses, and nothing else:
+//                 no network, no container and no volume (see DISK_CLEANUP). Each cleanup is written to
+//                 disk-cleanup-<stage>.log in `out`, with the time it started and ended. Off by default,
+//                 because on a person's own computer it would remove their images too. Meant for a
+//                 machine that only runs the benchmark, where a few hundred task images fill the disk.
 //   cap           the most the stage may spend, in dollars
 //   providerCaps  the most each provider may spend over all stages, for example {"api": 1500, "bedrock": 1500}
 //   stopAt, maxHarnessErrors, safetyGap   the stop rules (defaults 0.9, 0.1, 0.2)
 import { spawn } from 'node:child_process'
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { appendFileSync, existsSync, mkdirSync, readFileSync, statfsSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { importJobs, readRecords, taskFile, trialsOf, USAGE_LIMIT_ERROR } from './harbor.mjs'
@@ -106,6 +116,12 @@ export function stageOf(config) {
   if (new Set(c.setups.map((s) => s.provider)).size > 1) throw new Error('All setups of a stage use the same provider.')
   c.reference ??= c.setups[0].id
   c.providerCaps ??= {}
+  if (c.diskCleanup != null) {
+    const d = c.diskCleanup
+    if (typeof d !== 'object' || !(d.above >= 1 && d.above <= 99)) throw new Error('The stage option "diskCleanup" needs "above": the percent of the disk in use (1 to 99) above which Docker images are removed.')
+    c.diskCleanup = { path: '/', every: 120, ...d }
+    if (!(c.diskCleanup.every > 0)) throw new Error('The stage option "diskCleanup" needs "every" as a number of seconds above 0.')
+  }
   return c
 }
 
@@ -335,6 +351,85 @@ export async function dockerReady({ run = runProgram, wait = sleep, now = Date.n
   }
 }
 
+/**
+ * How full the disk that holds `path` is, in percent, counted as `df` counts it: what is in use, of what
+ * is in use plus what a program may still write, rounded up.
+ */
+export function diskUsed(path, statfs = statfsSync) {
+  const s = statfs(path)
+  const used = s.blocks - s.bfree
+  return used + s.bavail > 0 ? Math.ceil((100 * used) / (used + s.bavail)) : 0
+}
+
+/**
+ * What the disk cleanup runs: it removes Docker's build cache and the images that no container uses.
+ * It removes nothing else, on purpose. A prune of everything (`docker system prune`) also removes the
+ * networks that no container uses yet, and Harbor makes the network of a task a moment before its
+ * container. On 25 Nov 2026 such a prune, run by a script on the runner, ended four trials of the stage
+ * "lean" with "network not found" while they started. Docker does not remove an image that a container
+ * uses. A trial that starts in the same seconds may have to build or pull its image again.
+ */
+export const DISK_CLEANUP = [
+  ['docker', ['builder', 'prune', '-a', '-f']],
+  ['docker', ['image', 'prune', '-a', '-f']],
+]
+
+/**
+ * Looks at the disk once, and cleans it when it is fuller than the stage's `diskCleanup.above`.
+ * @param {object} stage The stage, from stageOf, with `diskCleanup`.
+ * @param {{run?: Function, used?: Function, log?: Function}} [options] `run` starts a program and gives
+ *   {code, output}, `used` gives the percent of the disk in use, and `log` takes one line per event, so
+ *   that a test can pass made-up ones in.
+ * @returns {Promise<null | {before: number, after: number, errors: string[]}>} null when the disk was
+ *   not full enough.
+ */
+export async function cleanDisk(stage, { run = runProgram, used = diskUsed, log = () => {} } = {}) {
+  const { path, above } = stage.diskCleanup
+  const before = used(path)
+  if (!(before > above)) return null
+  log(`disk ${before}%, above ${above}%: removing Docker's build cache and the images that no container uses`)
+  const errors = []
+  for (const [program, args] of DISK_CLEANUP) {
+    const r = await run(program, args)
+    if (r.code !== 0) errors.push(`${[program, ...args].join(' ')} ended with code ${r.code}: ${String(r.output ?? '').trim().split('\n').pop()}`)
+  }
+  const after = used(path)
+  log(`cleanup ended, disk ${after}%${errors.length ? `. ${errors.join('. ')}` : ''}`)
+  return { before, after, errors }
+}
+
+/** Starts a function every `ms` milliseconds and gives the function that stops it. */
+function every(fn, ms) {
+  const timer = setInterval(fn, ms)
+  return () => clearInterval(timer)
+}
+
+/**
+ * Keeps the disk clean while a stage runs: one look now, and one every `diskCleanup.every` seconds. A
+ * look that comes while a cleanup still runs does nothing, and a cleanup that fails is written to the
+ * log and does not end the stage.
+ * @returns {Promise<Function>} The function that stops the looks.
+ */
+async function diskGuard(stage, { program, now, timer, used }) {
+  if (!stage.diskCleanup) return () => {}
+  const file = join(stage.out, `disk-cleanup-${stage.name}.log`)
+  const log = (line) => appendFileSync(file, `${new Date(now()).toISOString()} ${line}\n`)
+  let busy = false
+  const look = async () => {
+    if (busy) return
+    busy = true
+    try {
+      await cleanDisk(stage, { run: program, used, log })
+    } catch (error) {
+      log(`the cleanup failed: ${error.message}`)
+    } finally {
+      busy = false
+    }
+  }
+  await look()
+  return timer(look, stage.diskCleanup.every * 1000)
+}
+
 /** How Harbor's output shows that a download of the tasks did not reach its server. */
 export const DOWNLOAD_FAILED = /ApiConnectionError/
 
@@ -411,15 +506,27 @@ export function planOf(stage) {
  * Runs the blocks of a stage until they are done or a stop rule holds, and writes the status file and the
  * ledger after each block.
  * @param {object} stage The stage, from stageOf.
- * @param {{run?: Function, program?: Function, wait?: Function, now?: Function}} [options] `run` starts one
- *   Harbor command and gives {code, output}, `program` starts `docker info`, `wait` sleeps and `now` is the
- *   clock. A test passes made-up ones in, so that nothing here needs Harbor or Docker.
+ * @param {{run?: Function, program?: Function, wait?: Function, now?: Function, timer?: Function, used?: Function}} [options]
+ *   `run` starts one Harbor command and gives {code, output}, `program` starts `docker info` and the
+ *   commands of the disk cleanup, `wait` sleeps, `now` is the clock, `timer` starts a function every so
+ *   many milliseconds and gives the function that stops it, and `used` gives the percent of the disk in
+ *   use. A test passes made-up ones in, so that nothing here needs Harbor or Docker.
  * @returns {Promise<{blocks: number, blocksDone: number, stopped: string | null}>}
  */
-export async function runStage(stage, { run = runHarbor, program = runProgram, wait = sleep, now = Date.now } = {}) {
+export async function runStage(stage, { run = runHarbor, program = runProgram, wait = sleep, now = Date.now, timer = every, used = diskUsed } = {}) {
   const blocks = blocksOf(stage.tasks, stage.blockSize, stage.seed)
   mkdirSync(stage.out, { recursive: true })
   if (stage.dockerWait) await dockerReady({ run: program, wait, now, seconds: stage.dockerWait })
+  const stopGuard = await diskGuard(stage, { program, now, timer, used })
+  try {
+    return await runBlocks(stage, blocks, { run, wait })
+  } finally {
+    stopGuard()
+  }
+}
+
+/** The blocks of a stage, one after another, with the stop rules before and after each. */
+async function runBlocks(stage, blocks, { run, wait }) {
   let stopped = null
   let blocksDone = 0
   for (const [n, block] of blocks.entries()) {

@@ -30,6 +30,9 @@
 //                   check can only refuse a stage that other code passes to checkStage.)
 //   --model, --provider, --agent   for every setup of the stage (one provider per stage)
 //   --cap, --concurrency, --block-size, --seed
+//   --disk-cleanup N   while the stage runs, Docker's build cache and the images that no container uses
+//                   are removed whenever the disk is more than N percent full ("diskCleanup" in the
+//                   stage file). For a machine that only runs the benchmark.
 //   --budget        the most one session may spend, in dollars, for the copies this stage writes
 //   --effort        the effort level of those copies (low, medium, high, xhigh, max)
 //   --fast          those copies run in fast mode (Claude Opus 5.5 and Claude Fable 5.2, at twice the price)
@@ -41,7 +44,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { shuffled } from './harbor-stage.mjs'
+import { shuffled, stageOf } from './harbor-stage.mjs'
 
 const SEED = 20261122
 
@@ -196,7 +199,10 @@ function main() {
     concurrency: Number(f.concurrency ?? 4),
     cap: Number(f.cap),
     providerCaps: { api: 1500, bedrock: 1500, openai: Number(f['openai-cap'] ?? 500) },
+    ...(f['disk-cleanup'] ? { diskCleanup: { above: Number(f['disk-cleanup']) } } : {}),
   }
+  // The stage runner would refuse the file for the same reasons when the stage starts.
+  stageOf(stage)
   writeFileSync(f.out, `${JSON.stringify(stage, null, 1)}\n`)
   console.log(`${f.name}: ${tasks.length} tasks${passed ? ' that passed the oracle' : ''}${excluded.length ? `, ${excluded.length} excluded` : ''}; setups ${setups.map((s) => s.id).join(', ')}; cap $${f.cap}`)
 }

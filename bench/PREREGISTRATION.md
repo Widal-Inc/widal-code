@@ -560,3 +560,32 @@ the stages "confirm" and "haiku" was also looked at, to size this stage.
 - **The usage limit.** A session that ends on the account's usage limit ("You have reached your specified API
   usage limits") is not a result. A guard on the runner stops both models at the first such session, and the
   tasks of the blocks that were running then are left out in every setup.
+
+## Correction, 26 Nov 2026: the disk cleanup is part of the stage runner, and removes images only
+
+This changes no measure, setup, task or cap, and no number of a stage that has ended.
+
+A few hundred task images fill the runner's disk, so since 23 Nov 2026 a script on the runner removed what
+Docker did not use whenever the disk was more than 70% full. The script was not in this repository, and it
+removed everything unused: images, the build cache, and also networks. Harbor makes the network of a task a
+moment before its container, so a cleanup could remove the network of a trial that was starting.
+
+In the stage "lean" this ended four trials, all on Haiku 5.5: apache pulsar 25793 in all three setups and
+matrixone 24632 in `skill`. They started between 20:47:04 and 20:49:39 UTC on 25 Nov 2026, inside the cleanup
+that ran from 20:46:37 to 20:51:57 UTC, and ended with "network not found". One more trial, on Sonnet 5.5 in
+`skill`, failed in `docker compose` at 17:11:40 UTC, a minute before the cleanup of 17:12:43 UTC was written
+to the log. That one is likely the same cause and is not proven. All five are errors of the harness: they
+spent nothing, count in no number of the stage, and are listed in its report. After the stage ended, the script
+on the runner was changed by hand to remove images and the build cache only (21:32 UTC on 25 Nov 2026).
+
+From now on the cleanup is code of this repository. A stage file turns it on with `diskCleanup`
+(`--disk-cleanup` in `bench/harbor-make-stage.mjs`), and `bench/harbor-stage.mjs` then looks at the disk
+every two minutes while the stage runs. Above the limit it removes Docker's build cache and the images that
+no container uses, and nothing else: no network, no container and no volume. It writes the start and the end
+of each cleanup to `disk-cleanup-<stage>.log` beside the records, so that the report of a stage can set every
+error of the harness against the cleanups. The script on the runner is turned off before the next stage
+starts, and every later stage file sets `diskCleanup`. The cleanup is covered by tests with a made-up Docker
+and a made-up disk. No stage has run with it yet.
+
+What stays possible: Docker does not remove an image that a container uses, but a trial that starts in the
+same seconds as a cleanup may have to build or pull its image again, which costs time and no money.
