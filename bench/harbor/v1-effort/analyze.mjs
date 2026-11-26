@@ -283,6 +283,10 @@ function main() {
     low,
     levels: { [base]: arg('base-level') ?? LEVEL[BASE], [low]: arg('low-level') ?? LEVEL[LOW] },
   })
+  if (!data.primary.tasks) {
+    console.error(`No task of the stage "${data.stage}" was run by both setups (${low}: ${data.setups[low].counted} counted records, ${base}: ${data.setups[base].counted}). Check --records, and --stage, --base and --low for a dry run.`)
+    process.exit(1)
+  }
   console.log(text)
   if (arg('json')) writeFileSync(arg('json'), `${JSON.stringify(data, null, 1)}\n`)
 }

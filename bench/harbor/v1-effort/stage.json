@@ -1,0 +1,546 @@
+{
+ "name": "effort",
+ "out": "/opt/bench/effort/v1",
+ "jobs": "/opt/bench/effort/jobs",
+ "setupsFile": "/opt/bench/widal-code-effort/bench/harbor/v1-effort/setups.json",
+ "claudeCode": "2.1.330",
+ "commands": {
+  "api": [
+   "/opt/bench/with-key.sh",
+   "/opt/bench/harbor.sh"
+  ]
+ },
+ "env": {},
+ "setups": [
+  {
+   "id": "effort-base",
+   "arm": "effort-base",
+   "rep": 1,
+   "model": "anthropic/claude-sonnet-5-5",
+   "provider": "api"
+  },
+  {
+   "id": "effort-low",
+   "arm": "effort-low",
+   "rep": 1,
+   "model": "anthropic/claude-sonnet-5-5",
+   "provider": "api"
+  }
+ ],
+ "reference": "effort-base",
+ "tasks": [
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pypsa__pypsa-1653"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/keras-team__keras-22330"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/sqlfluff__sqlfluff-7615"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/stablyai__orca-4331"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/sipeed__picoclaw-2928"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/ivov__lisette-657"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/delgan__loguru-1451"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-fbdb72a2bd39b05131ff905780d9d4a2a074de26-vbc0d9ba8f0071fbe982809910959a6ff8884dbbf"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/rest-sh__restish-337"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/kestra-io__kestra-16119"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/overfull-hbox"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/kv-store-grpc"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/kubernetes-sigs__kueue-11619"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/stablyai__orca-5176"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/bn-fit-modify"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/merge-diff-arc-agi-task"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/tursodatabase__turso-7117"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/teng-lin__notebooklm-py-826"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/adaptive-rejection-sampler"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/keras-team__keras-22642"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/sqlite-db-truncate"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pyinfra-dev__pyinfra-1679_interface"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_flipt-io__flipt-ea9a2663b176da329b3f574da2ce2a664fc5b4a1"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/stanfordnlp__dspy-9478_interface"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/floci-io__floci-1209"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/docker__docker-agent-2992"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-a48fd6ba9482c527602bc081491d9e8ae6e8226c-vfa6ff903cb27f336e17654595dd900fa943dcd91"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pennylaneai__pennylane-9298"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-01b519cd49e6a24d9a05d2eb97f54e420740072e"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/ueberdosis__tiptap-7887"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/cobol-modernization"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/sam-cell-seg"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pypa__build-1027"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/schemathesis__schemathesis-3778"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/unit8co__darts-3065"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/astronomy-commons__hats-648"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/meltano__meltano-9929"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/marimo-team__marimo-9626"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/python-wheel-build__fromager-1124"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/raullenchai__rapid-mlx-289"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/build-pmars"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-fe240cbf7f0fdd6744ef7bef8cb61676bcdbb621-vc4e41fd0029957297843cb9dec4a25c7c756f029"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-f373ac3808deefce8183dad8d16729839cc330c1-v2939aa9f4356f0dc9f523ee5ce19d09e08ab979b"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-12a6cbaa4f8b43c2f85caca0787ab55501539955-vc4e41fd0029957297843cb9dec4a25c7c756f029"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/olofk__fusesoc-776_interface"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/fix-git"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pandas-dev__pandas-64816"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-cfc237c2b79d8c731bbfc6cadf977ed530bfd57a-v0495b863a912fbff5749c67e860612b91825407c"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_element-hq__element-web-772df3021201d9c73835a626df8dcb6334ad9a3e-vnan"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_internetarchive__openlibrary-7bf3238533070f2d24bafbb26eedf675d51941f6-v08d8e8889ec945ab821fb156c04c7d2e2810debb"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/ArcadeData__arcadedb-4455"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tox-dev__tox-3931"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-8513a9e8114a8b42e64f4348335e0f23efa054c4-vee878bb72091875e912c52fc32bc60ec3760227b"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/extract-elf"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/vulnerable-secret"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/mikro-orm__mikro-orm-7799"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/gleam-lang__gleam-5798"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/mvanhorn__cli-printing-press-2086"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/tailscale__tailscale-19847"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/ludo-technologies__pyscn-500"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_future-architect__vuls-c11ba27509f733d7d280bdf661cbbe2e7a99df4c"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/ueberdosis__tiptap-7896"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/winning-avg-corewars"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/genericmappingtools__pygmt-4463"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_navidrome__navidrome-0130c6dc13438b48cf0fdfab08a89e357b5517c9"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/HKUDS__nanobot-4048"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/langchain4j__langchain4j-5328"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_flipt-io__flipt-cd2f3b0a9d4d8b8a6d3d56afab65851ecdc408e8"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/schemathesis__schemathesis-3933"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tobymao__sqlglot-7479"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/dna-insert"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_flipt-io__flipt-a0cbc0cb65ae601270bdbe3f5313e2dfd49c80e4"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/polyglot-rust-c"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/nearai__ironclaw-3735"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/rust-lang__rust-analyzer-22397"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/nearai__ironclaw-3694"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/scikit-learn__scikit-learn-33565"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_nodebb__nodebb-be43cd25974681c9743d424238b7536c357dc8d3-vf2cf3cbd463b7ad942381f1c6d077626485a1e9e"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/matrixorigin__matrixone-24632"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-1e516e989b3c0221f4af6b297d9c0e4c43e4adc3-vbc0d9ba8f0071fbe982809910959a6ff8884dbbf"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/ubugeeei-prod__vize-1281"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-fcfa069a06ade76d91bac38127f3235c13d78eb1-v5fc38aaf22415ab0b70567368332beee7955b367"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/floci-io__floci-1235"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/circuit-fibsqrt"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/torch-tensor-parallelism"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/line__line-bot-sdk-python-981_interface"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/cloudflare__vinext-1371"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/withcoral__coral-1186"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/getmoto__moto-9903"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/ivov__lisette-491"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/open-jarvis__OpenJarvis-465"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pallets-eco__wtforms-892_interface"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/langchain4j__langchain4j-5367"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/microsoft__qcodes-8039"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_protonmail__webclients-815695401137dac2975400fc610149a16db8214b"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/schemelike-metacircular-eval"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-3b823d908e8a5d17674f8c26d337d3114b7493b1-v0f01c69f1e2528b935359cfe578530722bca2c59"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-b4934a0f3c34d9d7649e944b183137e8fad3e859-vbc0d9ba8f0071fbe982809910959a6ff8884dbbf"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/pydantic__pydantic-ai-5580"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/vprusso__toqito-1538"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/cloudflare__vinext-1837"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/better-auth__better-auth-9756"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/code-from-image"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/koxudaxi__datamodel-code-generator-3071"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/fathah__hermes-desktop-268"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/ubugeeei-prod__vize-769"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_tutao__tutanota-f3ffe17af6e8ab007e8d461355057ad237846d9d-vbc0d9ba8f0071fbe982809910959a6ff8884dbbf"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/Soju06__codex-lb-744"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_ansible__ansible-c616e54a6e23fa5616a1d56d243f69576164ef9b-v1055803c3a812189a1133297f7f5468579283f86"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/tashfeenahmed__freellmapi-289"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/danny-avila__LibreChat-13166"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/vuejs__core-14897"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/pyinfra-dev__pyinfra-1665"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/large-scale-text-editing"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/copier-org__copier-2646"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/geopython__pygeoapi-2338"
+  },
+  {
+   "dataset": "cais/swebenchpro",
+   "task": "cais/instance_qutebrowser__qutebrowser-deeb15d6f009b3ca0c3bd503a7cef07462bd16b4-v363c8a7e5ccdf6968fc7ab84a2053ac78036691d"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/intellectronica__ruler-556"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/Gentleman-Programming__gentle-ai-595"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/nesquena__hermes-webui-1818"
+  },
+  {
+   "dataset": "ibragim-badertdinov/swe-rebench-07-2026",
+   "task": "ibragim-badertdinov/apache__hugegraph-3037"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tox-dev__tox-3846"
+  },
+  {
+   "dataset": "terminal-bench/terminal-bench-2-1",
+   "task": "terminal-bench/write-compressor"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/tox-dev__tox-3904"
+  },
+  {
+   "dataset": "swe-rebench/swe-rebench-leaderboard",
+   "task": "swe-rebench/ucfopen__canvasapi-716"
+  }
+ ],
+ "blockSize": 25,
+ "seed": 20261201,
+ "concurrency": 3,
+ "cap": 40,
+ "providerCaps": {
+  "api": 1500,
+  "bedrock": 1500,
+  "openai": 500
+ },
+ "taskSetsTogether": true,
+ "diskCleanup": {
+  "above": 70
+ }
+}

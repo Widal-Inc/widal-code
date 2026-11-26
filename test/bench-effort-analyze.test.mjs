@@ -1,10 +1,12 @@
 // The analysis of the stage "effort" (bench/harbor/v1-effort/analyze.mjs): which records count, the
 // measures of the registered plan, and the check that every session ran at its setup's effort level.
 import assert from 'node:assert/strict'
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
+import { fileURLToPath } from 'node:url'
 import { analysis, BASE, compare, loadSetup, LOW, sessionOf } from '../bench/harbor/v1-effort/analyze.mjs'
 
 /** A records folder and a jobs folder with the trials of both setups. */
@@ -143,4 +145,21 @@ test('a dry run names another stage, other setups and other levels', () => {
   assert.equal(data.primary.tasks, 6)
   assert.equal(data.rule.levelHeld, true)
   assert.equal(analysis(folders).data.primary.tasks, 0)
+})
+
+test('the command prints the analysis, and refuses records in which no task was run by both setups', () => {
+  const script = fileURLToPath(new URL('../bench/harbor/v1-effort/analyze.mjs', import.meta.url))
+  const trials = []
+  for (let i = 0; i < 6; i++) trials.push(...pair(`t${i}`, { cost: 1, reward: 1 }, { cost: 0.5, reward: 1 }))
+  const { records, jobs } = stage(trials)
+  const json = join(records, 'analysis.json')
+  const good = spawnSync(process.execPath, [script, '--records', records, '--jobs', jobs, '--json', json], { encoding: 'utf8' })
+  assert.equal(good.status, 0, good.stderr)
+  assert.match(good.stdout, /^## What ran/)
+  assert.ok(existsSync(json))
+  const empty = spawnSync(process.execPath, [script, '--records', join(records, 'nothing-here'), '--json', join(records, 'none.json')], { encoding: 'utf8' })
+  assert.equal(empty.status, 1)
+  assert.match(empty.stderr, /No task of the stage "effort" was run by both setups/)
+  assert.equal(empty.stdout, '')
+  assert.equal(existsSync(join(records, 'none.json')), false)
 })
