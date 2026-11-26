@@ -590,6 +590,38 @@ and a made-up disk. No stage has run with it yet.
 What stays possible: Docker does not remove an image that a container uses, but a trial that starts in the
 same seconds as a cleanup may have to build or pull its image again, which costs time and no money.
 
+## Recorded, 26 Nov 2026: the harness changes ran in real containers
+
+This changes no measure, setup, task or cap, and it is no stage: its sessions count in no result.
+
+Two harness changes had only run in tests: the API key in a file and no longer on a command line (the
+correction of 25 Nov 2026), and the disk cleanup inside the stage runner (the correction of 26 Nov 2026).
+Neither had run with the stage runner of this repository as it is, because the stage "lean" still ran with a
+copy of the block loop on the runner. So a small run ("harness-check") was made on the second runner on 26
+Nov 2026, from 01:50:37 to 02:09:58 UTC, from a checkout at commit bca700c with no changed file: 8 of the 20
+tasks of the test, on Claude Haiku 5.5, in two setups (Claude Code's default settings, and the same at the
+effort level low), one block, 16 sessions. The script on the runner that used to clean the disk was turned
+off before it.
+
+- **The stage runner.** All 16 sessions ran and ended, none on an error of the harness or of the agent. They
+  cost $0.31 against a cap of $3, and the ledger, the status file and the report were written.
+- **The key.** While the run lasted, a watcher read the arguments of every process on the runner every two
+  seconds, 579 times. It saw 141 `docker compose exec` processes, 64 of them with a Claude Code session, and
+  no process had the key in its arguments. `ANTHROPIC_API_KEY` was no longer among the variables on those
+  command lines. (`ANTHROPIC_AUTH_TOKEN` still is, with an empty value: Harbor empties the key variable that
+  is not in use.) Looked at from inside at 02:08:37 UTC, a container with a running session held the file of
+  keys and had no process with the key in its arguments. A minute later that session had ended, and the
+  file was gone from its container. Of the 323 files the run wrote (records, job folders, logs), none holds
+  the key.
+- **The disk cleanup.** For this run the limit was set to 10% of the disk, far below a real stage's 70%, so
+  that the cleanup ran as often as it could. It ran four times: once before the first trial, when it freed
+  23 GB of images of earlier stages in 75 seconds, and three times while 3 to 6 task containers ran (at
+  01:53:52, 01:55:52 and 01:57:52 UTC, each in under a second). No trial failed. That is one small run and
+  not a proof: what rules out the error of the stage "lean" is that the cleanup no longer removes a network.
+
+What it did not check: a stage of Codex, whose key a stage still gives with Harbor's `--ae`, and a cleanup on
+a disk that is really full.
+
 ## Change 7, 26 Nov 2026: a stage "effort" for the effort level low, on Claude Sonnet 5.5
 
 Widal.Code's advice proposes to start sessions at a lower effort level (`widal advise`, the proposal
@@ -614,6 +646,9 @@ Claude Code starts with, and does it solve as many tasks?
 - Which level Claude Code starts with was read from the session files that the stage "lean" kept. Every
   request of a session records its effort level there, and all 641 requests of the 65 sessions of
   `lean-s-base` ran at medium. So in this stage "Claude Code's default" means medium, on Claude Code 2.1.330.
+- The run "harness-check" of 26 Nov 2026 (above) ran the default effort level and the level low on Claude
+  Haiku 5.5, on 8 tasks of the test. Its comparison was seen when the analysis script was tried on its
+  records. Eight tasks on another model say nothing about this stage, and they count in no result.
 
 The plan:
 
@@ -635,7 +670,8 @@ The plan:
   `bench/harbor/v1-effort/run.sh` from a checkout of this repository at the commit of this change, and the
   script starts nothing when a file of the checkout differs from that commit. It is the first stage that
   runs with the stage runner of this repository as it is, and no longer with a copy of the block loop on
-  the runner. The disk cleanup of the correction of 26 Nov 2026 is on, above 70%.
+  the runner; the run "harness-check" above ran that stage runner in real containers first. The disk
+  cleanup of the correction of 26 Nov 2026 is on, above 70%.
 - **Size, and what it can show.** From the costs of the stage "lean" per task set, `effort-base` is expected
   to cost about $19 and `effort-low` about $14, so about $33 in all. The cap is $40, and the stage runner
   starts no new block once $36 are spent. With 125 tasks the 95% intervals are expected to be about 8 points
@@ -659,9 +695,10 @@ The plan:
   session, the session time and the cost per solved task, per setup. The sessions that ended on a limit (the
   time limit of a task or the session budget), per setup. The results per task set.
 - **Analysis.** `bench/harbor/v1-effort/analyze.mjs`, committed with this change, prints every number named
-  here. It was run on the records of the test, whose numbers were known, to see that it reads real records
-  and session files, and it gave the test's numbers. `run.sh` runs it when the stage has ended. While the
-  stage runs, only the status file is looked at, which holds spend and health and no comparison.
+  here. It was run on the records of the test and of the run "harness-check", whose numbers were known, to
+  see that it reads real records and session files, and it gave the test's numbers. `run.sh` runs it when
+  the stage has ended. While the stage runs, only the status file is looked at, which holds spend and
+  health and no comparison.
 - **What the stage cannot show.** It runs one model and one version of Claude Code, and it compares low
   with medium only. The tasks are short and have hidden tests (in `lean-s-base` the median session took 54
   seconds), and long or hard work may lose more at a lower effort than these tasks do. No person takes part
