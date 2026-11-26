@@ -30,6 +30,9 @@
 //                   check can only refuse a stage that other code passes to checkStage.)
 //   --model, --provider, --agent   for every setup of the stage (one provider per stage)
 //   --cap, --concurrency, --block-size, --seed
+//   --task-sets-together   within a setup, the task sets of a block run at the same time instead of one
+//                   after the other ("taskSetsTogether" in the stage file), so that a block waits for its
+//                   slowest task once
 //   --disk-cleanup N   while the stage runs, Docker's build cache and the images that no container uses
 //                   are removed whenever the disk is more than N percent full ("diskCleanup" in the
 //                   stage file). For a machine that only runs the benchmark.
@@ -199,6 +202,7 @@ function main() {
     concurrency: Number(f.concurrency ?? 4),
     cap: Number(f.cap),
     providerCaps: { api: 1500, bedrock: 1500, openai: Number(f['openai-cap'] ?? 500) },
+    ...(f['task-sets-together'] === true ? { taskSetsTogether: true } : {}),
     ...(f['disk-cleanup'] ? { diskCleanup: { above: Number(f['disk-cleanup']) } } : {}),
   }
   // The stage runner would refuse the file for the same reasons when the stage starts.

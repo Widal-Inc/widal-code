@@ -1,0 +1,43 @@
+{
+  "setups": [
+    {
+      "id": "effort-base",
+      "name": "Claude Code's default settings and its default effort level",
+      "settings": {
+        "autoMemoryEnabled": false,
+        "env": {
+          "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+          "DISABLE_AUTOUPDATER": "1",
+          "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS": "1"
+        }
+      },
+      "budget": 4,
+      "rootInstall": [
+        "for h in github.com api.github.com raw.githubusercontent.com codeload.github.com objects.githubusercontent.com gist.github.com uploads.github.com; do echo \"0.0.0.0 $h\" >> /etc/hosts; done"
+      ],
+      "agentInstall": [
+        "{ grep -c \"0.0.0.0 .*github\" /etc/hosts; if curl -s -m 8 -o /dev/null https://github.com; then echo GITHUB_REACHABLE; else echo GITHUB_BLOCKED; fi; } > /logs/agent/network-check.txt 2>&1"
+      ]
+    },
+    {
+      "id": "effort-low",
+      "name": "Claude Code's default settings with the effort level low",
+      "settings": {
+        "autoMemoryEnabled": false,
+        "env": {
+          "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+          "DISABLE_AUTOUPDATER": "1",
+          "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS": "1"
+        }
+      },
+      "effort": "low",
+      "budget": 4,
+      "rootInstall": [
+        "for h in github.com api.github.com raw.githubusercontent.com codeload.github.com objects.githubusercontent.com gist.github.com uploads.github.com; do echo \"0.0.0.0 $h\" >> /etc/hosts; done"
+      ],
+      "agentInstall": [
+        "{ grep -c \"0.0.0.0 .*github\" /etc/hosts; if curl -s -m 8 -o /dev/null https://github.com; then echo GITHUB_REACHABLE; else echo GITHUB_BLOCKED; fi; } > /logs/agent/network-check.txt 2>&1"
+      ]
+    }
+  ]
+}
