@@ -589,3 +589,131 @@ and a made-up disk. No stage has run with it yet.
 
 What stays possible: Docker does not remove an image that a container uses, but a trial that starts in the
 same seconds as a cleanup may have to build or pull its image again, which costs time and no money.
+
+## Recorded, 26 Nov 2026: the harness changes ran in real containers
+
+This changes no measure, setup, task or cap, and it is no stage: its sessions count in no result.
+
+Two harness changes had only run in tests: the API key in a file and no longer on a command line (the
+correction of 25 Nov 2026), and the disk cleanup inside the stage runner (the correction of 26 Nov 2026).
+Neither had run with the stage runner of this repository as it is, because the stage "lean" still ran with a
+copy of the block loop on the runner. So a small run ("harness-check") was made on the second runner on 26
+Nov 2026, from 01:50:37 to 02:09:58 UTC, from a checkout at commit bca700c with no changed file: 8 of the 20
+tasks of the test, on Claude Haiku 5.5, in two setups (Claude Code's default settings, and the same at the
+effort level low), one block, 16 sessions. The script on the runner that used to clean the disk was turned
+off before it.
+
+- **The stage runner.** All 16 sessions ran and ended, none on an error of the harness or of the agent. They
+  cost $0.31 against a cap of $3, and the ledger, the status file and the report were written.
+- **The key.** While the run lasted, a watcher read the arguments of every process on the runner every two
+  seconds, 579 times. It saw 141 `docker compose exec` processes, 64 of them with a Claude Code session, and
+  no process had the key in its arguments. `ANTHROPIC_API_KEY` was no longer among the variables on those
+  command lines. (`ANTHROPIC_AUTH_TOKEN` still is, with an empty value: Harbor empties the key variable that
+  is not in use.) Looked at from inside at 02:08:37 UTC, a container with a running session held the file of
+  keys and had no process with the key in its arguments. A minute later that session had ended, and the
+  file was gone from its container. Of the 323 files the run wrote (records, job folders, logs), none holds
+  the key.
+- **The disk cleanup.** For this run the limit was set to 10% of the disk, far below a real stage's 70%, so
+  that the cleanup ran as often as it could. It ran four times: once before the first trial, when it freed
+  23 GB of images of earlier stages in 75 seconds, and three times while 3 to 6 task containers ran (at
+  01:53:52, 01:55:52 and 01:57:52 UTC, each in under a second). No trial failed. That is one small run and
+  not a proof: what rules out the error of the stage "lean" is that the cleanup no longer removes a network.
+
+What it did not check: a stage of Codex, whose key a stage still gives with Harbor's `--ae`, and a cleanup on
+a disk that is really full.
+
+## Change 7, 26 Nov 2026: a stage "effort" for the effort level low, on Claude Sonnet 5.5
+
+Widal.Code's advice proposes to start sessions at a lower effort level (`widal advise`, the proposal
+"Start sessions at a lower effort"), and no number of this benchmark stands behind that proposal for Claude
+Sonnet 5.5. No registered stage has compared two effort levels on Sonnet 5.5: the stages on Sonnet 5.5 set no
+level, and the stage on Claude Fable 5.2 compared xhigh with high. Nils asked on 25 Nov 2026 for this stage
+to be prepared, and it does not start before he says so. The question:
+
+On Claude Sonnet 5.5, does a session at the effort level low cost less than a session at the level that
+Claude Code starts with, and does it solve as many tasks?
+
+**What was seen before this change was written.**
+
+- The test of 25 Nov 2026 ("lean-pilot", 20 tasks, not registered) ran Sonnet 5.5 with eight tools left out
+  at Claude Code's own effort level and at the level low. Low cost 27.9% less in the ratio of the totals (95%
+  interval -47.4% to -7.5%), cost less on 16 of the 20 tasks, and both solved 13 of 20, with one task solved
+  by each side only. With 20 tasks that decides nothing. The test counts in no result of this stage, and its
+  20 tasks are left out. The standard deviation of a task's log cost ratio between the two setups was 0.47,
+  which is used below to size the stage.
+- The stage "lean" had ended and its report was read: the setup `lean-s-base` (Claude Code's default
+  settings on Sonnet 5.5) cost $0.156 per task on 65 tasks.
+- Which level Claude Code starts with was read from the session files that the stage "lean" kept. Every
+  request of a session records its effort level there, and all 641 requests of the 65 sessions of
+  `lean-s-base` ran at medium. So in this stage "Claude Code's default" means medium, on Claude Code 2.1.330.
+- The run "harness-check" of 26 Nov 2026 (above) ran the default effort level and the level low on Claude
+  Haiku 5.5, on 8 tasks of the test. Its comparison was seen when the analysis script was tried on its
+  records. Eight tasks on another model say nothing about this stage, and they count in no result.
+
+The plan:
+
+- **Setups, fixed before the stage.** Settings only, with no plugin, no hook and no tool left out, so the
+  stage measures the effort level alone. Both are in `bench/harbor/v1-effort/setups.json`.
+  - `effort-base`: Claude Code's default settings and no effort level set. It is the setup `lean-s-base` of
+    the stage "lean" under another name.
+  - `effort-low`: the same, started with the effort level low. Nothing else differs.
+
+  Sonnet 5.5, Claude Code 2.1.330, one run per setup, and the session budget of the earlier stages ($4).
+- **Tasks.** 125 tasks, drawn with the seed 20261201 from the 269 tasks of `bench/harbor/v1-tasks.json` that
+  passed the oracle and were not in the test: 45 of swe-rebench 07-2026, 35 of the swe-rebench leaderboard,
+  24 of SWE-bench Pro and 21 of Terminal-Bench 2.1. Most of them ran in earlier stages, which gives neither
+  setup an advantage, because no setup is made from sessions and both run the same tasks. The stage file is
+  `bench/harbor/v1-effort/stage.json`, written by `bench/harbor-make-stage.mjs` on the runner on 26 Nov 2026.
+- **Order and runner.** The second runner. The tasks are shuffled with the stage's seed and run in blocks of
+  25. Both setups run each block side by side, so that they share the load of the machine, with the task
+  sets of a block at the same time and at most 3 trials at a time per task set. The stage is started by
+  `bench/harbor/v1-effort/run.sh` from a checkout of this repository at the commit of this change, and the
+  script starts nothing when a file of the checkout differs from that commit. It is the first stage that
+  runs with the stage runner of this repository as it is, and no longer with a copy of the block loop on
+  the runner; the run "harness-check" above ran that stage runner in real containers first. The disk
+  cleanup of the correction of 26 Nov 2026 is on, above 70%.
+- **Size, and what it can show.** From the costs of the stage "lean" per task set, `effort-base` is expected
+  to cost about $19 and `effort-low` about $14, so about $33 in all. The cap is $40, and the stage runner
+  starts no new block once $36 are spent. With 125 tasks the 95% intervals are expected to be about 8 points
+  wide to each side for the cost of a typical task, and about 8 to 12 points for the ratio of the totals. In
+  the test and in the stage "lean", two setups on Sonnet 5.5 differed in whether a task was solved on 8% to
+  10% of the tasks, so the share solved is expected to be known to about 5 to 7 points to each side. The
+  stage can show a saving of the size the test saw. It can show a loss of solved tasks of about 8 to 10
+  points or more, and it cannot show that less than 3 points are lost.
+- **Primary measure.** The cost ratio of `effort-low` against `effort-base`, as the ratio of the totals, like
+  in every stage before. The saving counts as proven when the upper end of its 95% interval is below 1.
+- **Named secondary measure.** The cost of a typical task: the geometric mean of the per-task cost ratios
+  with its 95% interval. A saving that only the typical task shows is reported as "a typical task costs
+  less", never as a lower bill.
+- **Check.** The difference in the share solved, `effort-low` minus `effort-base`, with its 95% interval.
+  The report states the margin the tasks reached, as change 1 says, and names the tasks that only one side
+  solved. The safety rule of 20 points stands.
+- **Control.** The effort level of every request, read from the session files of every trial. Every session
+  of `effort-base` must have run at medium and every session of `effort-low` at low. A session with a
+  request at another level is named in the report.
+- **Secondary, reported, not used for the decision.** The output tokens, the input tokens, the requests per
+  session, the session time and the cost per solved task, per setup. The sessions that ended on a limit (the
+  time limit of a task or the session budget), per setup. The results per task set.
+- **Analysis.** `bench/harbor/v1-effort/analyze.mjs`, committed with this change, prints every number named
+  here. It was run on the records of the test and of the run "harness-check", whose numbers were known, to
+  see that it reads real records and session files, and it gave the test's numbers. `run.sh` runs it when
+  the stage has ended. While the stage runs, only the status file is looked at, which holds spend and
+  health and no comparison.
+- **What the stage cannot show.** It runs one model and one version of Claude Code, and it compares low
+  with medium only. The tasks are short and have hidden tests (in `lean-s-base` the median session took 54
+  seconds), and long or hard work may lose more at a lower effort than these tasks do. No person takes part
+  in a session, so the stage does not measure whether a person has to ask again more often at a lower
+  effort. A person who has set another level than medium sees another saving. The API organization of this
+  benchmark needs Claude Code's experimental betas turned off, which changes the saving in percent that a
+  person would see.
+- **Decision rule, set before the stage.** Widal.Code changes no default from this stage, whatever it
+  shows. When the saving is proven, the share solved is not lower with an interval that excludes no change,
+  and the control holds, the advice may state the measured saving and the measured interval of the share
+  solved, for Sonnet 5.5 and with what the stage cannot show. Otherwise the advice stays as it is. A default
+  of low would need a stage that knows the share solved to 3 points, which is about 350 to 450 pairs of
+  sessions and more than this benchmark's 269 tasks give in one run. Nothing is published and no default
+  changes before Nils has read the report.
+- **The usage limit.** The API account reaches its monthly usage limit after about $20 to $40 more, by our
+  own records, and a key at its limit stays blocked until 00:00 UTC on 1 Dec 2026. So the stage starts after
+  that time. A session that ends on the usage limit is not a result: the stage runner stops after the first
+  block with such a session, and those sessions count in no number.
