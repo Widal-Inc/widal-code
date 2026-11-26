@@ -144,4 +144,15 @@ test('the command writes no stage file and no copy of a setup for a stage it ref
   const named = make('--setups', 'opus-fast=baseline', '--reference', 'opus-fast')
   assert.equal(named.status, 0, named.stderr)
   assert.equal(JSON.parse(readFileSync(out, 'utf8')).reference, 'opus-fast')
+  assert.equal(JSON.parse(readFileSync(out, 'utf8')).diskCleanup, undefined, 'no disk cleanup unless it is asked for')
+
+  // The disk cleanup is written into the stage file, and a value the stage runner would refuse writes no file.
+  const cleanup = make('--setups', 'opus-fast=baseline,opus-baseline=baseline', '--disk-cleanup', '70')
+  assert.equal(cleanup.status, 0, cleanup.stderr)
+  assert.deepEqual(JSON.parse(readFileSync(out, 'utf8')).diskCleanup, { above: 70 })
+  const kept = readFileSync(out, 'utf8')
+  const bad = make('--setups', 'opus-fast=baseline,opus-baseline=baseline', '--disk-cleanup', '100')
+  assert.notEqual(bad.status, 0)
+  assert.match(bad.stderr, /"diskCleanup" needs "above"/)
+  assert.equal(readFileSync(out, 'utf8'), kept, 'the stage file of before stays')
 })

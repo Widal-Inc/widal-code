@@ -6,7 +6,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
-import { blocksOf, commandsOf, DockerNotReady, dockerReady, groupsOf, ledgerOf, perSet, planOf, runStage, runWithRetry, shuffled, stageOf, statusOf, stopRule, togetherOf } from '../bench/harbor-stage.mjs'
+import { blocksOf, cleanDisk, commandsOf, DISK_CLEANUP, diskUsed, DockerNotReady, dockerReady, groupsOf, ledgerOf, perSet, planOf, runStage, runWithRetry, shuffled, stageOf, statusOf, stopRule, togetherOf } from '../bench/harbor-stage.mjs'
 import { readRecords } from '../bench/harbor.mjs'
 
 const dir = mkdtempSync(join(tmpdir(), 'widal-code-bench-stage-test-'))
@@ -403,4 +403,111 @@ test('a failed download does not lose the block', async () => {
   assert.deepEqual(waits, [30_000, 30_000])
   assert.match(readFileSync(join(s.jobs, 'pilot', 'baseline', 'block-1', 'harbor.log'), 'utf8'), /ApiConnectionError[\s\S]*The download of the tasks failed \(attempt 1 of 3\)[\s\S]*trials/)
   assert.equal(stageOf(base).downloadRetries, 2)
+})
+
+test('the disk cleanup is off unless the stage file turns it on, and its options are checked', () => {
+  assert.equal(stageOf(base).diskCleanup, undefined)
+  assert.deepEqual(stageOf({ ...base, diskCleanup: { above: 70 } }).diskCleanup, { path: '/', every: 120, above: 70 })
+  assert.deepEqual(stageOf({ ...base, diskCleanup: { above: 80, path: '/var/lib/docker', every: 60 } }).diskCleanup, { path: '/var/lib/docker', every: 60, above: 80 })
+  for (const bad of [true, 70, {}, { above: 0 }, { above: 100 }, { above: '70%' }, { above: 70, every: 0 }]) assert.throws(() => stageOf({ ...base, diskCleanup: bad }), /"diskCleanup" needs/, JSON.stringify(bad))
+})
+
+test('how full the disk is, counted as df counts it', () => {
+  // 100 blocks, 30 free, of which a program may write 20: 70 in use of 90, rounded up.
+  assert.equal(diskUsed('/x', () => ({ blocks: 100, bfree: 30, bavail: 20 })), 78)
+  assert.equal(diskUsed('/x', () => ({ blocks: 100, bfree: 100, bavail: 95 })), 0)
+  assert.equal(diskUsed('/x', () => ({ blocks: 0, bfree: 0, bavail: 0 })), 0)
+  const real = diskUsed(dir)
+  assert.ok(real >= 0 && real <= 100, 'the disk of this computer')
+})
+
+test('the disk cleanup removes the build cache and unused images, and never a network, a container or a volume', async () => {
+  const s = stageOf({ ...base, diskCleanup: { above: 70, path: '/data' } })
+  const calls = []
+  const lines = []
+  const docker = (code = 0, output = 'Total reclaimed space: 12GB\n') => async (program, args) => {
+    calls.push([program, ...args].join(' '))
+    return { code, output }
+  }
+  const disk = (...levels) => (path) => {
+    assert.equal(path, '/data')
+    return levels.length > 1 ? levels.shift() : levels[0]
+  }
+
+  assert.equal(await cleanDisk(s, { run: docker(), used: disk(70), log: (l) => lines.push(l) }), null, 'at the limit, not above it')
+  assert.deepEqual(calls, [])
+  assert.deepEqual(lines, [])
+
+  assert.deepEqual(await cleanDisk(s, { run: docker(), used: disk(74, 26), log: (l) => lines.push(l) }), { before: 74, after: 26, errors: [] })
+  assert.deepEqual(calls, ['docker builder prune -a -f', 'docker image prune -a -f'])
+  assert.deepEqual(lines, ["disk 74%, above 70%: removing Docker's build cache and the images that no container uses", 'cleanup ended, disk 26%'])
+
+  // What the commands may never be: a prune of everything removed networks that trials had just made.
+  for (const [program, args] of DISK_CLEANUP) {
+    assert.equal(program, 'docker')
+    assert.ok(['builder', 'image'].includes(args[0]), args.join(' '))
+    assert.equal(args[1], 'prune')
+    for (const word of ['system', 'network', 'container', 'volume', '--volumes']) assert.ok(!args.includes(word), `${args.join(' ')} has no "${word}"`)
+  }
+
+  // A command that fails is named, with the last line of its output, and the other one still runs.
+  calls.length = 0
+  lines.length = 0
+  const failed = await cleanDisk(s, { run: docker(1, 'Error response from daemon:\na prune operation is already running\n'), used: disk(90, 88), log: (l) => lines.push(l) })
+  assert.equal(calls.length, 2)
+  assert.deepEqual(failed.errors, ['docker builder prune -a -f ended with code 1: a prune operation is already running', 'docker image prune -a -f ended with code 1: a prune operation is already running'])
+  assert.match(lines[1], /^cleanup ended, disk 88%\. docker builder prune -a -f ended with code 1/)
+})
+
+test('a stage with the disk cleanup looks at the disk at its start and on a timer, and stops the timer at its end', async () => {
+  const s = fresh('disk', { setups: [two[0]], diskCleanup: { above: 70, every: 120 } })
+  const calls = []
+  const timers = []
+  let level = 60
+  let look = null
+  const program = async (name, args) => {
+    calls.push([name, ...args].join(' '))
+    // A cleanup takes a while: a look that comes meanwhile must not start a second one.
+    await new Promise((resolve) => setImmediate(resolve))
+    level = 30
+    return { code: 0, output: '' }
+  }
+  const timer = (fn, ms) => {
+    look = fn
+    timers.push(`start ${ms}`)
+    return () => timers.push('stop')
+  }
+  // The disk fills while Harbor runs, and the timer fires twice at once.
+  const events = []
+  const harbor = madeUpHarbor(events)
+  const run = async (c) => {
+    level = 75
+    await Promise.all([look(), look()])
+    return harbor(c)
+  }
+  const end = await runStage(s, { run, program, timer, used: () => level, now: () => Date.UTC(2026, 10, 26, 3, 0, 0) })
+  assert.equal(end.stopped, null)
+  assert.deepEqual(timers, ['start 120000', 'stop'])
+  // The block has two task sets, so Harbor starts twice: two cleanups, each one for two looks at once.
+  assert.deepEqual(calls, ['docker builder prune -a -f', 'docker image prune -a -f', 'docker builder prune -a -f', 'docker image prune -a -f'])
+  const log = readFileSync(join(s.out, 'disk-cleanup-pilot.log'), 'utf8').split('\n').filter(Boolean)
+  assert.equal(log[0], "2026-11-26T03:00:00.000Z disk 75%, above 70%: removing Docker's build cache and the images that no container uses")
+  assert.equal(log[1], '2026-11-26T03:00:00.000Z cleanup ended, disk 30%')
+  assert.equal(readRecords(s.out).length, 7)
+
+  // A cleanup that cannot start is written to the log, and the stage goes on. The timer stops also when the stage fails.
+  const t = fresh('disk-fails', { setups: [two[0]], diskCleanup: { above: 70 } })
+  timers.length = 0
+  await runStage(t, { run: madeUpHarbor([]), program: async () => { throw new Error('spawn docker ENOENT') }, timer, used: () => 95 })
+  assert.match(readFileSync(join(t.out, 'disk-cleanup-pilot.log'), 'utf8'), /the cleanup failed: spawn docker ENOENT/)
+  assert.deepEqual(timers, ['start 120000', 'stop'])
+  timers.length = 0
+  await assert.rejects(runStage(fresh('disk-throws', { setups: [two[0]], diskCleanup: { above: 70 } }), { run: async () => { throw new Error('harbor broke') }, program, timer, used: () => 10 }), /harbor broke/)
+  assert.deepEqual(timers, ['start 120000', 'stop'])
+
+  // Without the option the stage starts no timer and no Docker command.
+  calls.length = 0
+  timers.length = 0
+  await runStage(fresh('no-disk', { setups: [two[0]] }), { run: madeUpHarbor([]), program, timer, used: () => 99 })
+  assert.deepEqual([calls, timers], [[], []])
 })

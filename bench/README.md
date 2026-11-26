@@ -322,6 +322,17 @@ Before the first block the runner waits until Docker answers `docker info`, for 
 because the download of its tasks did not reach the server ("ApiConnectionError") starts again, at
 most twice (`downloadRetries`), and only when it had made no trial yet.
 
+A few hundred task images fill a disk. On a machine that only runs the benchmark, the stage file can
+turn on a disk cleanup: `"diskCleanup": {"above": 70}` (`--disk-cleanup 70` in
+`bench/harbor-make-stage.mjs`). While the stage runs, the runner then looks every two minutes at how
+full the disk is, and above 70% it removes Docker's build cache and the images that no container
+uses (`docker builder prune -a -f` and `docker image prune -a -f`). It removes nothing else: no
+network, no container and no volume, because Harbor makes the network of a task a moment before its
+container, and a cleanup that removes unused networks ends the trials that are starting. Each
+cleanup is written to `disk-cleanup-<stage>.log` beside the records, with the time it started and
+ended, so that an error of the harness can be set against it. The cleanup is off by default: on your
+own computer it would remove your own unused images too.
+
 Each setup writes its own job folders (`<jobs>/<stage>/<setup>/block-<n>`), and the import files a
 trial only under the setup that ran it. A run of the stage puts `bench/harbor/bin` first in PATH: its
 `docker` lets only one Harbor process at a time build the image of a task's environment, and the
